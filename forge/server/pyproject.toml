@@ -1,0 +1,41 @@
+[project]
+name = "forge-server"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "jinyang628",email = "chenjinyang4192@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12 <4.0"
+dependencies = [
+    "pydantic (>=2.10.6,<3.0.0)",
+    "fastapi (>=0.115.11,<0.116.0)",
+    "httpx (>=0.28.1,<0.29.0)",
+    "openai (>=1.66.3,<2.0.0)",
+    "langchain-openai (>=0.3.8,<0.4.0)",
+    "langchain (>=0.3.20,<0.4.0)",
+    "uvicorn (>=0.34.0,<0.35.0)",
+    "python-dotenv (>=1.0.1,<2.0.0)"
+]
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+isort = "^6.0.0"
+autoflake = "^2.3.1"
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+line_length = 100
+wrap_length = 100
+multi_line_output = 3
+profile = "black"
+include_trailing_comma = true
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
