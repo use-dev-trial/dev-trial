@@ -1,0 +1,109 @@
+name: CI checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  file-changes:
+    name: Check location of file changes
+    runs-on: ubuntu-latest
+    outputs:
+      arena-server: ${{ steps.filter.outputs.arena-server }} 
+      arena-frontend: ${{ steps.filter.outputs.arena-frontend }}
+      forge-server: ${{ steps.filter.outputs.forge-server }}
+      forge-frontend: ${{ steps.filter.outputs.forge-frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            arena-server:
+              - 'arena/server/**'
+            arena-frontend:
+              - 'arena/frontend/**'
+            forge-server:
+              - 'forge/server/**'
+            forge-frontend:
+              - 'forge/frontend/**'
+
+  arena-server-CI:
+    needs: file-changes
+    if: ${{ needs.file-changes.outputs.arena == 'true' }}
+    name: arena-server-CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.12.1
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.1'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+
+      - name: Install dependencies
+        working-directory: ./arena/server
+        run: |
+          poetry install --no-interaction --no-root
+
+      - name: Run isort
+        working-directory: ./arena/server
+        run: |
+          poetry run isort --check-only --diff .
+
+      - name: Run autoflake
+        working-directory: ./arena/server
+        run: |
+          poetry run autoflake --remove-all-unused-imports --in-place --recursive --check --exclude=__init__.py --ignore-pass-after-docstring .
+
+      - name: Run black
+        working-directory: ./arena/server
+        run: |
+          poetry run black --check --diff .
+
+  arena-frontend-CI:
+    needs: file-changes
+    if: ${{ needs.file-changes.outputs.arena-frontend == 'true' }}
+    name: arena-frontend-CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Prettier
+        run: npx prettier --check .
+  
+  forge-server-CI:
+    needs: file-changes
+    if: ${{ needs.file-changes.outputs.forge-server == 'true' }}
+    name: forge-server-CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+  forge-frontend-CI:
+    needs: file-changes
+    if: ${{ needs.file-changes.outputs.forge-frontend == 'true' }}
+    name: forge-frontend-CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
