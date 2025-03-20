@@ -30,7 +30,7 @@ jobs:
 
   arena-server-CI:
     needs: file-changes
-    if: ${{ needs.file-changes.outputs.arena == 'true' }}
+    if: ${{ needs.file-changes.outputs.arena-server == 'true' }}
     name: arena-server-CI
     runs-on: ubuntu-latest
 
@@ -95,8 +95,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.12.1
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.1'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+
+      - name: Install dependencies
+        working-directory: ./forge/server
+        run: |
+          poetry install --no-interaction --no-root
+
+      - name: Run isort
+        working-directory: ./forge/server
+        run: |
+          poetry run isort --check-only --diff .
+
+      - name: Run autoflake
+        working-directory: ./forge/server
+        run: |
+          poetry run autoflake --remove-all-unused-imports --in-place --recursive --check --exclude=__init__.py --ignore-pass-after-docstring .
+
+      - name: Run black
+        working-directory: ./forge/server
+        run: |
+          poetry run black --check --diff .
 
   forge-frontend-CI:
     needs: file-changes
