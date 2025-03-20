@@ -1,0 +1,78 @@
+{
+    "folders": [
+      {
+        "name": "DEV-TRIAL",
+        "path": "."
+      },
+      {
+        "name": "Arena Frontend",
+        "path": "./arena/frontend"
+      },
+      {
+        "name": "Arena Server",
+        "path": "./arena/server"
+      },
+      {
+        "name": "Forge Frontend",
+        "path": "./forge/frontend"
+      },
+      {
+        "name": "Forge Server",
+        "path": "./forge/server"
+      }
+    ],
+    "settings": {
+      "eslint.format.enable": true,
+      "editor.rulers": [100],
+      "editor.formatOnSave": true,
+      "files.insertFinalNewline": true,
+      
+      "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      },
+      "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      },
+      "[javascriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.tabSize": 2
+      },
+      "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.tabSize": 2
+      },
+      "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      },
+      "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "always",
+          "source.fixAll": "explicit"
+        }
+      },
+      
+      "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+      },
+      
+      "black-formatter.args": ["--line-length=100"],
+      "isort.args": [
+        "--line-length=100",
+        "--wrap-length=100",
+        "--multi-line=3",
+        "--trailing-comma",
+        "--profile=black"
+      ],
+      "python.testing.unittestEnabled": false,
+      "python.testing.pytestEnabled": true,
+      "pylint.importStrategy": "fromEnvironment",
+      "python.analysis.typeCheckingMode": "basic",
+      "python.analysis.useLibraryCodeForTypes": true,
+      "python.analysis.diagnosticSeverityOverrides": {
+        "reportGeneralTypeIssues": "error",
+        "reportTypeVarUsage": "error",
+        "reportUnknownMemberType": "none"
+      }
+    }
+  }
