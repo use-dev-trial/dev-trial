@@ -18,11 +18,11 @@ DevTrial allows companies to quickly verify AI-generated tests, as well as confi
 
 ## User Perspectives
 
-### From the Candidate’s Perspective
+### From the Candidate’s Perspective (Arena)
 
 DevTrial functions similarly to Coursemology, where candidates submit code in pre-defined files within a test environment. Upon clicking "Run Tests," pre-defined test cases will be executed against their code. Candidates will then receive the results of visible/hidden test cases.
 
-### From the Company's Perspective
+### From the Company's Perspective (Forge)
 
 DevTrial is similar to ChatGPT, where a chatbot helps you build the initial scaffolding of the problem scenario. The chat-based UI evolves as the conversation dives deeper into technical details. Possible (P2) features include an IDE for engineers to directly write code and more complex UI components that assist in problem scenario development and test suite creation.
 
