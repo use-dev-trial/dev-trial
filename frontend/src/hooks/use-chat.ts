@@ -2,10 +2,15 @@
 
 import { useState } from 'react';
 
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-}
+import { send } from '@/actions/messages';
+
+import {
+  Message,
+  MessageRequest,
+  MessageResponse,
+  messageRequestSchema,
+  role,
+} from '@/lib/messages';
 
 interface UseChatOptions {
   initialMessages?: Message[];
@@ -27,27 +32,21 @@ export function useChat({ initialMessages = [], onResponse }: UseChatOptions = {
     setIsLoading(true);
     setError(null);
 
-    // Add user message
-    const userMessage: Message = { role: 'user', content };
+    const userMessage: Message = { role: role.Values.user, content };
     addMessage(userMessage);
 
     try {
-      // In a real implementation, this would call an API
-      // For now, we'll simulate a response
-      setTimeout(() => {
-        const assistantMessage: Message = {
-          role: 'assistant',
-          content: `I've processed your message: "${content}"`,
-        };
-
-        addMessage(assistantMessage);
-
-        if (onResponse) {
-          onResponse(assistantMessage);
-        }
-
-        setIsLoading(false);
-      }, 1000);
+      const messageRequest: MessageRequest = messageRequestSchema.parse({ content });
+      const messageResponse: MessageResponse = await send(messageRequest);
+      const assistantMessage: Message = {
+        role: role.Values.assistant,
+        content: messageResponse.content,
+      };
+      addMessage(assistantMessage);
+      if (onResponse) {
+        onResponse(assistantMessage);
+      }
+      setIsLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('An error occurred'));
       setIsLoading(false);

@@ -13,9 +13,9 @@ class Message(BaseModel):
     content: str
 
 
-class MessagesRequest(BaseModel):
+class MessageRequest(BaseModel):
     content: str = Field(description="The content of the user message to be sent to the assistant.")
 
 
-class MessagesResponse(BaseModel):
+class MessageResponse(BaseModel):
     content: str = Field(description="The response from the assistant to be sent back to the user.")

@@ -8,10 +8,7 @@ import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-}
+import { Message } from '@/lib/messages';
 
 interface ChatInterfaceProps {
   messages: Message[];

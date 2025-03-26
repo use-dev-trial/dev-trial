@@ -1,6 +1,6 @@
-from app.models.messages import MessagesResponse
+from app.models.messages import MessageResponse
 
 
 class MessagesService:
-    async def chat(self, content: str) -> MessagesResponse:
-        return MessagesResponse(content=content)
+    async def chat(self, content: str) -> MessageResponse:
+        return MessageResponse(content=content)
