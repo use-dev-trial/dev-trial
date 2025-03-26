@@ -46,6 +46,8 @@ class MessagesService:
                 .eq("id", input.id)
                 .execute()
             )
+
+        # Extracts the id from the result of the database operation
         if result.data and result.data[0] and "id" in result.data[0]:
             response_id = result.data[0]["id"]
         else:

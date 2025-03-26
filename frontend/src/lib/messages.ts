@@ -19,6 +19,7 @@ export const messageRequestSchema = z.object({
 export type MessageRequest = z.infer<typeof messageRequestSchema>;
 
 export const messageResponseSchema = z.object({
+  id: z.string(),
   content: z.string(),
 });
 
