@@ -25,6 +25,6 @@ class MessagesController:
             input: MessageRequest,
         ) -> MessageResponse:
             log.info("Sending message to assistant...")
-            response: MessageResponse = await self.service.chat(content=input.content)
+            response: MessageResponse = await self.service.chat(input=input)
             log.info("Message to be sent back to user: %s", response.content)
             return response
