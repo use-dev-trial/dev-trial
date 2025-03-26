@@ -1,10 +1,9 @@
-type Props = {
-  params: {
-    id: string;
-  };
-};
+'use client';
 
-export default function ChallengeInterface({ params }: Props) {
+import { useParams } from 'next/navigation';
+
+export default function ChallengeInterface() {
+  const params = useParams();
   return (
     <div>
       <h1>Challenge {params.id}</h1>
