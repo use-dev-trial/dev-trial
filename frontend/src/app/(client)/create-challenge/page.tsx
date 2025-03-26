@@ -2,11 +2,21 @@
 
 import { useState } from 'react';
 
+import { send } from '@/actions/messages';
+
 import ChatInterface from '@/components/create-challenge/chat-interface';
 import QuestionPreview from '@/components/create-challenge/question-preview';
 
+import {
+  Message,
+  MessageRequest,
+  MessageResponse,
+  messageRequestSchema,
+  role,
+} from '@/lib/messages';
+
 export default function Home() {
-  const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [question, setQuestion] = useState({
     title: 'Untitled Question',
     description: 'Add a description for your coding interview question.',
@@ -19,8 +29,13 @@ export default function Home() {
 
   const handleSendMessage = async (message: string) => {
     // Add user message to chat
-    const updatedMessages = [...messages, { role: 'user' as const, content: message }];
+    const updatedMessages = [...messages, { role: role.Values.user, content: message }];
     setMessages(updatedMessages);
+
+    // Make API call to server for response
+    const messageRequest: MessageRequest = messageRequestSchema.parse({ content: message });
+    const messageResponse: MessageResponse = await send(messageRequest);
+    console.log(messageResponse.content);
 
     // Simulate AI response and question update
     setTimeout(() => {
@@ -68,7 +83,7 @@ export default function Home() {
       setMessages([
         ...updatedMessages,
         {
-          role: 'assistant',
+          role: role.Values.assistant,
           content: `I've updated the ${
             message.toLowerCase().includes('title')
               ? 'title'
