@@ -77,8 +77,18 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm ci
+        working-directory: ./frontend
+        run: npm install
 
       - name: Run Prettier
+        working-directory: ./frontend
         run: npx prettier --check .
+
+      - name: Run ESLint
+        working-directory: ./frontend
+        run: npm run lint .
+      
+      - name: Build
+        working-directory: ./frontend
+        run: npm run build
   
