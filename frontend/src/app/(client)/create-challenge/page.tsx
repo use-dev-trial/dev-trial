@@ -26,6 +26,11 @@ export default function Home() {
     // and update the question state accordingly
     // This is a simplistic example - you'd want more sophisticated parsing
     // const content = message.content;
+    setQuestion((prevQuestion) => ({
+      ...prevQuestion,
+      // Update properties based on message content
+    }));
+    console.log(message);
   }, []);
 
   const { messages, sendMessage, isLoading } = useChat({
