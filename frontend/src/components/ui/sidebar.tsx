@@ -251,7 +251,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
   const { toggleSidebar } = useSidebar();
 
   return (
-    <div className="pt-2 pl-2">
+    <div className="border-b border-gray-200 pt-2 pl-2">
       <Button
         data-sidebar="trigger"
         data-slot="sidebar-trigger"

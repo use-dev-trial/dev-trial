@@ -33,10 +33,10 @@ export default function RootLayout({
         <QueryProvider>
           <SidebarProvider>
             <AppSidebar />
-            <main className="flex flex-row">
+            <div className="flex w-full flex-col">
               <SidebarTrigger />
               {children}
-            </main>
+            </div>
           </SidebarProvider>
         </QueryProvider>
       </body>
