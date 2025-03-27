@@ -1,9 +1,34 @@
-from langchain_openai import ChatOpenAI
+import logging
+
+from langchain_core.messages import (
+    AnyMessage,
+    BaseMessage,
+    SystemMessage,
+)
 
 from app.agents.state import AgentState
+from app.utils.llm import LLMType
 
-file_generator_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+log = logging.getLogger(__name__)
 
 
-def file_generator(state: AgentState):
-    return {"messages": [file_generator_llm.invoke(state["messages"])]}
+def get_file_generator_system_prompt():
+    return f"""You are a helpful AI assistant that generates files for a coding assessment.
+"""
+
+
+class FileGenerator:
+
+    def __init__(self):
+        self.llm = LLMType.GOOGLE.get_chat_model()
+        self.system_prompt = get_file_generator_system_prompt()
+
+    def invoke(self, state: AgentState):
+        log.info("📁 Invoking FileGenerator 📁")
+        messages: list[AnyMessage] = [SystemMessage(self.system_prompt)] + state["messages"]
+        response: BaseMessage = self.llm.invoke(messages)
+        return {
+            "messages": [response],
+        }
+
+    __call__ = invoke

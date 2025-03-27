@@ -1,11 +1,34 @@
-from langchain_openai import ChatOpenAI
+import logging
+
+from langchain_core.messages import (
+    AnyMessage,
+    BaseMessage,
+    SystemMessage,
+)
 
 from app.agents.state import AgentState
+from app.utils.llm import LLMType
 
-problem_generator_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+log = logging.getLogger(__name__)
 
 
-def problem_generator(state: AgentState):
-    print("PROBLEM GENERATOR STATE:")
-    print(state)
-    return {"messages": [problem_generator_llm.invoke(state["messages"])]}
+def get_problem_description_generator_system_prompt():
+    return f"""You are a helpful AI assistant that generates problem descriptions for a coding assessment.
+"""
+
+
+class ProblemDescriptionGenerator:
+
+    def __init__(self):
+        self.llm = LLMType.GOOGLE.get_chat_model()
+        self.system_prompt = get_problem_description_generator_system_prompt()
+
+    def invoke(self, state: AgentState):
+        log.info("❓ Invoking ProblemDescriptionGenerator ❓")
+        messages: list[AnyMessage] = [SystemMessage(self.system_prompt)] + state["messages"]
+        response: BaseMessage = self.llm.invoke(messages)
+        return {
+            "messages": [response],
+        }
+
+    __call__ = invoke

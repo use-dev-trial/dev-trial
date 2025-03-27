@@ -21,7 +21,7 @@ class MessagesService:
         }
         for output in graph.stream(inputs):
             for name, value in output.items():
-                pass
+                print(name, value)
         # db_manager = await DatabaseManager.get_instance()
 
         # # TODO: Invoke LLM
