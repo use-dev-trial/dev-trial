@@ -3,7 +3,7 @@
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-import { Send } from 'lucide-react';
+import { Bot, Send, User } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -73,12 +73,22 @@ export default function ChatInterface({ messages, onSendMessage }: ChatInterface
           </div>
         ) : (
           messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
+            <div key={index} className="flex items-start space-x-2">
               <div
-                className={`max-w-[80%] rounded-lg p-3 ${
+                className={`flex-shrink-0 rounded-full p-1.5 ${
+                  message.role === 'user'
+                    ? 'bg-gradient-to-br from-pink-400 to-yellow-400'
+                    : 'bg-gradient-to-br from-blue-400 to-green-400'
+                }`}
+              >
+                {message.role === 'user' ? (
+                  <User className="h-3.5 w-3.5 text-white" />
+                ) : (
+                  <Bot className="h-3.5 w-3.5 text-white" />
+                )}
+              </div>
+              <div
+                className={`max-w-[85%] rounded-lg p-3 ${
                   message.role === 'user'
                     ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'bg-gray-100 text-gray-800 shadow-sm'
@@ -97,7 +107,7 @@ export default function ChatInterface({ messages, onSendMessage }: ChatInterface
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
+            placeholder={messages.length > 0 ? 'Ask followup...' : 'Type your message...'}
             className="flex-1"
           />
           <Button type="button" size="icon" variant="ghost" className="hover:bg-slate-100">
