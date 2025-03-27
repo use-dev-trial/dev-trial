@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
+import { AppSidebar } from '@/components/app-sidebar';
 import { QueryProvider } from '@/components/providers/query';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
 import '../globals.css';
 
@@ -28,7 +30,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <SidebarProvider>
+            <AppSidebar />
+            <main className="flex flex-row">
+              <SidebarTrigger />
+              {children}
+            </main>
+          </SidebarProvider>
+        </QueryProvider>
       </body>
     </html>
   );
