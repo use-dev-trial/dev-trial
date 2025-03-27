@@ -42,7 +42,7 @@ class LLMType(StrEnum):
                 raise ValueError(f"LLM type {self} not supported.")
 
 
-def postprocess_tool_message(msg: BaseMessage) -> BaseMessage:
+def postprocess_tool_message(msg: BaseMessage) -> AIMessage:
     """Post-processes the AIMessage returned by the LLM to preserve only the first tool call for the next turn."""
     processed_result = msg.model_copy()
     if isinstance(processed_result, AIMessage):
@@ -54,4 +54,4 @@ def postprocess_tool_message(msg: BaseMessage) -> BaseMessage:
         processed_result.additional_kwargs["tool_calls"] = processed_result.additional_kwargs[
             "tool_calls"
         ][:1]
-    return processed_result
+    return processed_result  # type: ignore

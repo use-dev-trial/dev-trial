@@ -19,4 +19,5 @@ class GenerateFileTool(BaseTool):
         raise RuntimeError("Synchronous GenerateFileTool not supported")
 
     async def _arun(self) -> str:
+        print("Generating a file...")
         return "Generating a file..."

@@ -19,4 +19,5 @@ class GenerateTestTool(BaseTool):
         raise RuntimeError("Synchronous GenerateTestTool not supported")
 
     async def _arun(self) -> str:
+        print("Generating a test case...")
         return "Generating a test case..."
