@@ -38,7 +38,7 @@ export default function Home() {
   });
 
   return (
-    <main className="flex h-screen bg-slate-50">
+    <main className="flex h-full bg-slate-50">
       <div className="flex h-full w-3/10 flex-col overflow-hidden border-r border-gray-200 bg-white">
         <div className="border-b border-gray-200 bg-white p-4">
           <h2 className="text-xl font-semibold">Interview Question Generator</h2>
