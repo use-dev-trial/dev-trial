@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { send } from '@/actions/messages';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
   Message,
@@ -19,44 +20,44 @@ interface UseChatOptions {
 
 export function useChat({ initialMessages = [], onResponse }: UseChatOptions = {}) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const queryClient = useQueryClient();
 
-  const addMessage = (message: Message) => {
-    setMessages((prev) => [...prev, message]);
-  };
-
-  const sendMessage = async (content: string) => {
-    if (!content.trim()) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    const userMessage: Message = { role: role.Values.user, content };
-    addMessage(userMessage);
-
-    try {
+  const mutation = useMutation({
+    mutationFn: async (content: string) => {
       const messageRequest: MessageRequest = messageRequestSchema.parse({ content });
-      const messageResponse: MessageResponse = await send(messageRequest);
+      return await send(messageRequest);
+    },
+    onMutate: (content) => {
+      const userMessage: Message = { role: role.Values.user, content };
+      setMessages((prev) => [...prev, userMessage]);
+    },
+    onSuccess: (data: MessageResponse) => {
       const assistantMessage: Message = {
         role: role.Values.assistant,
-        content: messageResponse.content,
+        content: data.content,
       };
-      addMessage(assistantMessage);
+      setMessages((prev) => [...prev, assistantMessage]);
+
       if (onResponse) {
         onResponse(assistantMessage);
       }
-      setIsLoading(false);
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('An error occurred'));
-      setIsLoading(false);
-    }
+
+      queryClient.invalidateQueries({ queryKey: ['messages'] });
+    },
+    onError: (error) => {
+      console.error('Error sending message:', error);
+    },
+  });
+
+  const sendMessage = async (content: string) => {
+    if (!content.trim()) return;
+    mutation.mutate(content);
   };
 
   return {
     messages,
-    isLoading,
-    error,
+    isLoading: mutation.isPending,
+    error: mutation.error,
     sendMessage,
   };
 }
