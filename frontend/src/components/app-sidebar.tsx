@@ -11,6 +11,8 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
+import { CustomSidebarTrigger } from './custom-sidebar-trigger';
+
 // Menu items.
 const items = [
   {
@@ -35,7 +37,10 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="mb-5 text-lg font-bold">Dev Trials</SidebarGroupLabel>
+          <div className="mb-5 flex items-center justify-between">
+            <SidebarGroupLabel className="mb-0 text-lg font-bold">Dev Trials</SidebarGroupLabel>
+            <CustomSidebarTrigger location="sidebar" />
+          </div>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
