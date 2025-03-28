@@ -1,13 +1,13 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useChat } from '@/hooks/use-chat';
 
 import ChatInterface from '@/components/create-challenge/chat-interface';
 import QuestionPreview from '@/components/create-challenge/question-preview';
 
-import { Message } from '@/lib/messages';
+import { Message, QuestionUpdate } from '@/lib/messages';
 
 export default function Home() {
   const [question, setQuestion] = useState({
@@ -20,40 +20,84 @@ export default function Home() {
     ],
   });
 
+  // Track which sections were updated for animations
+  const [updatedSections, setUpdatedSections] = useState<string[]>([]);
+
+  // Reference to preserve scroll position
+  const previewContainerRef = useRef<HTMLDivElement>(null);
+
+  // Clear updated sections after animations complete
+  useEffect(() => {
+    if (updatedSections.length > 0) {
+      const timer = setTimeout(() => {
+        setUpdatedSections([]);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [updatedSections]);
+
   // Handle AI responses to update the question
   const handleResponse = useCallback((message: Message) => {
-    // Here you would implement logic to parse the AI response
-    // and update the question state accordingly
-    // This is a simplistic example - you'd want more sophisticated parsing
-    // const content = message.content;
+    // Log the received message for debugging purposes
+    console.log(message);
+  }, []);
+
+  // Handle question updates while preserving scroll position
+  const handleQuestionUpdate = useCallback((update: QuestionUpdate, updatedSects?: string[]) => {
+    // Store the current scroll position
+    const scrollPosition = previewContainerRef.current?.scrollTop || 0;
+
+    // Update the question
     setQuestion((prevQuestion) => ({
       ...prevQuestion,
-      // Update properties based on message content
+      ...(update.title && { title: update.title }),
+      ...(update.description && { description: update.description }),
+      ...(update.requirements && { requirements: update.requirements }),
+      ...(update.sampleInteractions && { sampleInteractions: update.sampleInteractions }),
     }));
-    console.log(message);
+
+    // Set updated sections for animations
+    if (updatedSects && updatedSects.length > 0) {
+      setUpdatedSections(updatedSects);
+    }
+
+    // Restore scroll position after state updates
+    setTimeout(() => {
+      if (previewContainerRef.current) {
+        previewContainerRef.current.scrollTop = scrollPosition;
+      }
+    }, 0);
   }, []);
 
   const { messages, sendMessage, isLoading } = useChat({
     onResponse: handleResponse,
+    onQuestionUpdate: handleQuestionUpdate,
   });
 
   return (
-    <main className="flex h-full bg-slate-50">
-      <div className="flex h-full w-3/10 flex-col overflow-hidden border-r border-gray-200 bg-white">
+    <main className="flex h-screen bg-slate-50">
+      <div className="flex w-3/10 flex-col border-r border-gray-200 bg-white">
         <div className="border-b border-gray-200 bg-white p-4">
           <h2 className="text-xl font-semibold">Interview Question Generator</h2>
           <p className="text-sm text-gray-500">
             Chat to create and modify your coding interview question
           </p>
         </div>
-        <ChatInterface messages={messages} onSendMessage={sendMessage} />
-      </div>
-      <div className="h-full w-7/10 overflow-auto bg-white">
-        <div className="border-b border-gray-200 bg-white p-4">
-          <h2 className="text-xl font-semibold">Question Preview</h2>
-          {isLoading && <p className="text-sm text-gray-500">Updating question...</p>}
+        <div className="flex-1 overflow-hidden">
+          <ChatInterface messages={messages} onSendMessage={sendMessage} isLoading={isLoading} />
         </div>
-        <QuestionPreview question={question} />
+      </div>
+      <div ref={previewContainerRef} className="w-7/10 overflow-auto bg-white">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white p-4">
+          <h2 className="text-xl font-semibold">Question Preview</h2>
+          {isLoading && (
+            <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-blue-500"></span>
+              <span>Updating question...</span>
+            </div>
+          )}
+        </div>
+        <QuestionPreview question={question} updatedSections={updatedSections} />
       </div>
     </main>
   );

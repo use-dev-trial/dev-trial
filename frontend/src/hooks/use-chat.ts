@@ -9,6 +9,7 @@ import {
   Message,
   MessageRequest,
   MessageResponse,
+  QuestionUpdate,
   messageRequestSchema,
   role,
 } from '@/lib/messages';
@@ -16,9 +17,14 @@ import {
 interface UseChatOptions {
   initialMessages?: Message[];
   onResponse?: (message: Message) => void;
+  onQuestionUpdate?: (update: QuestionUpdate, updatedSections?: string[]) => void;
 }
 
-export function useChat({ initialMessages = [], onResponse }: UseChatOptions = {}) {
+export function useChat({
+  initialMessages = [],
+  onResponse,
+  onQuestionUpdate,
+}: UseChatOptions = {}) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const queryClient = useQueryClient();
 
@@ -40,6 +46,10 @@ export function useChat({ initialMessages = [], onResponse }: UseChatOptions = {
 
       if (onResponse) {
         onResponse(assistantMessage);
+      }
+
+      if (data.questionUpdate && onQuestionUpdate) {
+        onQuestionUpdate(data.questionUpdate, data.updatedSections);
       }
 
       queryClient.invalidateQueries({ queryKey: ['messages'] });
