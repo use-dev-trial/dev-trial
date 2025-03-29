@@ -4,7 +4,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-
 jobs:
   file-changes:
     name: Check location of file changes
@@ -67,6 +66,12 @@ jobs:
     if: ${{ needs.file-changes.outputs.frontend == 'true' }}
     name: frontend-CI
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "test_123"
+      CLERK_SECRET_KEY: "test_123"
+      NEXT_PUBLIC_CLERK_SIGN_IN_URL: "/sign-in"
+      NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: "/"
+      NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: "/"
 
     steps:
       - name: Checkout code
@@ -76,15 +81,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Initialize environment variables
-        run: echo "Setting up environment variables"
-        env:
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "test_123"
-          CLERK_SECRET_KEY: "test_123"
-          NEXT_PUBLIC_CLERK_SIGN_IN_URL: "/sign-in"
-          NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: "/"
-          NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: "/"
 
       - name: Install dependencies
         working-directory: ./frontend
