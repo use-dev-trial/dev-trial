@@ -4,10 +4,10 @@ from agents import Agent, ModelSettings, handoff
 from agents.extensions import handoff_filters
 
 from app.inference.constants import AgentNames
-from app.inference.prompts.file_generator import FILE_GENERATOR_SYSTEM_PROMPT
-from app.inference.prompts.question_generator import PROBLEM_GENERATOR_SYSTEM_PROMPT
-from app.inference.prompts.test_generator import TEST_GENERATOR_SYSTEM_PROMPT
-from app.inference.prompts.triager import TRIAGER_SYSTEM_PROMPT
+from app.inference.prompts.file_generator import get_file_generator_system_prompt
+from app.inference.prompts.problem_generator import get_problem_generator_system_prompt
+from app.inference.prompts.test_generator import get_test_generator_system_prompt
+from app.inference.prompts.triager import get_triager_system_prompt
 from app.inference.state import AgentState
 from app.models.question import Files, Problem, TestCases
 from app.utils.llm import LLMType
@@ -20,7 +20,7 @@ file_generator = Agent[AgentState](
         temperature=0.0,
     ),
     name=AgentNames.FILE_GENERATOR,
-    instructions=FILE_GENERATOR_SYSTEM_PROMPT,
+    instructions=get_file_generator_system_prompt,
     output_type=Files,
 )
 
@@ -30,7 +30,7 @@ problem_generator = Agent[AgentState](
         temperature=0.0,
     ),
     name=AgentNames.PROBLEM_GENERATOR,
-    instructions=PROBLEM_GENERATOR_SYSTEM_PROMPT,
+    instructions=get_problem_generator_system_prompt,
     output_type=Problem,
 )
 
@@ -40,7 +40,7 @@ test_generator = Agent[AgentState](
         temperature=0.0,
     ),
     name=AgentNames.TEST_GENERATOR,
-    instructions=TEST_GENERATOR_SYSTEM_PROMPT,
+    instructions=get_test_generator_system_prompt,
     output_type=TestCases,
 )
 
@@ -51,7 +51,8 @@ triager = Agent[AgentState](
         temperature=0.0,
     ),
     name=AgentNames.TRIAGER,
-    instructions=TRIAGER_SYSTEM_PROMPT,
+    instructions=get_triager_system_prompt,
+    # Handoffs invocation is OPTIONAL. Triager will not handoff to any agent if it does not believe it is necessary / suitable.
     handoffs=[
         handoff(
             agent=problem_generator,
@@ -69,11 +70,4 @@ triager = Agent[AgentState](
             on_handoff=lambda _: log.info(f"🎯 Handoff to {AgentNames.TEST_GENERATOR} 🎯"),
         ),
     ],
-)
-
-
-# https://github.com/openai/openai-agents-python/blob/main/examples/agent_patterns/agents_as_tools.py
-synthesizer_agent = Agent(
-    name=AgentNames.SYNTHESIZER,
-    instructions="You inspect translations, correct them if needed, and produce a final concatenated response.",
 )

@@ -1,8 +1,12 @@
 import logging
 
+from agents import RunResult
+
 from app.inference.agents import triager
+from app.inference.constants import AgentNames
 from app.inference.state import AgentState
 from app.models.message import MessageRequest, MessageResponse
+from app.models.question import Question
 
 log = logging.getLogger(__name__)
 from agents import Runner
@@ -10,8 +14,25 @@ from agents import Runner
 
 class MessagesService:
     async def chat(self, input: MessageRequest) -> MessageResponse:
-        result = await Runner.run(starting_agent=triager, input=input.content, context=AgentState())
-        print(result.final_output)
+        # TODO: Retrieve half-completed question object from DB
+        question = Question()
+        exit = False
+        while not exit:
+            result: RunResult = await Runner.run(
+                starting_agent=triager, input=input.content, context=AgentState(question=question)
+            )
+            match result.last_agent.name:
+                case AgentNames.PROBLEM_GENERATOR:
+                    question.problem = result.final_output
+                case AgentNames.FILE_GENERATOR:
+                    question.files = result.final_output
+                case AgentNames.TEST_GENERATOR:
+                    question.test_cases = result.final_output
+                case AgentNames.TRIAGER:
+                    log.info("Triager did not initiate a handoff. Terminating agent system...")
+                    exit = True
+
+        print(result)
 
         # db_manager = await DatabaseManager.get_instance()
 

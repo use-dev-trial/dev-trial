@@ -3,14 +3,14 @@ from agents import Agent, RunContextWrapper
 from app.inference.state import AgentState
 
 
-def get_file_generator_system_prompt(
+def get_problem_generator_system_prompt(
     context: RunContextWrapper[AgentState], agent: Agent[AgentState]
 ) -> str:
     question_dump: str = (
         context.context.question.model_dump_json() if context.context.question else ""
     )
 
-    return f"""You are a helpful AI assistant that generates files for a coding assessment.
+    return f"""You are a helpful AI assistant that generates problem descriptions for a coding assessment.
 
 Here is the constructed question so far:
 {question_dump}
