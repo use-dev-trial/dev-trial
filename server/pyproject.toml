@@ -22,7 +22,8 @@ dependencies = [
     "langchain-openrouter (>=0.0.1,<0.0.2)",
     "pydantic-ai (>=0.0.46,<0.0.47)",
     "langchain-google-genai (>=2.1.1,<3.0.0)",
-    "openai-agents (>=0.0.7,<0.0.8)"
+    "openai-agents (>=0.0.7,<0.0.8)",
+    "langsmith (>=0.3.19,<0.4.0)"
 ]
 
 [tool.poetry]
