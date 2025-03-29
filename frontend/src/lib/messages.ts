@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+// import { question } from '@/lib/question';
+
 export const role = z.enum(['user', 'assistant']);
 
 export type Role = z.infer<typeof role>;
@@ -41,6 +43,7 @@ export const messageResponseSchema = z.object({
   updatedSections: z
     .array(z.enum(['title', 'description', 'requirements', 'sampleInteractions']))
     .optional(),
+  // question: question,
 });
 
 export type MessageResponse = z.infer<typeof messageResponseSchema>;
