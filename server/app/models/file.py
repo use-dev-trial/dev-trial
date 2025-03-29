@@ -1,0 +1,14 @@
+from pydantic import BaseModel, Field
+
+from app.models.database import DatabaseObjectMixin
+
+
+class File(BaseModel):
+    name: str = Field(description="The name of the file including the file extension.")
+    code: str = Field(
+        description="The code present in the file. It might be fully complete, partially complete, or empty (depending on the purpose of the file in the overall question)."
+    )
+
+
+class FileDB(File, DatabaseObjectMixin):
+    pass

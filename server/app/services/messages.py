@@ -1,27 +1,18 @@
 import logging
 
-from langchain.schema import HumanMessage
-
-from app.agents.graph import build_graph
-from app.models.messages import MessageRequest, MessageResponse
+from app.inference.agents import triager
+from app.inference.state import AgentState
+from app.models.message import MessageRequest, MessageResponse
 
 log = logging.getLogger(__name__)
+from agents import Runner
 
 
 class MessagesService:
     async def chat(self, input: MessageRequest) -> MessageResponse:
-        graph = build_graph()
+        result = await Runner.run(starting_agent=triager, input=input.content, context=AgentState())
+        print(result.final_output)
 
-        inputs = {
-            "messages": [
-                HumanMessage(
-                    content="Create a problem that assesses whether the user can create a simple Todo app in React."
-                )
-            ]
-        }
-        for output in graph.stream(inputs):
-            for name, value in output.items():
-                print(name, value)
         # db_manager = await DatabaseManager.get_instance()
 
         # # TODO: Invoke LLM
