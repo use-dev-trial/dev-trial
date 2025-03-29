@@ -26,6 +26,7 @@ class MessagesService:
             if input.id is None
             else await _retrieve_existing_messages(db_manager=db_manager, message_id=input.id)
         )
+
         # Add user message to existing messages
         existing_messages.append({"role": Role.USER.value, "content": input.content})
 
@@ -37,7 +38,6 @@ class MessagesService:
                 db_manager=db_manager, question_id=input.question_id
             )
 
-        # TODO: Retrieve half-completed question object from DB
         exit = False
         while not exit:
             result: RunResult = await Runner.run(
@@ -47,11 +47,40 @@ class MessagesService:
             )
             match result.last_agent.name:
                 case AgentNames.PROBLEM_GENERATOR:
-                    question.problem = result.final_output
+                    if not question.problem:
+                        problem: Problem = await _insert_problem(
+                            db_manager=db_manager, result=result, question_id=question.id
+                        )
+                    else:
+                        problem: Problem = await _update_problem(
+                            db_manager=db_manager, result=result, problem_id=question.problem.id
+                        )
+                    question.problem = problem
                 case AgentNames.FILE_GENERATOR:
-                    question.files = result.final_output
+                    if not question.files:
+                        files: Files = await _insert_files(
+                            db_manager=db_manager, result=result, question_id=question.id
+                        )
+
+                    else:
+                        files: Files = await _update_files(
+                            db_manager=db_manager,
+                            result=result,
+                            original_files=question.files,
+                        )
+                    question.files = files
                 case AgentNames.TEST_GENERATOR:
-                    question.test_cases = result.final_output
+                    if not question.test_cases:
+                        test_cases: TestCases = await _insert_test_cases(
+                            db_manager=db_manager, result=result, question_id=question.id
+                        )
+                    else:
+                        test_cases: TestCases = await _update_test_cases(
+                            db_manager=db_manager,
+                            result=result,
+                            original_test_cases=question.test_cases,
+                        )
+                    question.test_cases = test_cases
                 case AgentNames.TRIAGER:
                     log.info("Triager did not initiate a handoff. Terminating agent system...")
                     exit = True
@@ -90,6 +119,189 @@ class MessagesService:
             content=result.final_output,
             question=question,
         )
+
+
+async def _insert_files(db_manager: DatabaseManager, result: RunResult, question_id: str) -> Files:
+    """
+    Inserts the newly generated files into the Files table.
+    Inserts the corresponding entry in the question_file join table to keep track of the relation.
+    """
+    files: list[File] = []
+    for file in result.final_output.files:
+        insert_file_result = (
+            await db_manager.client.table(Table.FILES)
+            .insert(
+                {
+                    "name": file.name,
+                    "code": file.code,
+                }
+            )
+            .execute()
+        )
+        file_id: str = insert_file_result.data[0]["id"]
+        files.append(
+            File(
+                id=file_id,
+                name=file.name,
+                code=file.code,
+            )
+        )
+        await db_manager.client.table(Table.QUESTION_FILE).insert(
+            {
+                "question_id": question_id,
+                "file_id": file_id,
+            }
+        ).execute()
+
+    return Files(files=files)
+
+
+async def _update_files(
+    db_manager: DatabaseManager, result: RunResult, original_files: Files
+) -> Files:
+    """
+    Updates the files table with the most recently generated files.
+    """
+    updated_files: dict[str, File] = {}
+    for file in result.final_output.files:
+        await db_manager.client.table(Table.FILES).update(
+            {
+                "name": file.name,
+                "code": file.code,
+            }
+        ).eq("id", file.id).execute()
+        updated_files[file.id] = File(
+            id=file.id,
+            name=file.name,
+            code=file.code,
+        )
+
+    final_files: list[File] = []
+    for file in original_files.files:
+        if file.id in updated_files:
+            # Use the updated file where relevant
+            final_files.append(updated_files[file.id])
+        else:
+            # Use the original file if LLM did not update it
+            final_files.append(file)
+
+    return Files(files=final_files)
+
+
+async def _insert_test_cases(
+    db_manager: DatabaseManager, result: RunResult, question_id: str
+) -> TestCases:
+    """
+    Inserts the newly generated test cases into the test_case table.
+    Inserts the corresponding entry in the question_test_case join table to keep track of the relation.
+    """
+    test_cases: list[TestCase] = []
+    for test_case in result.final_output.test_cases:
+        insert_test_case_result = (
+            await db_manager.client.table(Table.TEST_CASES)
+            .insert(
+                {
+                    "description": test_case.description,
+                }
+            )
+            .execute()
+        )
+        test_case_id: str = insert_test_case_result.data[0]["id"]
+        test_cases.append(
+            TestCase(
+                id=test_case_id,
+                description=test_case.description,
+            )
+        )
+        await db_manager.client.table(Table.QUESTION_TEST_CASE).insert(
+            {
+                "question_id": question_id,
+                "test_case_id": test_case_id,
+            }
+        ).execute()
+
+    return TestCases(test_cases=test_cases)
+
+
+async def _update_test_cases(
+    db_manager: DatabaseManager, result: RunResult, original_test_cases: TestCases
+) -> TestCases:
+    """
+    Updates the test_case table with the most recently generated test cases.
+    """
+    updated_test_cases: dict[str, TestCase] = {}
+    for test_case in result.final_output.test_cases:
+        await db_manager.client.table(Table.TEST_CASES).update(
+            {
+                "description": test_case.description,
+            }
+        ).eq("id", test_case.id).execute()
+        updated_test_cases[test_case.id] = TestCase(
+            id=test_case.id,
+            description=test_case.description,
+        )
+
+    final_test_cases: list[TestCase] = []
+    for test_case in original_test_cases.test_cases:
+        if test_case.id in updated_test_cases:
+            # Use the updated test case where relevant
+            final_test_cases.append(updated_test_cases[test_case.id])
+        else:
+            # Use the original test case if LLM did not update it
+            final_test_cases.append(test_case)
+
+    return TestCases(test_cases=final_test_cases)
+
+
+async def _insert_problem(
+    db_manager: DatabaseManager, result: RunResult, question_id: str
+) -> Problem:
+    """
+    Inserts the newly generated problem into the Problems table.
+    Updates the problem_id foreign key in the Questions table.
+    """
+    insert_problem_result = (
+        await db_manager.client.table(Table.PROBLEMS)
+        .insert(
+            {
+                "title": result.final_output.title,
+                "description": result.final_output.description,
+                "requirements": result.final_output.requirements,
+            }
+        )
+        .execute()
+    )
+    problem_id: str = insert_problem_result.data[0]["id"]
+    await db_manager.client.table(Table.QUESTIONS).update({"problem_id": problem_id}).eq(
+        "id", question_id
+    ).execute()
+    return Problem(
+        id=problem_id,
+        title=result.final_output.title,
+        description=result.final_output.description,
+        requirements=result.final_output.requirements,
+    )
+
+
+async def _update_problem(
+    db_manager: DatabaseManager, result: RunResult, problem_id: str
+) -> Problem:
+    """
+    Updates the more recently modified version of the problem in the Problems table.
+    """
+    await db_manager.client.table(Table.PROBLEMS).update(
+        {
+            "title": result.final_output.title,
+            "description": result.final_output.description,
+            "requirements": result.final_output.requirements,
+        }
+    ).eq("id", problem_id).execute()
+    return Problem(
+        id=problem_id,
+        title=result.final_output.title,
+        description=result.final_output.description,
+        requirements=result.final_output.requirements,
+    )
 
 
 async def _retrieve_existing_question(db_manager: DatabaseManager, question_id: str) -> Question:
