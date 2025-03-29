@@ -9,15 +9,15 @@ import {
   Message,
   MessageRequest,
   MessageResponse,
-  QuestionUpdate,
   messageRequestSchema,
   role,
 } from '@/lib/messages';
+import { Question } from '@/lib/question';
 
 interface UseChatOptions {
   initialMessages?: Message[];
   onResponse?: (message: Message) => void;
-  onQuestionUpdate?: (update: QuestionUpdate, updatedSections?: string[]) => void;
+  onQuestionUpdate?: (update: Question) => void;
 }
 
 export function useChat({
@@ -48,8 +48,8 @@ export function useChat({
         onResponse(assistantMessage);
       }
 
-      if (data.questionUpdate && onQuestionUpdate) {
-        onQuestionUpdate(data.questionUpdate, data.updatedSections);
+      if (data.question && onQuestionUpdate) {
+        onQuestionUpdate(data.question);
       }
 
       queryClient.invalidateQueries({ queryKey: ['messages'] });

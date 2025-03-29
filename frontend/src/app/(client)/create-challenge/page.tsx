@@ -7,61 +7,63 @@ import { useChat } from '@/hooks/use-chat';
 import ChatInterface from '@/components/create-challenge/chat-interface';
 import QuestionPreview from '@/components/create-challenge/question-preview';
 
-import { Message, QuestionUpdate } from '@/lib/messages';
+import { Message } from '@/lib/messages';
+import { Question } from '@/lib/question';
 
 export default function Home() {
-  const [question, setQuestion] = useState({
-    title: 'Untitled Question',
-    description: 'Add a description for your coding interview question.',
-    requirements: ['List your requirements here'],
-    sampleInteractions: [
-      { title: 'Initial State', steps: ['Describe the initial state'] },
-      { title: 'User Action 1', steps: ['Describe user action 1'] },
-    ],
+  const [question, setQuestion] = useState<Question>({
+    problem: {
+      title: 'Untitled Question',
+      description: 'Add a description for your coding interview question.',
+      requirements: ['List your requirements here'],
+    },
+    files: null,
+    test_cases: null,
   });
 
-  // Track which sections were updated for animations
-  const [updatedSections, setUpdatedSections] = useState<string[]>([]);
+  const [updatedQuestion, setUpdatedQuestion] = useState<Question>(question);
 
-  // Reference to preserve scroll position
   const previewContainerRef = useRef<HTMLDivElement>(null);
 
-  // Clear updated sections after animations complete
-  useEffect(() => {
-    if (updatedSections.length > 0) {
-      const timer = setTimeout(() => {
-        setUpdatedSections([]);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [updatedSections]);
-
-  // Handle AI responses to update the question
   const handleResponse = useCallback((message: Message) => {
-    // Log the received message for debugging purposes
     console.log(message);
   }, []);
 
-  // Handle question updates while preserving scroll position
-  const handleQuestionUpdate = useCallback((update: QuestionUpdate, updatedSects?: string[]) => {
-    // Store the current scroll position
+  const handleQuestionUpdate = useCallback((update: Question) => {
     const scrollPosition = previewContainerRef.current?.scrollTop || 0;
 
-    // Update the question
-    setQuestion((prevQuestion) => ({
-      ...prevQuestion,
-      ...(update.title && { title: update.title }),
-      ...(update.description && { description: update.description }),
-      ...(update.requirements && { requirements: update.requirements }),
-      ...(update.sampleInteractions && { sampleInteractions: update.sampleInteractions }),
-    }));
+    setUpdatedQuestion((prevQuestion) => {
+      const updated: Question = {
+        problem: prevQuestion.problem
+          ? {
+              title: prevQuestion.problem.title,
+              description: prevQuestion.problem.description,
+              requirements: prevQuestion.problem.requirements,
+            }
+          : null,
+        files: prevQuestion.files,
+        test_cases: prevQuestion.test_cases,
+      };
 
-    // Set updated sections for animations
-    if (updatedSects && updatedSects.length > 0) {
-      setUpdatedSections(updatedSects);
-    }
+      if (update.problem && prevQuestion.problem) {
+        updated.problem = {
+          title: update.problem.title ?? prevQuestion.problem.title,
+          description: update.problem.description ?? prevQuestion.problem.description,
+          requirements: update.problem.requirements ?? prevQuestion.problem.requirements,
+        };
+      }
 
-    // Restore scroll position after state updates
+      if (update.test_cases) {
+        updated.test_cases = update.test_cases;
+      }
+
+      if (update.files) {
+        updated.files = update.files;
+      }
+
+      return updated;
+    });
+
     setTimeout(() => {
       if (previewContainerRef.current) {
         previewContainerRef.current.scrollTop = scrollPosition;
@@ -73,6 +75,10 @@ export default function Home() {
     onResponse: handleResponse,
     onQuestionUpdate: handleQuestionUpdate,
   });
+
+  useEffect(() => {
+    setQuestion(updatedQuestion);
+  }, [updatedQuestion]);
 
   return (
     <main className="flex h-screen bg-slate-50">
@@ -97,7 +103,7 @@ export default function Home() {
             </div>
           )}
         </div>
-        <QuestionPreview question={question} updatedSections={updatedSections} />
+        <QuestionPreview question={question} />
       </div>
     </main>
   );
