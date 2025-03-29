@@ -27,8 +27,11 @@ export default function Home() {
 
   const previewContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleResponse = useCallback((message: Message) => {
+  const handleResponse = useCallback((message: Message, messageId?: string) => {
     console.log(message);
+    if (messageId) {
+      console.log('Response message ID:', messageId);
+    }
   }, []);
 
   const handleQuestionUpdate = useCallback((update: Question) => {
@@ -76,7 +79,7 @@ export default function Home() {
     }, 0);
   }, []);
 
-  const { messages, sendMessage, isLoading } = useChat({
+  const { messages, sendMessage, isLoading, lastMessageId } = useChat({
     onResponse: handleResponse,
     onQuestionUpdate: handleQuestionUpdate,
   });

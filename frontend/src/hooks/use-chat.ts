@@ -16,7 +16,7 @@ import { Question } from '@/lib/question';
 
 interface UseChatOptions {
   initialMessages?: Message[];
-  onResponse?: (message: Message) => void;
+  onResponse?: (message: Message, messageId?: string) => void;
   onQuestionUpdate?: (update: Question) => void;
 }
 
@@ -26,6 +26,7 @@ export function useChat({
   onQuestionUpdate,
 }: UseChatOptions = {}) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [lastMessageId, setLastMessageId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -43,9 +44,10 @@ export function useChat({
         content: data.content,
       };
       setMessages((prev) => [...prev, assistantMessage]);
+      setLastMessageId(data.id);
 
       if (onResponse) {
-        onResponse(assistantMessage);
+        onResponse(assistantMessage, data.id);
       }
 
       if (data.question && onQuestionUpdate) {
@@ -69,5 +71,6 @@ export function useChat({
     isLoading: mutation.isPending,
     error: mutation.error,
     sendMessage,
+    lastMessageId,
   };
 }
