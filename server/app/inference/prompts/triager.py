@@ -8,8 +8,6 @@ from app.inference.state import AgentState
 def get_triager_system_prompt(
     context: RunContextWrapper[AgentState], agent: Agent[AgentState]
 ) -> str:
-    # return f"The user's name is {context.context.name}. Help them with their questions."
-
     question_dump: str = (
         context.context.question.model_dump_json() if context.context.question else ""
     )
