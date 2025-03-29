@@ -66,7 +66,7 @@ export function useChat({
 
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
-    mutation.mutate({ content, id: lastMessageId });
+    mutation.mutate({ content, id: lastMessageId || undefined });
   };
 
   return {
