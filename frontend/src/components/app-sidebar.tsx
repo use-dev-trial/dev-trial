@@ -1,10 +1,10 @@
+import { OrganizationSwitcher, UserButton } from '@clerk/nextjs';
 import { Inbox, Plus, Settings } from 'lucide-react';
 
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
@@ -13,7 +13,6 @@ import {
 
 import { CustomSidebarTrigger } from './custom-sidebar-trigger';
 
-// Menu items.
 const items = [
   {
     title: 'Create Challenge',
@@ -35,13 +34,13 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarContent>
-        <SidebarGroup>
+      <SidebarContent className="flex h-full flex-col">
+        <SidebarGroup className="flex h-full flex-col">
           <div className="mb-5 flex items-center justify-between">
             <SidebarGroupLabel className="mb-0 text-lg font-bold">Dev Trials</SidebarGroupLabel>
             <CustomSidebarTrigger location="sidebar" />
           </div>
-          <SidebarGroupContent>
+          <div className="flex min-h-0 flex-1 flex-col">
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
@@ -54,7 +53,11 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
-          </SidebarGroupContent>
+          </div>
+          <div className="mt-auto flex items-center justify-between p-4">
+            <OrganizationSwitcher />
+            <UserButton />
+          </div>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
