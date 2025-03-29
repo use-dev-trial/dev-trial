@@ -126,7 +126,7 @@ export default function QuestionPreview({
                 <p className="text-md font-semibold text-slate-800">Test Cases</p>
               </div>
               <div className="divide-y divide-slate-100 rounded-lg border border-slate-100 bg-white shadow-sm">
-                {question?.test_cases?.testCases.map((testCase, index) => (
+                {question?.test_cases?.map((testCase, index) => (
                   <div key={index} className="p-5">
                     <h3 className="mb-3 flex items-center font-medium text-slate-800">
                       <span className="mr-2 inline-block h-2 w-2 rounded-full bg-blue-500"></span>
