@@ -15,6 +15,7 @@ export type Message = z.infer<typeof message>;
 
 export const messageRequestSchema = z.object({
   id: z.string().nullable().optional().default(null),
+  question_id: z.string().nullable().optional().default(null),
   content: z.string(),
 });
 
