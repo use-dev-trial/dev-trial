@@ -3,6 +3,7 @@
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { UpdatedTab } from '@/hooks/use-chat';
 import { Bot, Loader2, Send, User } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -14,12 +15,14 @@ interface ChatInterfaceProps {
   messages: Message[];
   onSendMessage: (message: string) => void;
   isLoading?: boolean;
+  updatedTabs?: UpdatedTab[];
 }
 
 export default function ChatInterface({
   messages,
   onSendMessage,
   isLoading = false,
+  updatedTabs = [],
 }: ChatInterfaceProps) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -33,12 +36,31 @@ export default function ChatInterface({
     }
   };
 
-  // Auto-scroll to bottom when messages change
+  // Auto-scroll to bottom when messages change or loading state changes
   useEffect(() => {
     if (messagesEndRef.current && messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      const scrollToBottom = () => {
+        messagesContainerRef.current!.scrollTop = messagesContainerRef.current!.scrollHeight;
+      };
+
+      // Use requestAnimationFrame for smoother scrolling after render is complete
+      window.requestAnimationFrame(scrollToBottom);
     }
-  }, [messages]);
+  }, [messages, isLoading]);
+
+  // Helper function to get friendly tab name
+  const getTabDisplayName = (tab: UpdatedTab): string => {
+    switch (tab) {
+      case 'question':
+        return 'Question';
+      case 'files':
+        return 'Files';
+      case 'test-cases':
+        return 'Test Cases';
+      default:
+        return tab;
+    }
+  };
 
   return (
     <div className="flex h-full flex-col">
@@ -117,7 +139,15 @@ export default function ChatInterface({
             </div>
             <div className="flex items-center space-x-2 rounded-lg bg-gray-100 p-3 text-gray-800 shadow-sm">
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Processing your request...</span>
+              <span className="text-sm">i0 is thinking...</span>
+            </div>
+          </div>
+        )}
+        {updatedTabs.length > 0 && (
+          <div className="sticky right-0 bottom-0 mb-3 flex items-center justify-center">
+            <div className="rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-800 shadow-sm">
+              {updatedTabs.map(getTabDisplayName).join(', ')} Updated
+              <span className="ml-1.5 inline-flex h-2 w-2 animate-pulse rounded-full bg-amber-500"></span>
             </div>
           </div>
         )}
@@ -126,6 +156,7 @@ export default function ChatInterface({
 
       <div className="border-t border-gray-200 bg-white p-4">
         <form onSubmit={handleSubmit} className="flex space-x-2">
+          {/* TODO: input field should expand when typing */}
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
