@@ -12,7 +12,9 @@ import { Question } from '@/lib/question';
 
 export default function Home() {
   const [question, setQuestion] = useState<Question>({
+    id: 'temp-id',
     problem: {
+      id: 'temp-id',
       title: 'Untitled Question',
       description: 'Add a description for your coding interview question.',
       requirements: ['List your requirements here'],
@@ -34,8 +36,10 @@ export default function Home() {
 
     setUpdatedQuestion((prevQuestion) => {
       const updated: Question = {
+        id: prevQuestion.id,
         problem: prevQuestion.problem
           ? {
+              id: prevQuestion.problem.id,
               title: prevQuestion.problem.title,
               description: prevQuestion.problem.description,
               requirements: prevQuestion.problem.requirements,
@@ -47,6 +51,7 @@ export default function Home() {
 
       if (update.problem && prevQuestion.problem) {
         updated.problem = {
+          id: prevQuestion.problem.id,
           title: update.problem.title ?? prevQuestion.problem.title,
           description: update.problem.description ?? prevQuestion.problem.description,
           requirements: update.problem.requirements ?? prevQuestion.problem.requirements,
