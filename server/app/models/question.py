@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 from app.models.database import DatabaseObjectMixin
 from app.models.file import File
+from app.models.problem import Problem
 from app.models.test_case import TestCase
 
 
@@ -19,15 +20,8 @@ class TestCases(BaseModel):
     )
 
 
-class Problem(BaseModel):
-    title: str = Field(description="The title of the question.")
-    description: str = Field(description="The general overview of the question.")
-    requirements: list[str] = Field(
-        description="The requirements which the candidate must meet to successfully complete the question."
-    )
-
-
 class Question(BaseModel):
+    id: str = Field(description="The ID of the question as it is stored in the database.")
     problem: Optional[Problem] = Field(
         default=None,
         description="The problem description that the agent is trying to create for the user. None if problem description creation has not commenced.",
