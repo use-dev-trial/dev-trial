@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const problem = z.object({
+  id: z.string().optional(), // remove this id later, added cus ci was failing and blocking me
   title: z.string(),
   description: z.string(),
   requirements: z.array(z.string()),
