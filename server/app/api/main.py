@@ -1,15 +1,14 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 
+from agents import set_tracing_export_api_key
 from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from agents import set_tracing_export_api_key
 
 from app.api.routes import router
-import os
-
 
 logging.basicConfig(
     level=logging.INFO,

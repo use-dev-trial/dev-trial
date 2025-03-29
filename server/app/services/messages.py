@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from agents import Runner, RunResult, TResponseInputItem, trace, RunConfig
+from agents import RunConfig, Runner, RunResult, TResponseInputItem, trace
 
 from app.inference.agents import triager
 from app.inference.constants import AgentNames
@@ -15,8 +15,7 @@ from app.models.test_case import TestCase
 from app.utils.database import DatabaseManager, is_valid_uuid
 
 log = logging.getLogger(__name__)
-from agents import Runner
-from agents import enable_verbose_stdout_logging
+from agents import Runner, enable_verbose_stdout_logging
 
 # TODO: Handle cases where LLM hallucinates the id of the file/test case it is trying to update
 
