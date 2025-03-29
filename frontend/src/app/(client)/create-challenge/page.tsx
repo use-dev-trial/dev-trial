@@ -79,7 +79,7 @@ export default function Home() {
     }, 0);
   }, []);
 
-  const { messages, sendMessage, isLoading, lastMessageId } = useChat({
+  const { messages, sendMessage, isLoading } = useChat({
     onResponse: handleResponse,
     onQuestionUpdate: handleQuestionUpdate,
   });

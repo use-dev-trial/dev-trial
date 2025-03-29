@@ -30,12 +30,15 @@ export function useChat({
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (content: string) => {
-      const messageRequest: MessageRequest = messageRequestSchema.parse({ content });
+    mutationFn: async (params: { content: string; id?: string }) => {
+      const messageRequest: MessageRequest = messageRequestSchema.parse({
+        content: params.content,
+        id: params.id || lastMessageId,
+      });
       return await send(messageRequest);
     },
-    onMutate: (content) => {
-      const userMessage: Message = { role: role.Values.user, content };
+    onMutate: (params) => {
+      const userMessage: Message = { role: role.Values.user, content: params.content };
       setMessages((prev) => [...prev, userMessage]);
     },
     onSuccess: (data: MessageResponse) => {
@@ -63,7 +66,7 @@ export function useChat({
 
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
-    mutation.mutate(content);
+    mutation.mutate({ content, id: lastMessageId });
   };
 
   return {

@@ -6,6 +6,7 @@ import { MessageRequest, MessageResponse, messageResponseSchema } from '@/lib/me
 
 export async function send(request: MessageRequest): Promise<MessageResponse> {
   try {
+    console.log('Sending message:', request);
     const response = await axios.post(
       `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/messages`,
       request,
