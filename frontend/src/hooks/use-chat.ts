@@ -16,7 +16,7 @@ import { Question } from '@/lib/question';
 
 interface UseChatOptions {
   initialMessages?: Message[];
-  onResponse?: (message: Message) => void;
+  onResponse?: (message: Message, messageId?: string) => void;
   onQuestionUpdate?: (update: Question) => void;
 }
 
@@ -26,15 +26,19 @@ export function useChat({
   onQuestionUpdate,
 }: UseChatOptions = {}) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [lastMessageId, setLastMessageId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (content: string) => {
-      const messageRequest: MessageRequest = messageRequestSchema.parse({ content });
+    mutationFn: async (params: { content: string; id?: string }) => {
+      const messageRequest: MessageRequest = messageRequestSchema.parse({
+        content: params.content,
+        id: params.id || lastMessageId,
+      });
       return await send(messageRequest);
     },
-    onMutate: (content) => {
-      const userMessage: Message = { role: role.Values.user, content };
+    onMutate: (params) => {
+      const userMessage: Message = { role: role.Values.user, content: params.content };
       setMessages((prev) => [...prev, userMessage]);
     },
     onSuccess: (data: MessageResponse) => {
@@ -43,9 +47,10 @@ export function useChat({
         content: data.content,
       };
       setMessages((prev) => [...prev, assistantMessage]);
+      setLastMessageId(data.id);
 
       if (onResponse) {
-        onResponse(assistantMessage);
+        onResponse(assistantMessage, data.id);
       }
 
       if (data.question && onQuestionUpdate) {
@@ -61,7 +66,7 @@ export function useChat({
 
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
-    mutation.mutate(content);
+    mutation.mutate({ content, id: lastMessageId || undefined });
   };
 
   return {
@@ -69,5 +74,6 @@ export function useChat({
     isLoading: mutation.isPending,
     error: mutation.error,
     sendMessage,
+    lastMessageId,
   };
 }
