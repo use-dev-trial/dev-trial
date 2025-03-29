@@ -34,9 +34,9 @@ export const test_cases = z.object({
 export type TestCases = z.infer<typeof test_cases>;
 
 export const question = z.object({
-  problem: problem.optional(),
-  files: files.optional(),
-  test_cases: test_cases.optional(),
+  problem: problem.nullable(),
+  files: files.nullable(),
+  test_cases: test_cases.nullable(),
 });
 
 export type Question = z.infer<typeof question>;

@@ -145,7 +145,7 @@ export async function send(request: MessageRequest): Promise<MessageResponse> {
     //   `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/messages`,
     //   request,
     // );
-
+    // console.log(messageResponseSchema.parse(response.data));
     // return messageResponseSchema.parse(response.data);
     const dummyResponse = generateDummyResponse(request.content);
 
