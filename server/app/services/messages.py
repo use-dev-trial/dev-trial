@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Optional
 
@@ -15,6 +16,7 @@ from app.models.test_case import TestCase
 from app.utils.database import DatabaseManager, is_valid_uuid
 
 log = logging.getLogger(__name__)
+
 
 MAX_TURNS = 3
 
@@ -388,70 +390,98 @@ async def _update_problem(
 
 
 async def _retrieve_existing_question(db_manager: DatabaseManager, question_id: str) -> Question:
-    # TODO: Make these DB operations run in parallel
-    problem_id_result = (
-        await db_manager.client.table(Table.QUESTIONS)
+    problem_id_task = (
+        db_manager.client.table(Table.QUESTIONS)
         .select("problem_id")
         .eq("id", question_id)
         .execute()
     )
-    file_ids_result = (
-        await db_manager.client.table(Table.QUESTION_FILE)
+    file_ids_task = (
+        db_manager.client.table(Table.QUESTION_FILE)
         .select("file_id")
         .eq("question_id", question_id)
         .execute()
     )
-    test_case_ids_result = (
-        await db_manager.client.table(Table.QUESTION_TEST_CASE)
+    test_case_ids_task = (
+        db_manager.client.table(Table.QUESTION_TEST_CASE)
         .select("test_case_id")
         .eq("question_id", question_id)
         .execute()
     )
 
-    problem_id: Optional[str] = problem_id_result.data[0]["problem_id"]
-    file_ids: list[str] = [
-        file_id_result.data[0]["file_id"] for file_id_result in file_ids_result.data
-    ]
-    test_case_ids: list[str] = [
-        test_case_ids_result.data[0]["test_case_id"]
-        for test_case_ids_result in test_case_ids_result.data
-    ]
-
-    problem_result = (
-        await db_manager.client.table(Table.PROBLEMS)
-        .select("problems")
-        .eq("id", problem_id)
-        .execute()
-    )
-    problem: Optional[Problem] = (
-        None
-        if not problem_result.data
-        else Problem.model_validate(problem_result.data[0]["problems"])
+    problem_id_result, file_ids_result, test_case_ids_result = await asyncio.gather(
+        problem_id_task, file_ids_task, test_case_ids_task
     )
 
-    file_results = (
-        await db_manager.client.table(Table.FILES).select("files").in_("id", file_ids).execute()
+    problem_id_task = asyncio.to_thread(
+        lambda: problem_id_result.data[0]["problem_id"] if problem_id_result.data else None
     )
-    files: Optional[list[File]] = (
-        None
-        if not file_results.data
-        else [File.model_validate(file_result["files"]) for file_result in file_results.data]
+    file_ids_task = asyncio.to_thread(
+        lambda: [row["file_id"] for row in file_ids_result.data] if file_ids_result.data else []
+    )
+    test_case_ids_task = asyncio.to_thread(
+        lambda: (
+            [row["test_case_id"] for row in test_case_ids_result.data]
+            if test_case_ids_result.data
+            else []
+        )
     )
 
-    test_case_results = (
-        await db_manager.client.table(Table.TEST_CASES)
+    problem_id, file_ids, test_case_ids = await asyncio.gather(
+        problem_id_task, file_ids_task, test_case_ids_task
+    )
+
+    problem_task = (
+        db_manager.client.table(Table.PROBLEMS).select("problems").eq("id", problem_id).execute()
+        if problem_id
+        else asyncio.sleep(0)
+    )
+
+    file_task = (
+        db_manager.client.table(Table.FILES).select("files").in_("id", file_ids).execute()
+        if file_ids
+        else asyncio.sleep(0)
+    )
+
+    test_case_task = (
+        db_manager.client.table(Table.TEST_CASES)
         .select("test_cases")
         .in_("id", test_case_ids)
         .execute()
+        if test_case_ids
+        else asyncio.sleep(0)
     )
-    test_cases: Optional[list[TestCase]] = (
-        None
-        if not test_case_results.data
-        else [
-            TestCase.model_validate(test_case_result["test_cases"])
-            for test_case_result in file_results.data
-        ]
+
+    problem_result, file_results, test_case_results = await asyncio.gather(
+        problem_task, file_task, test_case_task
     )
+
+    # Parse results in parallel
+    problem_task = asyncio.to_thread(
+        lambda: (
+            Problem.model_validate(problem_result.data[0]["problems"])
+            if problem_result and problem_result.data
+            else None
+        )
+    )
+
+    files_task = asyncio.to_thread(
+        lambda: (
+            [File.model_validate(row["files"]) for row in file_results.data]
+            if file_results and file_results.data
+            else []
+        )
+    )
+
+    test_cases_task = asyncio.to_thread(
+        lambda: (
+            [TestCase.model_validate(row["test_cases"]) for row in test_case_results.data]
+            if test_case_results and test_case_results.data
+            else []
+        )
+    )
+
+    problem, files, test_cases = await asyncio.gather(problem_task, files_task, test_cases_task)
 
     return Question(id=question_id, problem=problem, files=files, test_cases=test_cases)
 
@@ -467,6 +497,5 @@ async def _retrieve_existing_messages(
     )
     if not result.data:
         raise ValueError(f"Chat with id '{message_id}' not found.")
-    # TODO: Check whether theres polluting metadata like datetime. If yes, drop them.
     existing_messages = result.data[0]["messages"]
     return existing_messages
