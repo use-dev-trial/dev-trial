@@ -63,14 +63,14 @@ class MessagesService:
             # Create a new entry in the messages table
             db_result = (
                 await db_manager.client.table(Table.MESSAGES)
-                .insert([{Table.MESSAGES: existing_messages}])
+                .insert([{"messages": existing_messages}])
                 .execute()
             )
         else:
             # Update existing entry in the messages table
             db_result = (
                 await db_manager.client.table(Table.MESSAGES)
-                .update({Table.MESSAGES: existing_messages})
+                .update({"messages": existing_messages})
                 .eq("id", input.id)
                 .execute()
             )

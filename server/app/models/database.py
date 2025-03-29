@@ -6,6 +6,16 @@ from pydantic import BaseModel, Field
 
 class Table(StrEnum):
     MESSAGES = "messages"
+    PROBLEMS = "problems"
+    FILES = "files"
+    TEST_CASES = "test_cases"
+    CHALLENGES = "challenges"
+    QUESTIONS = "questions"
+
+    # Join Tables
+    CHALLENGE_QUESTION = "challenge_question"
+    QUESTION_FILE = "question_file"
+    QUESTION_TEST_CASE = "question_test_case"
 
 
 class DatabaseObjectMixin(BaseModel):
