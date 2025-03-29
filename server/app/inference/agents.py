@@ -1,7 +1,8 @@
 import logging
 
-from agents import Agent, ModelSettings, handoff
+from agents import Agent, ModelSettings, RunContextWrapper, handoff
 from agents.extensions import handoff_filters
+from pydantic import BaseModel, Field
 
 from app.inference.constants import AgentNames
 from app.inference.prompts.file_generator import get_file_generator_system_prompt
@@ -15,6 +16,7 @@ from app.models.test_case import TestCase
 from app.utils.llm import LLMType
 
 log = logging.getLogger(__name__)
+
 
 file_generator = Agent[AgentState](
     model=LLMType.GPT4O_MINI,
@@ -46,6 +48,20 @@ test_generator = Agent[AgentState](
     output_type=list[TestCase],
 )
 
+
+class HandoffReason(BaseModel):
+    agent_name: AgentNames = Field(
+        description="The name of the subagent that is being handed off to."
+    )
+    reason: str = Field(
+        description="The reason for the handoff to the subagent. You should clearly state what you hope the subagent will accomplish through this handoff."
+    )
+
+
+async def on_handoff(ctx: RunContextWrapper[None], input_data: HandoffReason):
+    log.info(f"Reason for handoff to {input_data.agent_name}: {input_data.reason}")
+
+
 # Entrypoint agent that takes the user's input and attempts to create a SINGLE question
 triager = Agent[AgentState](
     model=LLMType.GPT4O_MINI,
@@ -59,17 +75,23 @@ triager = Agent[AgentState](
         handoff(
             agent=problem_generator,
             input_filter=handoff_filters.remove_all_tools,
-            on_handoff=lambda _: log.info(f"❓ Handoff to {AgentNames.PROBLEM_GENERATOR} ❓"),
+            # on_handoff=lambda _: log.info(f"❓ Handoff to {AgentNames.PROBLEM_GENERATOR} ❓"),
+            on_handoff=on_handoff,
+            input_type=HandoffReason,
         ),
         handoff(
             agent=file_generator,
             input_filter=handoff_filters.remove_all_tools,
-            on_handoff=lambda _: log.info(f"📁 Handoff to {AgentNames.FILE_GENERATOR} 📁"),
+            # on_handoff=lambda _: log.info(f"📁 Handoff to {AgentNames.FILE_GENERATOR} 📁"),
+            on_handoff=on_handoff,
+            input_type=HandoffReason,
         ),
         handoff(
             agent=test_generator,
             input_filter=handoff_filters.remove_all_tools,
-            on_handoff=lambda _: log.info(f"🎯 Handoff to {AgentNames.TEST_GENERATOR} 🎯"),
+            # on_handoff=lambda _: log.info(f"🎯 Handoff to {AgentNames.TEST_GENERATOR} 🎯"),
+            on_handoff=on_handoff,
+            input_type=HandoffReason,
         ),
     ],
 )
