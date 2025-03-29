@@ -97,7 +97,6 @@ export default function QuestionPreview({
               </div>
             </section>
           </TabsContent>
-
           {/* Files Tab Content */}
           <TabsContent value="files">
             <section>

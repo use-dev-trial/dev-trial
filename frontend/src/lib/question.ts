@@ -17,12 +17,6 @@ export const file = z.object({
 
 export type File = z.infer<typeof file>;
 
-export const files = z.object({
-  files: z.array(file),
-});
-
-export type Files = z.infer<typeof files>;
-
 export const test_case = z.object({
   id: z.string(),
   description: z.string(),
@@ -30,17 +24,11 @@ export const test_case = z.object({
 
 export type TestCase = z.infer<typeof test_case>;
 
-export const test_cases = z.object({
-  testCases: z.array(test_case),
-});
-
-export type TestCases = z.infer<typeof test_cases>;
-
 export const question = z.object({
   id: z.string(),
   problem: problem.nullable(),
-  files: files.nullable(),
-  test_cases: test_cases.nullable(),
+  files: z.array(file).nullable(),
+  test_cases: z.array(test_case).nullable(),
 });
 
 export type Question = z.infer<typeof question>;
