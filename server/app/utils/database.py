@@ -1,11 +1,20 @@
 import logging
 import os
+import uuid
 from typing import Optional
 
 from supabase._async.client import AsyncClient as Client
 from supabase._async.client import create_client
 
 log = logging.getLogger(__name__)
+
+
+def is_valid_uuid(value):
+    try:
+        uuid.UUID(str(value))
+        return True
+    except ValueError:
+        return False
 
 
 class DatabaseManager:
@@ -40,3 +49,43 @@ class DatabaseManager:
 
         await cls._instance._init()
         return cls._instance
+
+
+"""
+### RULES IMPLEMENTED IN POSTGRES ###
+
+## Reject uuid inserts
+
+CREATE OR REPLACE FUNCTION reject_uuid_insert()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.id := gen_random_uuid();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER before_insert_challenges
+BEFORE INSERT ON challenges
+FOR EACH ROW
+EXECUTE FUNCTION reject_uuid_insert();
+
+CREATE TRIGGER before_insert_files
+BEFORE INSERT ON files
+FOR EACH ROW
+EXECUTE FUNCTION reject_uuid_insert();
+
+CREATE TRIGGER before_insert_messages
+BEFORE INSERT ON messages
+FOR EACH ROW
+EXECUTE FUNCTION reject_uuid_insert();
+
+CREATE TRIGGER before_insert_problems
+BEFORE INSERT ON problems
+FOR EACH ROW
+EXECUTE FUNCTION reject_uuid_insert();
+
+CREATE TRIGGER before_insert_questions
+BEFORE INSERT ON questions
+FOR EACH ROW
+EXECUTE FUNCTION reject_uuid_insert();
+"""
