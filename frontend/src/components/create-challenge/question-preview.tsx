@@ -60,7 +60,7 @@ export default function QuestionPreview({ question }: QuestionPreviewProps) {
           <h2 className="text-lg font-semibold text-slate-800">FILES</h2>
         </div>
         <div className="divide-y divide-slate-100 rounded-lg border border-slate-100 bg-white shadow-sm">
-          {question?.files?.files.map((file, index) => (
+          {question?.files?.map((file, index) => (
             <div key={index} className="p-5">
               <h3 className="mb-3 flex items-center font-medium text-slate-800">
                 <span className="mr-2 inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
@@ -81,7 +81,7 @@ export default function QuestionPreview({ question }: QuestionPreviewProps) {
           <h2 className="text-lg font-semibold text-slate-800">TEST CASES</h2>
         </div>
         <div className="divide-y divide-slate-100 rounded-lg border border-slate-100 bg-white shadow-sm">
-          {question?.test_cases?.testCases.map((interaction, index) => (
+          {question?.test_cases?.map((interaction, index) => (
             <div key={index} className="p-5">
               <h3 className="mb-3 flex items-center font-medium text-slate-800">
                 <span className="mr-2 inline-block h-2 w-2 rounded-full bg-emerald-500"></span>
