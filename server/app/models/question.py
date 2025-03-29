@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 from app.models.database import DatabaseObjectMixin
@@ -25,8 +27,19 @@ class Problem(BaseModel):
     )
 
 
-class Question(Problem, Files, TestCases):
-    pass
+class Question(BaseModel):
+    problem: Optional[Problem] = Field(
+        default=None,
+        description="The problem description that the agent is trying to create for the user. None if problem description creation has not commenced.",
+    )
+    files: Optional[Files] = Field(
+        default=None,
+        description="The files which the agent is trying to create for the user. None if file creation has not commenced.",
+    )
+    test_cases: Optional[TestCases] = Field(
+        default=None,
+        description="The test cases which the agent is trying to create for the user. None if test case creation has not commenced.",
+    )
 
 
 class QuestionDB(Question, DatabaseObjectMixin):
