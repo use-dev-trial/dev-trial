@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from agents import Runner, RunResult, TResponseInputItem
+from agents import Runner, RunResult, TResponseInputItem, trace, RunConfig
 
 from app.inference.agents import triager
 from app.inference.constants import AgentNames
@@ -12,10 +12,13 @@ from app.models.message import MessageRequest, MessageResponse, Role
 from app.models.problem import Problem
 from app.models.question import Files, Question, TestCases
 from app.models.test_case import TestCase
-from app.utils.database import DatabaseManager
+from app.utils.database import DatabaseManager, is_valid_uuid
 
 log = logging.getLogger(__name__)
 from agents import Runner
+from agents import enable_verbose_stdout_logging
+
+# TODO: Handle cases where LLM hallucinates the id of the file/test case it is trying to update
 
 
 class MessagesService:
@@ -39,51 +42,59 @@ class MessagesService:
             )
 
         exit = False
-        while not exit:
-            result: RunResult = await Runner.run(
-                starting_agent=triager,
-                input=existing_messages,
-                context=AgentState(question=question),
-            )
-            match result.last_agent.name:
-                case AgentNames.PROBLEM_GENERATOR:
-                    if not question.problem:
-                        problem: Problem = await _insert_problem(
-                            db_manager=db_manager, result=result, question_id=question.id
-                        )
-                    else:
-                        problem: Problem = await _update_problem(
-                            db_manager=db_manager, result=result, problem_id=question.problem.id
-                        )
-                    question.problem = problem
-                case AgentNames.FILE_GENERATOR:
-                    if not question.files:
-                        files: Files = await _insert_files(
-                            db_manager=db_manager, result=result, question_id=question.id
-                        )
+        with trace("DevTrial"):
+            while not exit:
+                result: RunResult = await Runner.run(
+                    starting_agent=triager,
+                    input=existing_messages,
+                    context=AgentState(question=question),
+                    run_config=RunConfig(
+                        tracing_disabled=False,
+                    ),
+                )
+                match result.last_agent.name:
+                    case AgentNames.PROBLEM_GENERATOR:
+                        if not question.problem:
+                            problem: Problem = await _insert_problem(
+                                db_manager=db_manager, result=result, question_id=question.id
+                            )
+                        else:
+                            problem: Problem = await _update_problem(
+                                db_manager=db_manager, result=result, problem_id=question.problem.id
+                            )
+                        question.problem = problem
+                    case AgentNames.FILE_GENERATOR:
+                        if not question.files:
+                            files: Files = await _insert_files(
+                                db_manager=db_manager, result=result, question_id=question.id
+                            )
 
-                    else:
-                        files: Files = await _update_files(
-                            db_manager=db_manager,
-                            result=result,
-                            original_files=question.files,
-                        )
-                    question.files = files
-                case AgentNames.TEST_GENERATOR:
-                    if not question.test_cases:
-                        test_cases: TestCases = await _insert_test_cases(
-                            db_manager=db_manager, result=result, question_id=question.id
-                        )
-                    else:
-                        test_cases: TestCases = await _update_test_cases(
-                            db_manager=db_manager,
-                            result=result,
-                            original_test_cases=question.test_cases,
-                        )
-                    question.test_cases = test_cases
-                case AgentNames.TRIAGER:
-                    log.info("Triager did not initiate a handoff. Terminating agent system...")
-                    exit = True
+                        else:
+                            files: Files = await _update_files(
+                                db_manager=db_manager,
+                                result=result,
+                                original_files=question.files,
+                                question_id=question.id,
+                            )
+                        question.files = files
+                    case AgentNames.TEST_GENERATOR:
+                        if not question.test_cases:
+                            test_cases: TestCases = await _insert_test_cases(
+                                db_manager=db_manager, result=result, question_id=question.id
+                            )
+                        else:
+                            test_cases: TestCases = await _update_test_cases(
+                                db_manager=db_manager,
+                                result=result,
+                                original_test_cases=question.test_cases,
+                                question_id=question.id,
+                            )
+                        question.test_cases = test_cases
+                    case AgentNames.TRIAGER:
+                        log.info("Triager did not initiate a handoff. Terminating agent system...")
+                        exit = True
+
+                enable_verbose_stdout_logging()
 
         # Add assistant response to existing messages
         existing_messages.append({"role": Role.ASSISTANT.value, "content": result.final_output})
@@ -157,24 +168,49 @@ async def _insert_files(db_manager: DatabaseManager, result: RunResult, question
 
 
 async def _update_files(
-    db_manager: DatabaseManager, result: RunResult, original_files: Files
+    db_manager: DatabaseManager, result: RunResult, original_files: Files, question_id: str
 ) -> Files:
     """
     Updates the files table with the most recently generated files.
     """
     updated_files: dict[str, File] = {}
     for file in result.final_output.files:
-        await db_manager.client.table(Table.FILES).update(
-            {
-                "name": file.name,
-                "code": file.code,
-            }
-        ).eq("id", file.id).execute()
-        updated_files[file.id] = File(
-            id=file.id,
-            name=file.name,
-            code=file.code,
-        )
+        if is_valid_uuid(file.id):
+            # LLM updates an existing test case
+            await db_manager.client.table(Table.FILES).update(
+                {
+                    "name": file.name,
+                    "code": file.code,
+                }
+            ).eq("id", file.id).execute()
+            updated_files[file.id] = File(
+                id=file.id,
+                name=file.name,
+                code=file.code,
+            )
+        else:
+            # LLM either creates a new file of hallucinates id of an existing file. For now, we will just create a new file
+            insert_file_result = (
+                await db_manager.client.table(Table.FILES)
+                .insert(
+                    {
+                        "name": file.name,
+                        "code": file.code,
+                    }
+                )
+                .execute()
+            )
+            await db_manager.client.table(Table.QUESTION_FILE).insert(
+                {
+                    "question_id": question_id,
+                    "file_id": insert_file_result.data[0]["id"],
+                }
+            ).execute()
+            updated_files[file.id] = File(
+                id=file.id,
+                name=file.name,
+                code=file.code,
+            )
 
     final_files: list[File] = []
     for file in original_files.files:
@@ -224,22 +260,45 @@ async def _insert_test_cases(
 
 
 async def _update_test_cases(
-    db_manager: DatabaseManager, result: RunResult, original_test_cases: TestCases
+    db_manager: DatabaseManager, result: RunResult, original_test_cases: TestCases, question_id: str
 ) -> TestCases:
     """
     Updates the test_case table with the most recently generated test cases.
     """
     updated_test_cases: dict[str, TestCase] = {}
     for test_case in result.final_output.test_cases:
-        await db_manager.client.table(Table.TEST_CASES).update(
-            {
-                "description": test_case.description,
-            }
-        ).eq("id", test_case.id).execute()
-        updated_test_cases[test_case.id] = TestCase(
-            id=test_case.id,
-            description=test_case.description,
-        )
+        if is_valid_uuid(test_case.id):
+            # LLM updates an existing test case
+            await db_manager.client.table(Table.TEST_CASES).update(
+                {
+                    "description": test_case.description,
+                }
+            ).eq("id", test_case.id).execute()
+            updated_test_cases[test_case.id] = TestCase(
+                id=test_case.id,
+                description=test_case.description,
+            )
+        else:
+            # LLM either creates a new test case of hallucinates id of an existing test case. For now, we will just create a new test case
+            insert_test_case_result = (
+                await db_manager.client.table(Table.TEST_CASES)
+                .insert(
+                    {
+                        "description": test_case.description,
+                    }
+                )
+                .execute()
+            )
+            await db_manager.client.table(Table.QUESTION_TEST_CASE).insert(
+                {
+                    "question_id": question_id,
+                    "test_case_id": insert_test_case_result.data[0]["id"],
+                }
+            ).execute()
+            updated_test_cases[test_case.id] = TestCase(
+                id=test_case.id,
+                description=test_case.description,
+            )
 
     final_test_cases: list[TestCase] = []
     for test_case in original_test_cases.test_cases:

@@ -5,8 +5,11 @@ from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from agents import set_tracing_export_api_key
 
 from app.api.routes import router
+import os
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -51,6 +54,11 @@ def create_app() -> FastAPI:
 
             content = {"status_code": 10422, "message": exc_str, "data": None}
             return JSONResponse(content=content, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+
+        OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+        if not OPENAI_API_KEY:
+            raise Exception("OPENAI_API_KEY is not set")
+        set_tracing_export_api_key(OPENAI_API_KEY)
 
         return app
     except Exception as e:
