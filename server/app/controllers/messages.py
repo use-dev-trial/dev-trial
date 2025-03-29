@@ -2,7 +2,7 @@ import logging
 
 from fastapi import APIRouter
 
-from app.models.messages import MessageRequest, MessageResponse
+from app.models.message import MessageRequest, MessageResponse
 from app.services.messages import MessagesService
 
 log = logging.getLogger(__name__)
