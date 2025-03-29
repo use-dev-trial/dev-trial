@@ -24,7 +24,7 @@ class MessagesController:
         async def chat(
             input: MessageRequest,
         ) -> MessageResponse:
-            log.info("Sending message to assistant...")
+            log.info(f"Sending message of id {input.id} to assistant...")
             response: MessageResponse = await self.service.chat(input=input)
             log.info("Message to be sent back to user: %s", response.content)
             return response

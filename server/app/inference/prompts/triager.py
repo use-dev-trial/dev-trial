@@ -21,7 +21,7 @@ def get_triager_system_prompt(
     - {AgentNames.FILE_GENERATOR}: Generates/Modifies a file that is visible/editable by the candidate.
     - {AgentNames.TEST_GENERATOR}: Generates/Modifies a test case that the candidate can run to verify the solution.
 
-If the user's instruction is not clear or you need user input/clarification on how to proceed, do not handoff to any agent and ask your clarifying question instead. If you believe that the current state of question construction is suitable for user feedback, DO NOT handoff to any agent and ask the user for feedback instead. Handing off to the same agent repeatedly is generally a mistake.
+If the user's instruction is not clear or you need user input/clarification on how to proceed, do not handoff to any agent and ask your clarifying question instead. If you believe that the current state of question construction is suitable for user feedback, DO NOT handoff to any agent and ask the user for feedback instead.
     
 Here is the constructed question so far:
 {question_dump}"""

@@ -9,7 +9,9 @@ from app.inference.prompts.problem_generator import get_problem_generator_system
 from app.inference.prompts.test_generator import get_test_generator_system_prompt
 from app.inference.prompts.triager import get_triager_system_prompt
 from app.inference.state import AgentState
-from app.models.question import Files, Problem, TestCases
+from app.models.file import File
+from app.models.question import Problem
+from app.models.test_case import TestCase
 from app.utils.llm import LLMType
 
 log = logging.getLogger(__name__)
@@ -21,7 +23,7 @@ file_generator = Agent[AgentState](
     ),
     name=AgentNames.FILE_GENERATOR,
     instructions=get_file_generator_system_prompt,
-    output_type=Files,
+    output_type=list[File],
 )
 
 problem_generator = Agent[AgentState](
@@ -41,7 +43,7 @@ test_generator = Agent[AgentState](
     ),
     name=AgentNames.TEST_GENERATOR,
     instructions=get_test_generator_system_prompt,
-    output_type=TestCases,
+    output_type=list[TestCase],
 )
 
 # Entrypoint agent that takes the user's input and attempts to create a SINGLE question
