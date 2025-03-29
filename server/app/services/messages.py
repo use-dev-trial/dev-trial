@@ -55,7 +55,7 @@ class MessagesService:
                     exit = True
 
         # Add assistant response to existing messages
-        existing_messages.append({"role": Role.ASSISTANT.value, "content": str(result)})
+        existing_messages.append({"role": Role.ASSISTANT.value, "content": result.final_output})
 
         response_id: Optional[str] = None
 
@@ -85,6 +85,6 @@ class MessagesService:
 
         return MessageResponse(
             id=response_id,
-            content=str(result),
+            content=result.final_output,
             question=question,
         )
