@@ -3,6 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from app.models.question import Question
+
 
 class Role(StrEnum):
     ASSISTANT = "assistant"
@@ -26,3 +28,6 @@ class MessageResponse(BaseModel):
         description="The ID of the chat history which this message belongs to. This should be passed back to the server during the next request."
     )
     content: str = Field(description="The response from the assistant to be sent back to the user.")
+    question: Question = Field(
+        description="The (partially) complete question object that was generated so far by the assistant."
+    )

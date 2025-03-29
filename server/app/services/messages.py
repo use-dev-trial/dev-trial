@@ -1,12 +1,15 @@
 import logging
+from typing import Optional
 
-from agents import RunResult
+from agents import Runner, RunResult, TResponseInputItem
 
 from app.inference.agents import triager
 from app.inference.constants import AgentNames
 from app.inference.state import AgentState
-from app.models.message import MessageRequest, MessageResponse
+from app.models.database import Table
+from app.models.message import MessageRequest, MessageResponse, Role
 from app.models.question import Question
+from app.utils.database import DatabaseManager
 
 log = logging.getLogger(__name__)
 from agents import Runner
@@ -14,12 +17,31 @@ from agents import Runner
 
 class MessagesService:
     async def chat(self, input: MessageRequest) -> MessageResponse:
+        db_manager = await DatabaseManager.get_instance()
+        existing_messages: list[TResponseInputItem] = []
+        if input.id is not None:
+            # Retrieve prior messages from DB
+            existing_chat = (
+                await db_manager.client.table(Table.MESSAGES)
+                .select(Table.MESSAGES)
+                .eq("id", input.id)
+                .execute()
+            )
+            if not existing_chat.data:
+                raise ValueError(f"Chat with id '{input.id}' not found.")
+            existing_messages = existing_chat.data[0][Table.MESSAGES]
+
+        # Add user message to existing messages
+        existing_messages.append({"role": Role.USER.value, "content": input.content})
+
         # TODO: Retrieve half-completed question object from DB
         question = Question()
         exit = False
         while not exit:
             result: RunResult = await Runner.run(
-                starting_agent=triager, input=input.content, context=AgentState(question=question)
+                starting_agent=triager,
+                input=existing_messages,
+                context=AgentState(question=question),
             )
             match result.last_agent.name:
                 case AgentNames.PROBLEM_GENERATOR:
@@ -32,52 +54,37 @@ class MessagesService:
                     log.info("Triager did not initiate a handoff. Terminating agent system...")
                     exit = True
 
-        print(result)
+        # Add assistant response to existing messages
+        existing_messages.append({"role": Role.ASSISTANT.value, "content": str(result)})
 
-        # db_manager = await DatabaseManager.get_instance()
+        response_id: Optional[str] = None
 
-        # # TODO: Invoke LLM
-        # dummy_response: str = "I've processed your message: \"" + input.content + '"'
-        # new_messages: list[Message] = [
-        #     Message(role=Role.USER, content=input.content),
-        #     Message(role=Role.ASSISTANT, content=dummy_response),
-        # ]
+        if input.id is None:
+            # Create a new entry in the messages table
+            db_result = (
+                await db_manager.client.table(Table.MESSAGES)
+                .insert([{Table.MESSAGES: existing_messages}])
+                .execute()
+            )
+        else:
+            # Update existing entry in the messages table
+            db_result = (
+                await db_manager.client.table(Table.MESSAGES)
+                .update({Table.MESSAGES: existing_messages})
+                .eq("id", input.id)
+                .execute()
+            )
 
-        # response_id: Optional[str] = None
+        # Extracts the id from the result of the database operation
+        if db_result.data and db_result.data[0] and "id" in db_result.data[0]:
+            response_id = db_result.data[0]["id"]
+            if not response_id:
+                raise Exception("ID of entry in messages table cannot be None.")
+        else:
+            raise Exception("Failed to retrieve ID after inserting messages.")
 
-        # if input.id is None:
-        #     # Create a new chat history
-        #     result = (
-        #         await db_manager.client.table(Table.MESSAGES)
-        #         .insert([{Table.MESSAGES: [msg.model_dump() for msg in new_messages]}])
-        #         .execute()
-        #     )
-        # else:
-        #     # Append to existing chat history
-        #     existing_chat = (
-        #         await db_manager.client.table(Table.MESSAGES)
-        #         .select(Table.MESSAGES)
-        #         .eq("id", input.id)
-        #         .execute()
-        #     )
-
-        #     if not existing_chat.data:
-        #         raise ValueError(f"Chat with id '{input.id}' not found.")
-
-        #     existing_messages: list[dict] = existing_chat.data[0][Table.MESSAGES]
-        #     existing_messages.extend([msg.model_dump() for msg in new_messages])
-
-        #     result = (
-        #         await db_manager.client.table(Table.MESSAGES)
-        #         .update({Table.MESSAGES: existing_messages})
-        #         .eq("id", input.id)
-        #         .execute()
-        #     )
-
-        # # Extracts the id from the result of the database operation
-        # if result.data and result.data[0] and "id" in result.data[0]:
-        #     response_id = result.data[0]["id"]
-        # else:
-        #     raise Exception("Failed to retrieve ID after inserting messages.")
-
-        # return MessageResponse.model_validate({"id": response_id, "content": dummy_response})
+        return MessageResponse(
+            id=response_id,
+            content=str(result),
+            question=question,
+        )
