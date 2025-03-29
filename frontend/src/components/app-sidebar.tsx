@@ -37,7 +37,9 @@ export function AppSidebar() {
       <SidebarContent className="flex h-full flex-col">
         <SidebarGroup className="flex h-full flex-col">
           <div className="mb-5 flex items-center justify-between">
-            <SidebarGroupLabel className="mb-0 text-lg font-bold">Dev Trials</SidebarGroupLabel>
+            <SidebarGroupLabel className="mb-0 p-3 text-lg font-bold text-blue-700">
+              Dev Trial
+            </SidebarGroupLabel>
             <CustomSidebarTrigger location="sidebar" />
           </div>
           <div className="flex min-h-0 flex-1 flex-col">
