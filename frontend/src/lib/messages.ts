@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-// import { question } from '@/lib/question';
+import { question } from '@/lib/question';
 
 export const role = z.enum(['user', 'assistant']);
 
@@ -15,6 +15,7 @@ export type Message = z.infer<typeof message>;
 
 export const messageRequestSchema = z.object({
   id: z.string().nullable().optional().default(null),
+  question_id: z.string().nullable().optional().default(null),
   content: z.string(),
 });
 
@@ -39,11 +40,11 @@ export type QuestionUpdate = z.infer<typeof questionUpdateSchema>;
 export const messageResponseSchema = z.object({
   id: z.string(),
   content: z.string(),
-  questionUpdate: questionUpdateSchema.optional(),
-  updatedSections: z
-    .array(z.enum(['title', 'description', 'requirements', 'sampleInteractions']))
-    .optional(),
-  // question: question,
+  // questionUpdate: questionUpdateSchema.optional(),
+  // updatedSections: z
+  //   .array(z.enum(['title', 'description', 'requirements', 'sampleInteractions']))
+  //   .optional(),
+  question: question,
 });
 
 export type MessageResponse = z.infer<typeof messageResponseSchema>;

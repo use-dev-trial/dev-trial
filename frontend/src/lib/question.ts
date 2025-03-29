@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const problem = z.object({
+  id: z.string(),
   title: z.string(),
   description: z.string(),
   requirements: z.array(z.string()),
@@ -9,6 +10,7 @@ export const problem = z.object({
 export type Problem = z.infer<typeof problem>;
 
 export const file = z.object({
+  id: z.string(),
   name: z.string(),
   code: z.string(),
 });
@@ -22,6 +24,7 @@ export const files = z.object({
 export type Files = z.infer<typeof files>;
 
 export const test_case = z.object({
+  id: z.string(),
   description: z.string(),
 });
 
@@ -34,6 +37,7 @@ export const test_cases = z.object({
 export type TestCases = z.infer<typeof test_cases>;
 
 export const question = z.object({
+  id: z.string(),
   problem: problem.nullable(),
   files: files.nullable(),
   test_cases: test_cases.nullable(),
