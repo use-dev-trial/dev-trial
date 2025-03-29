@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from agents import RunConfig, Runner, RunResult, TResponseInputItem, trace
+from agents import RunConfig, Runner, RunResult, TResponseInputItem
 
 from app.inference.agents import triager
 from app.inference.constants import AgentNames
@@ -15,8 +15,6 @@ from app.models.test_case import TestCase
 from app.utils.database import DatabaseManager, is_valid_uuid
 
 log = logging.getLogger(__name__)
-
-# TODO: Add reasoning to the triager's handoff in the ctx
 
 MAX_TURNS = 3
 
@@ -43,62 +41,79 @@ class MessagesService:
 
         num_turns = 0
         exit = False
-        with trace("DevTrial"):
-            while not exit:
-                num_turns += 1
-                if num_turns > MAX_TURNS:
-                    log.error(f"Max turns ({MAX_TURNS}) exceeded. Exiting agent system...")
-                    break
-                result: RunResult = await Runner.run(
-                    starting_agent=triager,
-                    input=existing_messages,
-                    context=AgentState(question=question),
-                    run_config=RunConfig(
-                        tracing_disabled=False,
-                    ),
-                )
-                match result.last_agent.name:
-                    case AgentNames.PROBLEM_GENERATOR:
-                        if not question.problem:
-                            problem: Problem = await _insert_problem(
-                                db_manager=db_manager, result=result, question_id=question.id
-                            )
-                        else:
-                            problem: Problem = await _update_problem(
-                                db_manager=db_manager, result=result, problem_id=question.problem.id
-                            )
-                        question.problem = problem
-                    case AgentNames.FILE_GENERATOR:
-                        if not question.files:
-                            files: list[File] = await _insert_files(
-                                db_manager=db_manager, result=result, question_id=question.id
-                            )
+        while not exit:
+            num_turns += 1
+            if num_turns > MAX_TURNS:
+                log.error(f"Max turns ({MAX_TURNS}) exceeded. Exiting agent system...")
+                break
+            result: RunResult = await Runner.run(
+                starting_agent=triager,
+                input=existing_messages,
+                context=AgentState(question=question),
+                run_config=RunConfig(
+                    tracing_disabled=False,
+                ),
+            )
+            match result.last_agent.name:
+                case AgentNames.PROBLEM_GENERATOR:
+                    if not question.problem:
+                        problem: Problem = await _insert_problem(
+                            db_manager=db_manager, result=result, question_id=question.id
+                        )
+                    else:
+                        problem: Problem = await _update_problem(
+                            db_manager=db_manager, result=result, problem_id=question.problem.id
+                        )
+                    question.problem = problem
+                    existing_messages.append(
+                        {
+                            "role": Role.ASSISTANT.value,
+                            "content": f"Here is the revised problem description:\n{problem.model_dump_json(indent=2)}",
+                        }
+                    )
+                case AgentNames.FILE_GENERATOR:
+                    if not question.files:
+                        files: list[File] = await _insert_files(
+                            db_manager=db_manager, result=result, question_id=question.id
+                        )
+                    else:
+                        files: list[File] = await _update_files(
+                            db_manager=db_manager,
+                            result=result,
+                            original_files=question.files,
+                            question_id=question.id,
+                        )
+                    question.files = files
+                    existing_messages.append(
+                        {
+                            "role": Role.ASSISTANT.value,
+                            "content": f"Here is the revised set of files:\n{[file.model_dump_json(indent=2) for file in files]}",
+                        }
+                    )
+                case AgentNames.TEST_GENERATOR:
+                    if not question.test_cases:
+                        test_cases: list[TestCase] = await _insert_test_cases(
+                            db_manager=db_manager, result=result, question_id=question.id
+                        )
+                    else:
+                        test_cases: list[TestCase] = await _update_test_cases(
+                            db_manager=db_manager,
+                            result=result,
+                            original_test_cases=question.test_cases,
+                            question_id=question.id,
+                        )
+                    question.test_cases = test_cases
+                    existing_messages.append(
+                        {
+                            "role": Role.ASSISTANT.value,
+                            "content": f"Here is the revised set of test cases:\n{[test_case.model_dump_json(indent=2) for test_case in test_cases]}",
+                        }
+                    )
+                case AgentNames.TRIAGER:
+                    log.info("Triager did not initiate a handoff. Terminating agent system...")
+                    exit = True
 
-                        else:
-                            files: list[File] = await _update_files(
-                                db_manager=db_manager,
-                                result=result,
-                                original_files=question.files,
-                                question_id=question.id,
-                            )
-                        question.files = files
-                    case AgentNames.TEST_GENERATOR:
-                        if not question.test_cases:
-                            test_cases: list[TestCase] = await _insert_test_cases(
-                                db_manager=db_manager, result=result, question_id=question.id
-                            )
-                        else:
-                            test_cases: list[TestCase] = await _update_test_cases(
-                                db_manager=db_manager,
-                                result=result,
-                                original_test_cases=question.test_cases,
-                                question_id=question.id,
-                            )
-                        question.test_cases = test_cases
-                    case AgentNames.TRIAGER:
-                        log.info("Triager did not initiate a handoff. Terminating agent system...")
-                        exit = True
-                log.info(f"Turn {num_turns}: {result.final_output}")
+            log.info(f"Turn {num_turns}: {result.final_output}")
 
         # Add assistant response to existing messages
         existing_messages.append({"role": Role.ASSISTANT.value, "content": result.final_output})

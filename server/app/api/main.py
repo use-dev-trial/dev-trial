@@ -14,6 +14,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(name)s - %(message)s",
 )
+logging.getLogger("httpx").setLevel(logging.WARNING)
 log = logging.getLogger(__name__)
 log.addHandler(logging.StreamHandler())
 
