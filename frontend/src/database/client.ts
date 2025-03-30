@@ -65,8 +65,8 @@ export async function POST<T extends TableName>(
   // });
   const client = await getSupabaseClient();
 
-  const filteredData = data.map((row) =>
-    Object.fromEntries(Object.entries(row).filter(([_, value]) => value != null)),
+  const filteredData = data.map(
+    (row) => Object.fromEntries(Object.entries(row).filter(([_, value]) => value != null)), // eslint-disable-line @typescript-eslint/no-unused-vars
   );
 
   const { data: insertedData, error } = await client.from(tableName).insert(filteredData).select();
