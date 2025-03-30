@@ -9,8 +9,8 @@ import { Pencil } from 'lucide-react';
 import ChatInterface from '@/components/challenges/create/chat-interface';
 import QuestionPreview from '@/components/challenges/create/question-preview';
 
-import { Message } from '@/lib/messages';
-import { Question } from '@/lib/question';
+import { Message } from '@/types/messages';
+import { Question } from '@/types/question';
 
 export default function Home() {
   const [question, setQuestion] = useState<Question>({

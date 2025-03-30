@@ -10,7 +10,7 @@ import SuggestionCard from '@/components/challenges/create/suggestion-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-import { Message } from '@/lib/messages';
+import { Message } from '@/types/messages';
 
 interface ChatInterfaceProps {
   messages: Message[];
