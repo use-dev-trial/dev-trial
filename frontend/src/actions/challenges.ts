@@ -4,14 +4,16 @@ import { auth } from '@clerk/nextjs/server';
 import axios from 'axios';
 
 import {
-  ChallengeResponse,
   CreateChallengeRequest,
-  challengeResponseSchema,
+  CreateChallengeResponse,
+  GetChallengeResponse,
+  createChallengeResponseSchema,
+  getChallengeResponseSchema,
 } from '@/types/challenges';
 
 import { JWT_TEMPLATE_NAME } from '@/lib/constants';
 
-export async function getChallenge(challengeId: string): Promise<ChallengeResponse> {
+export async function getChallenge(challengeId: string): Promise<GetChallengeResponse> {
   const authInstance = await auth();
   const token: string | null = await authInstance.getToken({
     template: JWT_TEMPLATE_NAME,
@@ -30,7 +32,8 @@ export async function getChallenge(challengeId: string): Promise<ChallengeRespon
         },
       },
     );
-    return challengeResponseSchema.parse(response.data);
+    console.log('response', response.data);
+    return getChallengeResponseSchema.parse(response.data);
   } catch (error) {
     console.error('Error sending message:', error);
     throw error;
@@ -39,7 +42,7 @@ export async function getChallenge(challengeId: string): Promise<ChallengeRespon
 
 export async function createChallenge(
   challenge: CreateChallengeRequest,
-): Promise<ChallengeResponse> {
+): Promise<CreateChallengeResponse> {
   const authInstance = await auth();
   const token: string | null = await authInstance.getToken({
     template: JWT_TEMPLATE_NAME,
@@ -60,7 +63,7 @@ export async function createChallenge(
         },
       },
     );
-    return challengeResponseSchema.parse(response.data);
+    return createChallengeResponseSchema.parse(response.data);
   } catch (error) {
     console.error('Error creating challenge:', error);
     throw error;
