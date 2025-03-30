@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { createChallenge } from '@/actions/challenges';
+// import { createChallenge } from '@/actions/challenges';
 import { upsertProblem } from '@/actions/problems';
 import { UpdatedTab, useChat } from '@/hooks/use-chat';
 import { Settings } from 'lucide-react';
@@ -163,21 +163,21 @@ export default function Home() {
     debouncedSaveProblem(input, question.id);
   };
 
-  const handleCreateChallenge = async () => {
-    const challenge = await createChallenge({
-      name: 'Test Challenge',
-      description: 'Test Description',
-      question_id: 'temp-id',
-    });
-    console.log(challenge);
-  };
+  // const handleCreateChallenge = async () => {
+  //   const challenge = await createChallenge({
+  //     name: 'Test Challenge',
+  //     description: 'Test Description',
+  //     question_id: 'temp-id',
+  //   });
+  //   console.log(challenge);
+  // };
 
   return (
     <main className="flex h-screen">
       <div className="flex w-3/10 flex-col border-r">
         <div className="flex items-center justify-between border-b p-4">
           <p className="text-md font-medium">Test Challenge Title</p>
-          <button onClick={handleCreateChallenge}>Create Challenge</button>
+          {/* <button onClick={handleCreateChallenge}>Create Challenge</button> */}
           <div className="flex items-center space-x-2">
             <button className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-gray-700 dark:hover:text-gray-300">
               <Pencil size={16} />

@@ -1,6 +1,10 @@
+'use client';
+
+import { useTheme } from 'next-themes';
 import Link from 'next/link';
 
 import { OrganizationSwitcher, UserButton } from '@clerk/nextjs';
+import { dark } from '@clerk/themes';
 import { Inbox, Plus, Settings } from 'lucide-react';
 
 import { ThemeToggle } from '@/components/shared/theme-toggle';
@@ -37,6 +41,8 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const { theme } = useTheme();
+
   return (
     <Sidebar>
       <SidebarContent className="flex h-full flex-col">
@@ -65,7 +71,11 @@ export function AppSidebar() {
             </SidebarMenu>
           </div>
           <div className="mt-auto flex items-center justify-between p-4">
-            <OrganizationSwitcher />
+            <OrganizationSwitcher
+              appearance={{
+                baseTheme: theme === 'dark' ? dark : undefined,
+              }}
+            />
             <UserButton />
           </div>
         </SidebarGroup>
