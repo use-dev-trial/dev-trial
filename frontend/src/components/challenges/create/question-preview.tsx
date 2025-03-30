@@ -78,7 +78,10 @@ export default function QuestionPreview({
 
         <div className="overflow-auto">
           <TabsContent value="question" className="space-y-6">
-            <ProblemTab problem={question.problem} onProblemUpdate={onProblemUpdate} />
+            <ProblemTab
+              problem={question.problem}
+              onProblemUpdate={onProblemUpdate || (() => {})}
+            />
           </TabsContent>
           {/* Files Tab Content */}
           <TabsContent value="files">
