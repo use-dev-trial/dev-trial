@@ -30,4 +30,3 @@ class ChallengesService:
             description=challenge.description,
             problem_id=challenge.problem_id,
         )
-
