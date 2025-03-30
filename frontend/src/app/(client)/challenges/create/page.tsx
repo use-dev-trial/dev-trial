@@ -6,8 +6,8 @@ import { UpdatedTab, useChat } from '@/hooks/use-chat';
 import { Settings } from 'lucide-react';
 import { Pencil } from 'lucide-react';
 
-import ChatInterface from '@/components/create-challenge/chat-interface';
-import QuestionPreview from '@/components/create-challenge/question-preview';
+import ChatInterface from '@/components/challenges/create/chat-interface';
+import QuestionPreview from '@/components/challenges/create/question-preview';
 
 import { Message } from '@/lib/messages';
 import { Question } from '@/lib/question';
