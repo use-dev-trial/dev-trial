@@ -19,3 +19,16 @@ class Challenge(BaseModel):
 
 class ChallengeDB(Challenge, DatabaseObjectMixin):
     pass
+
+
+class CreateChallengeRequest(BaseModel):
+    name: str = Field(description="The name of the challenge.")
+    description: str = Field(description="The description of the challenge.")
+    question_id: str = Field(description="The ID of the question that the challenge is based on.")
+
+
+class ChallengeResponse(BaseModel):
+    id: str = Field(description="The ID of the challenge as it is stored in the database.")
+    name: str = Field(description="The name of the challenge.")
+    description: str = Field(description="The description of the challenge.")
+    question_id: str = Field(description="The ID of the question that the challenge is based on.")
