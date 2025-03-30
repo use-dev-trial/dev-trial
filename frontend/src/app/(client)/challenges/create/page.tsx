@@ -20,6 +20,8 @@ import {
 } from '@/types/problems';
 import { Question, defaultQuestion } from '@/types/question';
 
+import { useDebouncedCallback } from '@/lib/utils';
+
 export default function Home() {
   const [question, setQuestion] = useState<Question>(defaultQuestion);
 
@@ -127,25 +129,38 @@ export default function Home() {
     setUpdatedTabs((prev) => prev.filter((t) => t !== tab));
   };
 
+  const handleUpsertProblem = useCallback(
+    async (problemInput: Problem, currentQuestionId: string | undefined) => {
+      console.log('Debounced API call executing...');
+      try {
+        const upsertProblemRequest = upsertProblemRequestSchema.parse({
+          ...problemInput,
+          question_id: currentQuestionId,
+        });
+        const upsertProblemResponse: UpsertProblemResponse =
+          await upsertProblem(upsertProblemRequest);
+
+        setQuestion((prev) => ({
+          ...prev,
+          id: upsertProblemResponse.question_id,
+          problem: upsertProblemResponse,
+        })); // Register ID changes for both the question and/or problem (if they are not created before this invocation)
+        console.log('Problem saved successfully:', upsertProblemResponse.question_id);
+      } catch (error) {
+        console.error('Error updating problem via debounced call:', error);
+        // Can consider reversing the optimistic UI update
+      }
+    },
+    [],
+  );
+
+  const debouncedSaveProblem = useDebouncedCallback(handleUpsertProblem, 1000);
+
   const onProblemUpdate = async (input: Problem) => {
     // Update the question content on the UI regardless of whether API call succeeds
     setQuestion((prev) => ({ ...prev, problem: input }));
 
-    try {
-      const upsertProblemRequest = upsertProblemRequestSchema.parse({
-        ...input,
-        question_id: question.id,
-      });
-      const upsertProblemResponse: UpsertProblemResponse =
-        await upsertProblem(upsertProblemRequest);
-      setQuestion((prev) => ({
-        ...prev,
-        id: upsertProblemResponse.question_id,
-        problem: upsertProblemResponse,
-      })); // Register ID changes for both the question and/or problem (if they are not created before this invocation)
-    } catch (error) {
-      console.error('Error updating problem:', error);
-    }
+    debouncedSaveProblem(input, question.id);
   };
 
   const handleCreateChallenge = async () => {
