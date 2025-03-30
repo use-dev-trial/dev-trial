@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import Editor from '@monaco-editor/react';
 import { ChevronRight, FileCode, FileJson, FileText, FileType } from 'lucide-react';
 
 interface FileProps {
@@ -94,25 +95,7 @@ export default function FileContainer({ files }: FileContainerProps) {
       {/* Code editor */}
       {currentFile && (
         <div className="flex">
-          {/* Line numbers */}
-          <div className="min-w-[50px] border-r bg-gray-50 px-2 py-4 text-right text-gray-500 select-none">
-            {currentFile.code.split('\n').map((_, i) => (
-              <div key={i} className="leading-6">
-                {i + 1}
-              </div>
-            ))}
-          </div>
-
-          {/* Code content */}
-          <pre className="w-full overflow-auto bg-white p-4">
-            <code className="font-mono text-sm">
-              {currentFile.code.split('\n').map((line, i) => (
-                <div key={i} className="leading-6">
-                  {line || ' '}
-                </div>
-              ))}
-            </code>
-          </pre>
+          <Editor height="90vh" defaultLanguage="python" defaultValue={currentFile.code} />
         </div>
       )}
     </div>
