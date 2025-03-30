@@ -1,8 +1,9 @@
 import logging
 
+from supabase._async.client import AsyncClient as Client
+
 from app.models.challenge import Challenge
 from app.models.database import Table
-from supabase._async.client import AsyncClient as Client
 
 log = logging.getLogger(__name__)
 
