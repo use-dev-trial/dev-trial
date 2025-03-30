@@ -9,12 +9,14 @@ interface QuestionPreviewProps {
   question: Question;
   updatedTabs?: UpdatedTab[];
   onTabChange?: (tab: UpdatedTab) => void;
+  isLoading?: boolean;
 }
 
 export default function QuestionPreview({
   question,
   updatedTabs = [],
   onTabChange,
+  isLoading = false,
 }: QuestionPreviewProps) {
   const handleTabChange = (value: string) => {
     if (
@@ -28,13 +30,13 @@ export default function QuestionPreview({
 
   return (
     <div className="mx-auto max-w-4xl p-5">
-      <p className="mb-3 text-lg font-semibold text-slate-800">{question.problem?.title}</p>
+      <p className="text-md mb-4 font-semibold text-slate-800">{question.problem?.title}</p>
       <Tabs defaultValue="question" onValueChange={handleTabChange}>
         <div className="mb-6 flex items-center justify-between border-b">
           <TabsList className="flex h-10 justify-start bg-transparent p-0">
             <TabsTrigger
               value="question"
-              className="rounded-none border-b-2 border-transparent px-4 data-[state=active]:border-blue-500 data-[state=active]:bg-transparent"
+              className="rounded-md border-b-2 border-transparent px-4 data-[state=active]:border-blue-500 data-[state=active]:bg-transparent"
             >
               Question
               {updatedTabs.includes('question') && (
@@ -43,7 +45,7 @@ export default function QuestionPreview({
             </TabsTrigger>
             <TabsTrigger
               value="files"
-              className="rounded-none border-b-2 border-transparent px-4 data-[state=active]:border-blue-500 data-[state=active]:bg-transparent"
+              className="rounded-md border-b-2 border-transparent px-4 data-[state=active]:border-blue-500 data-[state=active]:bg-transparent"
             >
               Files
               {updatedTabs.includes('files') && (
@@ -52,7 +54,7 @@ export default function QuestionPreview({
             </TabsTrigger>
             <TabsTrigger
               value="test-cases"
-              className="rounded-none border-b-2 border-transparent px-4 data-[state=active]:border-blue-500 data-[state=active]:bg-transparent"
+              className="rounded-md border-b-2 border-transparent px-4 data-[state=active]:border-blue-500 data-[state=active]:bg-transparent"
             >
               Test Cases
               {updatedTabs.includes('test-cases') && (
@@ -60,6 +62,14 @@ export default function QuestionPreview({
               )}
             </TabsTrigger>
           </TabsList>
+          {isLoading && (
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white p-4">
+              <div className="flex animate-pulse items-center space-x-2 text-sm text-gray-500">
+                <span className="inline-block h-2 w-2 rounded-full bg-blue-500"></span>
+                <span>updating</span>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="overflow-auto">
@@ -86,7 +96,7 @@ export default function QuestionPreview({
                     <li key={index} className="flex items-start">
                       <Badge
                         variant="outline"
-                        className="mt-0.5 mr-2 border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-50"
+                        className="mt-0.5 mr-2 border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-50"
                       >
                         {index + 1}
                       </Badge>
