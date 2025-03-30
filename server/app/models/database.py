@@ -23,3 +23,9 @@ class DatabaseObjectMixin(BaseModel):
     updated_at: datetime = Field(
         description="The date and time when the question was last updated."
     )
+
+
+class UpsertMixin(BaseModel):
+    question_id: str = Field(
+        description="The ID of the question to update the foreign key or join table for."
+    )

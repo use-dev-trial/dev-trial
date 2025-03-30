@@ -1,23 +1,26 @@
 import { UpdatedTab } from '@/hooks/use-chat';
 
 import FileContainer from '@/components/challenges/create/files-container';
-import { Badge } from '@/components/ui/badge';
+import ProblemTab from '@/components/challenges/create/problem-tab';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+import { Problem } from '@/types/problems';
 import { Question } from '@/types/question';
 
 interface QuestionPreviewProps {
+  isLoading: boolean;
   question: Question;
   updatedTabs?: UpdatedTab[];
   onTabChange?: (tab: UpdatedTab) => void;
-  isLoading?: boolean;
+  onProblemUpdate?: (input: Problem) => void;
 }
 
 export default function QuestionPreview({
+  isLoading,
   question,
   updatedTabs = [],
   onTabChange,
-  isLoading = false,
+  onProblemUpdate,
 }: QuestionPreviewProps) {
   const handleTabChange = (value: string) => {
     if (
@@ -74,39 +77,11 @@ export default function QuestionPreview({
         </div>
 
         <div className="overflow-auto">
-          {/* Question Tab Content */}
           <TabsContent value="question" className="space-y-6">
-            {/* Question Description */}
-            <section>
-              <div className="mb-4 flex items-center">
-                <p className="text-md font-semibold">Question Description</p>
-              </div>
-              <div className="rounded-lg border p-5 shadow-sm">
-                <p className="leading-relaxed">{question?.problem?.description}</p>
-              </div>
-            </section>
-
-            {/* Detailed Requirements */}
-            <section>
-              <div className="mb-4 flex items-center">
-                <p className="text-md font-semibold">Detailed Requirements</p>
-              </div>
-              <div className="rounded-lg border p-5 shadow-sm">
-                <ol className="list-none space-y-3">
-                  {question?.problem?.requirements.map((requirement, index) => (
-                    <li key={index} className="flex items-start">
-                      <Badge
-                        variant="outline"
-                        className="mt-0.5 mr-2 border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-50"
-                      >
-                        {index + 1}
-                      </Badge>
-                      <span>{requirement}</span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </section>
+            <ProblemTab
+              problem={question.problem}
+              onProblemUpdate={onProblemUpdate || (() => {})}
+            />
           </TabsContent>
           {/* Files Tab Content */}
           <TabsContent value="files">
