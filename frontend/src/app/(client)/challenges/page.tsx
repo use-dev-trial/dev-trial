@@ -1,4 +1,4 @@
-import { ChallengeCard } from '@/components/challenges/challenge-card';
+import { ChallengeCard } from '@/components/challenges/card';
 
 export default function ChallengePage() {
   const challenges = [

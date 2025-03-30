@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 
 import { Message } from '@/lib/messages';
 
-import SuggestionCard from './suggestoin-card';
+import SuggestionCard from './suggestion-card';
 
 interface ChatInterfaceProps {
   messages: Message[];
