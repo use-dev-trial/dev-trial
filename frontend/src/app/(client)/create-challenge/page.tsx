@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { UpdatedTab, useChat } from '@/hooks/use-chat';
+import { Settings } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 
 import ChatInterface from '@/components/create-challenge/chat-interface';
 import QuestionPreview from '@/components/create-challenge/question-preview';
@@ -130,11 +132,16 @@ export default function Home() {
   return (
     <main className="flex h-screen bg-slate-50">
       <div className="flex w-3/10 flex-col border-r border-gray-200 bg-white">
-        <div className="border-b border-gray-200 bg-white p-4">
-          <h2 className="text-xl font-semibold">Interview Question Generator</h2>
-          <p className="text-sm text-gray-500">
-            Chat to create and modify your coding interview question
-          </p>
+        <div className="flex items-center justify-between border-b border-gray-200 bg-white p-4">
+          <p className="text-md font-medium">Test Challenge Title</p>
+          <div className="flex items-center space-x-2">
+            <button className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700">
+              <Pencil size={16} />
+            </button>
+            <button className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700">
+              <Settings size={16} />
+            </button>
+          </div>
         </div>
         <div className="flex-1 overflow-hidden">
           <ChatInterface
@@ -146,16 +153,8 @@ export default function Home() {
         </div>
       </div>
       <div ref={previewContainerRef} className="w-7/10 overflow-auto bg-white">
-        {/* <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white p-4">
-          <h2 className="text-xl font-semibold">Question Preview</h2>
-          {isLoading && (
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-blue-500"></span>
-              <span>Updating question...</span>
-            </div>xx
-          )}
-        </div> */}
         <QuestionPreview
+          isLoading={isLoading}
           question={question}
           updatedTabs={updatedTabs}
           onTabChange={handleTabChange}
