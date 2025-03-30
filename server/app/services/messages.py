@@ -23,7 +23,7 @@ MAX_TURNS = 3
 
 class MessagesService:
     async def chat(self, input: MessageRequest, token: str) -> MessageResponse:
-        db_manager = await DatabaseManager.get_instance()
+        db_manager = await DatabaseManager.get_instance(token=token)
         existing_messages: list[TResponseInputItem] = (
             []
             if input.id is None
