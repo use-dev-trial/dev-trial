@@ -1,0 +1,21 @@
+from typing import Optional
+
+from pydantic import BaseModel, Field
+
+from app.models.database import DatabaseObjectMixin
+
+
+class Challenge(BaseModel):
+    id: str = Field(description="The ID of the challenge as it is stored in the database.")
+    name: Optional[str] = Field(
+        default=None,
+        description="The name of the challenge.",
+    )
+    description: Optional[str] = Field(
+        default=None,
+        description="The description of the challenge.",
+    )
+
+
+class ChallengeDB(Challenge, DatabaseObjectMixin):
+    pass
