@@ -1,11 +1,10 @@
 import { UpdatedTab } from '@/hooks/use-chat';
 
+import FileContainer from '@/components/challenges/create/files-container';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { Question } from '@/lib/question';
-
-import FileContainer from './files-container';
 
 interface QuestionPreviewProps {
   question: Question;
@@ -32,7 +31,7 @@ export default function QuestionPreview({
 
   return (
     <div className="mx-auto max-w-4xl p-5">
-      <p className="text-md mb-4 font-semibold text-slate-800">{question.problem?.title}</p>
+      <p className="text-md mb-4 font-semibold">{question.problem?.title}</p>
       <Tabs defaultValue="question" onValueChange={handleTabChange}>
         <div className="mb-6 flex items-center justify-between border-b">
           <TabsList className="flex h-10 justify-start bg-transparent p-0">
@@ -65,10 +64,10 @@ export default function QuestionPreview({
             </TabsTrigger>
           </TabsList>
           {isLoading && (
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white p-4">
-              <div className="flex animate-pulse items-center space-x-2 text-sm text-gray-500">
-                <span className="inline-block h-2 w-2 rounded-full bg-blue-500"></span>
-                <span>updating</span>
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b p-4">
+              <div className="flex animate-pulse items-center space-x-2 text-sm">
+                <span className="inline-block h-2 w-2 rounded-full bg-blue-500 dark:bg-blue-600"></span>
+                <span>Generating</span>
               </div>
             </div>
           )}
@@ -80,19 +79,19 @@ export default function QuestionPreview({
             {/* Question Description */}
             <section>
               <div className="mb-4 flex items-center">
-                <p className="text-md font-semibold text-slate-800">Question Description</p>
+                <p className="text-md font-semibold">Question Description</p>
               </div>
-              <div className="rounded-lg border border-slate-100 bg-white p-5 shadow-sm">
-                <p className="leading-relaxed text-slate-700">{question?.problem?.description}</p>
+              <div className="rounded-lg border p-5 shadow-sm">
+                <p className="leading-relaxed">{question?.problem?.description}</p>
               </div>
             </section>
 
             {/* Detailed Requirements */}
             <section>
               <div className="mb-4 flex items-center">
-                <p className="text-md font-semibold text-slate-800">Detailed Requirements</p>
+                <p className="text-md font-semibold">Detailed Requirements</p>
               </div>
-              <div className="rounded-lg border border-slate-100 bg-white p-5 shadow-sm">
+              <div className="rounded-lg border p-5 shadow-sm">
                 <ol className="list-none space-y-3">
                   {question?.problem?.requirements.map((requirement, index) => (
                     <li key={index} className="flex items-start">
@@ -102,7 +101,7 @@ export default function QuestionPreview({
                       >
                         {index + 1}
                       </Badge>
-                      <span className="text-slate-700">{requirement}</span>
+                      <span>{requirement}</span>
                     </li>
                   ))}
                 </ol>
@@ -120,12 +119,12 @@ export default function QuestionPreview({
           <TabsContent value="test-cases">
             <section>
               <div className="mb-4 flex items-center">
-                <p className="text-md font-semibold text-slate-800">Test Cases</p>
+                <p className="text-md font-semibold">Test Cases</p>
               </div>
-              <div className="divide-y divide-slate-100 rounded-lg border border-slate-100 bg-white shadow-sm">
+              <div className="divide-y divide-slate-100 rounded-lg border shadow-sm">
                 {question?.test_cases?.map((testCase, index) => (
                   <div key={index} className="p-5">
-                    <h3 className="mb-3 flex items-center font-medium text-slate-800">
+                    <h3 className="mb-3 flex items-center font-medium">
                       <span className="mr-2 inline-block h-2 w-2 rounded-full bg-blue-500"></span>
                       {testCase.description}
                     </h3>
