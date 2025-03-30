@@ -1,8 +1,11 @@
 import httpx
 from fastapi import Header, HTTPException
 
+from app.utils.database import db_client
 
-async def verify_token(authorization: str = Header(...)):
+
+async def init_db_client(authorization: str = Header(...)):
     if not authorization.startswith("Bearer "):
         raise HTTPException(status_code=httpx.codes.UNAUTHORIZED, detail="Invalid token format")
-    return authorization.removeprefix("Bearer ").strip()
+
+    return await db_client(token=authorization.removeprefix("Bearer ").strip())

@@ -3,6 +3,7 @@ import logging
 from typing import Optional
 
 from agents import RunConfig, Runner, RunResult, TResponseInputItem
+from supabase._async.client import AsyncClient as Client
 
 from app.inference.agents import triager
 from app.inference.constants import AgentNames
@@ -13,7 +14,7 @@ from app.models.message import MessageRequest, MessageResponse, Role
 from app.models.problem import Problem
 from app.models.question import Question
 from app.models.test_case import TestCase
-from app.utils.database import DatabaseManager, is_valid_uuid
+from app.utils.database import is_valid_uuid
 
 log = logging.getLogger(__name__)
 
@@ -22,23 +23,22 @@ MAX_TURNS = 3
 
 
 class MessagesService:
-    async def chat(self, input: MessageRequest, token: str) -> MessageResponse:
-        db_manager = await DatabaseManager.get_instance()
+    async def chat(self, input: MessageRequest, client: Client) -> MessageResponse:
         existing_messages: list[TResponseInputItem] = (
             []
             if input.id is None
-            else await _retrieve_existing_messages(db_manager=db_manager, message_id=input.id)
+            else await _retrieve_existing_messages(client=client, message_id=input.id)
         )
 
         # Add user message to existing messages
         existing_messages.append({"role": Role.USER.value, "content": input.content})
 
         if input.question_id is None:
-            db_result = await db_manager.client.table(Table.QUESTIONS).insert({}).execute()
+            db_result = await client.table(Table.QUESTIONS).insert({}).execute()
             question = Question(id=db_result.data[0]["id"])
         else:
             question = await _retrieve_existing_question(
-                db_manager=db_manager, question_id=input.question_id
+                client=client, question_id=input.question_id
             )
 
         num_turns = 0
@@ -60,11 +60,11 @@ class MessagesService:
                 case AgentNames.PROBLEM_GENERATOR:
                     if not question.problem:
                         problem: Problem = await _insert_problem(
-                            db_manager=db_manager, result=result, question_id=question.id
+                            client=client, result=result, question_id=question.id
                         )
                     else:
                         problem: Problem = await _update_problem(
-                            db_manager=db_manager, result=result, problem_id=question.problem.id
+                            client=client, result=result, problem_id=question.problem.id
                         )
                     question.problem = problem
                     existing_messages.append(
@@ -76,11 +76,11 @@ class MessagesService:
                 case AgentNames.FILE_GENERATOR:
                     if not question.files:
                         files: list[File] = await _insert_files(
-                            db_manager=db_manager, result=result, question_id=question.id
+                            client=client, result=result, question_id=question.id
                         )
                     else:
                         files: list[File] = await _update_files(
-                            db_manager=db_manager,
+                            client=client,
                             result=result,
                             original_files=question.files,
                             question_id=question.id,
@@ -95,11 +95,11 @@ class MessagesService:
                 case AgentNames.TEST_GENERATOR:
                     if not question.test_cases:
                         test_cases: list[TestCase] = await _insert_test_cases(
-                            db_manager=db_manager, result=result, question_id=question.id
+                            client=client, result=result, question_id=question.id
                         )
                     else:
                         test_cases: list[TestCase] = await _update_test_cases(
-                            db_manager=db_manager,
+                            client=client,
                             result=result,
                             original_test_cases=question.test_cases,
                             question_id=question.id,
@@ -125,14 +125,14 @@ class MessagesService:
         if input.id is None:
             # Create a new entry in the messages table
             db_result = (
-                await db_manager.client.table(Table.MESSAGES)
+                await client.table(Table.MESSAGES)
                 .insert([{"messages": existing_messages}])
                 .execute()
             )
         else:
             # Update existing entry in the messages table
             db_result = (
-                await db_manager.client.table(Table.MESSAGES)
+                await client.table(Table.MESSAGES)
                 .update({"messages": existing_messages})
                 .eq("id", input.id)
                 .execute()
@@ -153,9 +153,7 @@ class MessagesService:
         )
 
 
-async def _insert_files(
-    db_manager: DatabaseManager, result: RunResult, question_id: str
-) -> list[File]:
+async def _insert_files(client: Client, result: RunResult, question_id: str) -> list[File]:
     """
     Inserts the newly generated files into the Files table.
     Inserts the corresponding entry in the question_file join table to keep track of the relation.
@@ -163,7 +161,7 @@ async def _insert_files(
     files: list[File] = []
     for file in result.final_output:
         insert_file_result = (
-            await db_manager.client.table(Table.FILES)
+            await client.table(Table.FILES)
             .insert(
                 {
                     "name": file.name,
@@ -180,7 +178,7 @@ async def _insert_files(
                 code=file.code,
             )
         )
-        await db_manager.client.table(Table.QUESTION_FILE).insert(
+        await client.table(Table.QUESTION_FILE).insert(
             {
                 "question_id": question_id,
                 "file_id": file_id,
@@ -191,7 +189,7 @@ async def _insert_files(
 
 
 async def _update_files(
-    db_manager: DatabaseManager, result: RunResult, original_files: list[File], question_id: str
+    client: Client, result: RunResult, original_files: list[File], question_id: str
 ) -> list[File]:
     """
     Updates the files table with the most recently generated files.
@@ -200,7 +198,7 @@ async def _update_files(
     for file in result.final_output:
         if is_valid_uuid(file.id):
             # LLM updates an existing test case
-            await db_manager.client.table(Table.FILES).update(
+            await client.table(Table.FILES).update(
                 {
                     "name": file.name,
                     "code": file.code,
@@ -214,7 +212,7 @@ async def _update_files(
         else:
             # LLM either creates a new file of hallucinates id of an existing file. For now, we will just create a new file
             insert_file_result = (
-                await db_manager.client.table(Table.FILES)
+                await client.table(Table.FILES)
                 .insert(
                     {
                         "name": file.name,
@@ -223,7 +221,7 @@ async def _update_files(
                 )
                 .execute()
             )
-            await db_manager.client.table(Table.QUESTION_FILE).insert(
+            await client.table(Table.QUESTION_FILE).insert(
                 {
                     "question_id": question_id,
                     "file_id": insert_file_result.data[0]["id"],
@@ -247,9 +245,7 @@ async def _update_files(
     return final_files
 
 
-async def _insert_test_cases(
-    db_manager: DatabaseManager, result: RunResult, question_id: str
-) -> list[TestCase]:
+async def _insert_test_cases(client: Client, result: RunResult, question_id: str) -> list[TestCase]:
     """
     Inserts the newly generated test cases into the test_case table.
     Inserts the corresponding entry in the question_test_case join table to keep track of the relation.
@@ -257,7 +253,7 @@ async def _insert_test_cases(
     test_cases: list[TestCase] = []
     for test_case in result.final_output:
         insert_test_case_result = (
-            await db_manager.client.table(Table.TEST_CASES)
+            await client.table(Table.TEST_CASES)
             .insert(
                 {
                     "description": test_case.description,
@@ -272,7 +268,7 @@ async def _insert_test_cases(
                 description=test_case.description,
             )
         )
-        await db_manager.client.table(Table.QUESTION_TEST_CASE).insert(
+        await client.table(Table.QUESTION_TEST_CASE).insert(
             {
                 "question_id": question_id,
                 "test_case_id": test_case_id,
@@ -283,7 +279,7 @@ async def _insert_test_cases(
 
 
 async def _update_test_cases(
-    db_manager: DatabaseManager,
+    client: Client,
     result: RunResult,
     original_test_cases: list[TestCase],
     question_id: str,
@@ -295,7 +291,7 @@ async def _update_test_cases(
     for test_case in result.final_output:
         if is_valid_uuid(test_case.id):
             # LLM updates an existing test case
-            await db_manager.client.table(Table.TEST_CASES).update(
+            await client.table(Table.TEST_CASES).update(
                 {
                     "description": test_case.description,
                 }
@@ -307,7 +303,7 @@ async def _update_test_cases(
         else:
             # LLM either creates a new test case of hallucinates id of an existing test case. For now, we will just create a new test case
             insert_test_case_result = (
-                await db_manager.client.table(Table.TEST_CASES)
+                await client.table(Table.TEST_CASES)
                 .insert(
                     {
                         "description": test_case.description,
@@ -315,7 +311,7 @@ async def _update_test_cases(
                 )
                 .execute()
             )
-            await db_manager.client.table(Table.QUESTION_TEST_CASE).insert(
+            await client.table(Table.QUESTION_TEST_CASE).insert(
                 {
                     "question_id": question_id,
                     "test_case_id": insert_test_case_result.data[0]["id"],
@@ -338,15 +334,13 @@ async def _update_test_cases(
     return final_test_cases
 
 
-async def _insert_problem(
-    db_manager: DatabaseManager, result: RunResult, question_id: str
-) -> Problem:
+async def _insert_problem(client: Client, result: RunResult, question_id: str) -> Problem:
     """
     Inserts the newly generated problem into the Problems table.
     Updates the problem_id foreign key in the Questions table.
     """
     insert_problem_result = (
-        await db_manager.client.table(Table.PROBLEMS)
+        await client.table(Table.PROBLEMS)
         .insert(
             {
                 "title": result.final_output.title,
@@ -357,7 +351,7 @@ async def _insert_problem(
         .execute()
     )
     problem_id: str = insert_problem_result.data[0]["id"]
-    await db_manager.client.table(Table.QUESTIONS).update({"problem_id": problem_id}).eq(
+    await client.table(Table.QUESTIONS).update({"problem_id": problem_id}).eq(
         "id", question_id
     ).execute()
     return Problem(
@@ -368,13 +362,11 @@ async def _insert_problem(
     )
 
 
-async def _update_problem(
-    db_manager: DatabaseManager, result: RunResult, problem_id: str
-) -> Problem:
+async def _update_problem(client: Client, result: RunResult, problem_id: str) -> Problem:
     """
     Updates the more recently modified version of the problem in the Problems table.
     """
-    await db_manager.client.table(Table.PROBLEMS).update(
+    await client.table(Table.PROBLEMS).update(
         {
             "title": result.final_output.title,
             "description": result.final_output.description,
@@ -389,21 +381,15 @@ async def _update_problem(
     )
 
 
-async def _retrieve_existing_question(db_manager: DatabaseManager, question_id: str) -> Question:
+async def _retrieve_existing_question(client: Client, question_id: str) -> Question:
     problem_id_task = (
-        db_manager.client.table(Table.QUESTIONS)
-        .select("problem_id")
-        .eq("id", question_id)
-        .execute()
+        client.table(Table.QUESTIONS).select("problem_id").eq("id", question_id).execute()
     )
     file_ids_task = (
-        db_manager.client.table(Table.QUESTION_FILE)
-        .select("file_id")
-        .eq("question_id", question_id)
-        .execute()
+        client.table(Table.QUESTION_FILE).select("file_id").eq("question_id", question_id).execute()
     )
     test_case_ids_task = (
-        db_manager.client.table(Table.QUESTION_TEST_CASE)
+        client.table(Table.QUESTION_TEST_CASE)
         .select("test_case_id")
         .eq("question_id", question_id)
         .execute()
@@ -432,22 +418,19 @@ async def _retrieve_existing_question(db_manager: DatabaseManager, question_id: 
     )
 
     problem_task = (
-        db_manager.client.table(Table.PROBLEMS).select("problems").eq("id", problem_id).execute()
+        client.table(Table.PROBLEMS).select("problems").eq("id", problem_id).execute()
         if problem_id
         else asyncio.sleep(0)
     )
 
     file_task = (
-        db_manager.client.table(Table.FILES).select("files").in_("id", file_ids).execute()
+        client.table(Table.FILES).select("files").in_("id", file_ids).execute()
         if file_ids
         else asyncio.sleep(0)
     )
 
     test_case_task = (
-        db_manager.client.table(Table.TEST_CASES)
-        .select("test_cases")
-        .in_("id", test_case_ids)
-        .execute()
+        client.table(Table.TEST_CASES).select("test_cases").in_("id", test_case_ids).execute()
         if test_case_ids
         else asyncio.sleep(0)
     )
@@ -486,15 +469,8 @@ async def _retrieve_existing_question(db_manager: DatabaseManager, question_id: 
     return Question(id=question_id, problem=problem, files=files, test_cases=test_cases)
 
 
-async def _retrieve_existing_messages(
-    db_manager: DatabaseManager, message_id: str
-) -> list[TResponseInputItem]:
-    result = (
-        await db_manager.client.table(Table.MESSAGES)
-        .select("messages")
-        .eq("id", message_id)
-        .execute()
-    )
+async def _retrieve_existing_messages(client: Client, message_id: str) -> list[TResponseInputItem]:
+    result = await client.table(Table.MESSAGES).select("messages").eq("id", message_id).execute()
     if not result.data:
         raise ValueError(f"Chat with id '{message_id}' not found.")
     existing_messages = result.data[0]["messages"]
