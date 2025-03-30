@@ -15,13 +15,11 @@ export default function ProblemTab({ problem, onProblemUpdate }: ProblemTabProps
         <div className="mb-4 flex items-center">
           <p className="text-md font-semibold">Question Description</p>
         </div>
-        <div className="rounded-lg border p-5 shadow-sm">
-          <Input
-            className="leading-relaxed"
-            onChange={(e) => onProblemUpdate({ ...problem, description: e.target.value })}
-            value={problem.description}
-          />
-        </div>
+        <Input
+          className="rounded-lg leading-relaxed shadow-sm"
+          onChange={(e) => onProblemUpdate({ ...problem, description: e.target.value })}
+          value={problem.description}
+        />
       </section>
 
       <section>
