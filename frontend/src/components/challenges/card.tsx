@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import { useState } from 'react';
 
 import { Check, Copy } from 'lucide-react';
@@ -7,6 +9,7 @@ import { Check, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
+import { CLIENT_ROUTES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 interface Challenge {
@@ -32,7 +35,7 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
   };
 
   return (
-    <Card className="overflow-hidden rounded-md border border-gray-200 transition-all duration-300 hover:shadow-md">
+    <Card className="overflow-hidden rounded-md border transition-all duration-300 hover:shadow-md">
       <div className="p-5">
         <div className="mb-4 flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -45,26 +48,27 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
               <span className="text-sm font-medium text-white">{challenge.name.charAt(0)}</span>
             </div>
             <div>
-              <h3 className="font-medium text-gray-800">{challenge.name}</h3>
-              <p className="text-xs text-gray-500">{challenge.date}</p>
+              <h3 className="font-medium">{challenge.name}</h3>
+              <p className="text-xs">{challenge.date}</p>
             </div>
           </div>
 
           <Button
             onClick={copyToClipboard}
-            className="green:border-green-500 green:bg-green-800 green:text-white green:hover:bg-green-700 rounded-md border border-gray-300 bg-white p-1.5 text-black transition-colors hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+            className="green:border-green-500 green:bg-green-800 green:text-white green:hover:bg-green-700 rounded-md bg-white p-1.5 text-black transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
             aria-label="Copy URL"
+            variant="ghost"
           >
             {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
           </Button>
         </div>
 
         <CardContent className="p-0">
-          <p className="line-clamp-3 text-sm text-gray-600">{challenge.description}</p>
+          <p className="line-clamp-3 text-sm">{challenge.description}</p>
 
-          <div className="mt-4 border-t border-gray-100 pt-3">
-            <a
-              href={`/challenges/${challenge.id}`}
+          <div className="mt-4 border-t pt-3">
+            <Link
+              href={CLIENT_ROUTES.CHALLENGES_DETAIL(challenge.id)}
               className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
               rel="noopener noreferrer"
             >
@@ -83,7 +87,7 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
                   d="M14 5l7 7m0 0l-7 7m7-7H3"
                 />
               </svg>
-            </a>
+            </Link>
           </div>
         </CardContent>
       </div>
