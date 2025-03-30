@@ -130,15 +130,15 @@ export default function Home() {
   };
 
   return (
-    <main className="flex h-screen bg-slate-50">
-      <div className="flex w-3/10 flex-col border-r border-gray-200 bg-white">
-        <div className="flex items-center justify-between border-b border-gray-200 bg-white p-4">
+    <main className="flex h-screen">
+      <div className="flex w-3/10 flex-col border-r">
+        <div className="flex items-center justify-between border-b p-4">
           <p className="text-md font-medium">Test Challenge Title</p>
           <div className="flex items-center space-x-2">
-            <button className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700">
+            <button className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-gray-700 dark:hover:text-gray-300">
               <Pencil size={16} />
             </button>
-            <button className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700">
+            <button className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-gray-700 dark:hover:text-gray-300">
               <Settings size={16} />
             </button>
           </div>
@@ -152,7 +152,7 @@ export default function Home() {
           />
         </div>
       </div>
-      <div ref={previewContainerRef} className="w-7/10 overflow-auto bg-white">
+      <div ref={previewContainerRef} className="w-7/10 overflow-auto">
         <QuestionPreview
           isLoading={isLoading}
           question={question}

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ThemeProvider } from 'next-themes';
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import { ClerkProvider } from '@clerk/nextjs';
@@ -32,17 +33,24 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <QueryProvider>
-            <SidebarProvider>
-              <AppSidebar />
-              <div className="flex w-full flex-col peer-data-[state=collapsed]:pl-10">
-                <CustomSidebarTrigger location="layout" />
-                {children}
-              </div>
-            </SidebarProvider>
-          </QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <QueryProvider>
+              <SidebarProvider>
+                <AppSidebar />
+                <div className="flex w-full flex-col peer-data-[state=collapsed]:pl-10">
+                  <CustomSidebarTrigger location="layout" />
+                  {children}
+                </div>
+              </SidebarProvider>
+            </QueryProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

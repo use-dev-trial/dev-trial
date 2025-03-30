@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { Check, Copy } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 import { cn } from '@/lib/utils';
@@ -49,17 +50,13 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
             </div>
           </div>
 
-          <button
+          <Button
             onClick={copyToClipboard}
-            className="rounded-md p-1.5 transition-colors hover:bg-gray-100"
+            className="green:border-green-500 green:bg-green-800 green:text-white green:hover:bg-green-700 rounded-md border border-gray-300 bg-white p-1.5 text-black transition-colors hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
             aria-label="Copy URL"
           >
-            {copied ? (
-              <Check className="h-4 w-4 text-green-600" />
-            ) : (
-              <Copy className="h-4 w-4 text-gray-400" />
-            )}
-          </button>
+            {copied ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+          </Button>
         </div>
 
         <CardContent className="p-0">
