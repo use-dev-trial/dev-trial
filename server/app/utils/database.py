@@ -1,11 +1,10 @@
 import logging
 import os
 import uuid
-from typing import Optional
 
+from supabase import AsyncClientOptions
 from supabase._async.client import AsyncClient as Client
 from supabase._async.client import create_client
-from supabase import AsyncClientOptions
 
 log = logging.getLogger(__name__)
 
@@ -18,47 +17,21 @@ def is_valid_uuid(value):
         return False
 
 
-class DatabaseManager:
-    _instance: Optional["DatabaseManager"] = None
-    client: Client = None  # type: ignore
-
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-
-    async def _init(self, token: str):
-        if self.client is not None:
-            return
-
-        try:
-            supabase_url = os.environ["SUPABASE_URL"]
-            supabase_key = os.environ["SUPABASE_ANON_KEY"]
-            self.client = await create_client(
-                supabase_url=supabase_url,
-                supabase_key=supabase_key,
-                options=AsyncClientOptions(
-                    headers={
-                        "Authorization": f"Bearer {token}",
-                        "apiKey": supabase_key,
-                    }
-                ),
-            )
-            log.info("Supabase client initialized.")
-        except KeyError as e:
-            log.error(f"Missing environment variable: {e}")
-            raise
-        except Exception as e:
-            log.error(f"Error initializing Supabase client: {e}")
-            raise
-
-    @classmethod
-    async def get_instance(cls, token: str) -> "DatabaseManager":
-        if cls._instance is None:
-            cls._instance = cls()
-
-        await cls._instance._init(token=token)
-        return cls._instance
+async def db_client(
+    token: str,
+) -> Client:
+    supabase_url = os.environ["SUPABASE_URL"]
+    supabase_key = os.environ["SUPABASE_ANON_KEY"]
+    return await create_client(
+        supabase_url=supabase_url,
+        supabase_key=supabase_key,
+        options=AsyncClientOptions(
+            headers={
+                "Authorization": f"Bearer {token}",
+                "apiKey": supabase_key,
+            }
+        ),
+    )
 
 
 """
