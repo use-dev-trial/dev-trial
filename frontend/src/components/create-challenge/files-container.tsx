@@ -95,7 +95,7 @@ export default function FileContainer({ files }: FileContainerProps) {
       {/* Code editor */}
       {currentFile && (
         <div className="flex">
-          <Editor height="90vh" defaultLanguage="python" defaultValue={currentFile.code} />
+          <Editor height="90vh" defaultLanguage="python" value={currentFile.code} />
         </div>
       )}
     </div>
