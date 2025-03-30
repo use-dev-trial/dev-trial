@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { send } from '@/actions/messages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { File } from '@/types/files';
 import {
   Message,
   MessageRequest,
@@ -12,25 +13,51 @@ import {
   messageRequestSchema,
   role,
 } from '@/types/messages';
-import { Question } from '@/types/question';
+import { Problem } from '@/types/problems';
+import { Question, TestCase, defaultQuestion } from '@/types/question';
 
-// Define the tabs that can be updated
-export type UpdatedTab = 'question' | 'files' | 'test-cases';
+export type Tab = 'question' | 'files' | 'test-cases';
 
-interface UseChatOptions {
-  initialMessages?: Message[];
-  onResponse?: (message: Message, messageId?: string) => void;
-  onQuestionUpdate?: (update: Question, updatedTabs: UpdatedTab[]) => void;
-}
+const isProblemUpdated = (q1: Problem, q2: Problem): boolean => {
+  // Dont account for id changes as we do not want to account for manual changes by the user
+  return (
+    q1.title !== q2.title ||
+    q1.description !== q2.description ||
+    q1.requirements !== q2.requirements
+  );
+};
 
-export function useChat({
-  initialMessages = [],
-  onResponse,
-  onQuestionUpdate,
-}: UseChatOptions = {}) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [lastMessageId, setLastMessageId] = useState<string | null>(null);
-  const [updatedTabs, setUpdatedTabs] = useState<UpdatedTab[]>([]);
+const areFilesUpdated = (f1: File[], f2: File[]): boolean => {
+  // Dont account for id changes as we do not want to account for manual changes by the user
+  if (f1.length !== f2.length) {
+    return true;
+  }
+  for (let i = 0; i < f1.length; i++) {
+    if (f1[i].name !== f2[i].name || f1[i].code !== f2[i].code) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const areTestCasesUpdated = (t1: TestCase[], t2: TestCase[]): boolean => {
+  // Dont account for id changes as we do not want to account for manual changes by the user
+  if (t1.length !== t2.length) {
+    return true;
+  }
+  for (let i = 0; i < t1.length; i++) {
+    if (t1[i].description !== t2[i].description) {
+      return true;
+    }
+  }
+  return false;
+};
+
+export function useChat() {
+  const [question, setQuestion] = useState<Question>(defaultQuestion);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [lastMessageId, setLastMessageId] = useState<string>('');
+  const [updatedTabs, setUpdatedTabs] = useState<Tab[]>([]);
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -53,42 +80,22 @@ export function useChat({
       setMessages((prev) => [...prev, assistantMessage]);
       setLastMessageId(data.id);
 
-      if (onResponse) {
-        onResponse(assistantMessage, data.id);
+      // Determine which tabs were updated
+      const tabs: Tab[] = [];
+
+      if (isProblemUpdated(question.problem, data.question.problem)) {
+        tabs.push('question');
       }
 
-      if (data.question && onQuestionUpdate) {
-        // Determine which tabs were updated
-        const tabs: UpdatedTab[] = [];
-
-        if (data.question.problem) {
-          tabs.push('question');
-        }
-
-        if (data.question.files) {
-          tabs.push('files');
-        }
-
-        if (data.question.test_cases) {
-          tabs.push('test-cases');
-        }
-
-        // Only update if we have tabs to update and a callback
-        if (tabs.length > 0) {
-          // Update the state with the newly updated tabs, but only if they're new
-          setUpdatedTabs((prev) => {
-            // Create a new Set to ensure uniqueness
-            const newSet = new Set([...prev, ...tabs]);
-            const uniqueTabs = Array.from(newSet);
-
-            // Only return a new array if there are actually new tabs
-            return uniqueTabs.length !== prev.length ? uniqueTabs : prev;
-          });
-
-          // Pass both the question and updated tabs to the callback
-          onQuestionUpdate(data.question, tabs);
-        }
+      if (areFilesUpdated(question.files, data.question.files)) {
+        tabs.push('files');
       }
+
+      if (areTestCasesUpdated(question.test_cases, data.question.test_cases)) {
+        tabs.push('test-cases');
+      }
+      setUpdatedTabs(tabs);
+      setQuestion(data.question);
 
       queryClient.invalidateQueries({ queryKey: ['messages'] });
     },
@@ -99,27 +106,20 @@ export function useChat({
 
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
-    mutation.mutate({ content, id: lastMessageId || undefined });
+    mutation.mutate({ content, id: lastMessageId });
   };
 
-  // Add function to clear a tab from the updated tabs list
-  const clearUpdatedTab = (tab: UpdatedTab) => {
-    setUpdatedTabs((prev) => prev.filter((t) => t !== tab));
-  };
-
-  // Add function to clear all updated tabs
-  const clearAllUpdatedTabs = () => {
-    setUpdatedTabs([]);
+  const clearUpdatedTab = (tab: Tab) => {
+    setUpdatedTabs((prev) => prev.filter((t: Tab) => t !== tab));
   };
 
   return {
+    question,
     messages,
     isLoading: mutation.isPending,
-    error: mutation.error,
-    sendMessage,
-    lastMessageId,
     updatedTabs,
+    sendMessage,
+    setQuestion,
     clearUpdatedTab,
-    clearAllUpdatedTabs,
   };
 }

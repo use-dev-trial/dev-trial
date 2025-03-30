@@ -8,7 +8,7 @@ class Problem(BaseModel):
     title: str = Field(description="The title of the question.")
     description: str = Field(description="The general overview of the question.")
     requirements: list[str] = Field(
-        description="The requirements which the candidate must meet to successfully complete the question."
+        description="The requirements which the candidate must meet to successfully complete the question.",
     )
 
 

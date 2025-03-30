@@ -1,4 +1,4 @@
-import { UpdatedTab } from '@/hooks/use-chat';
+import { Tab } from '@/hooks/use-chat';
 
 import FileContainer from '@/components/challenges/create/files-container';
 import ProblemTab from '@/components/challenges/create/problem-tab';
@@ -10,8 +10,8 @@ import { Question } from '@/types/question';
 interface QuestionPreviewProps {
   isLoading: boolean;
   question: Question;
-  updatedTabs?: UpdatedTab[];
-  onTabChange?: (tab: UpdatedTab) => void;
+  updatedTabs?: Tab[];
+  onTabChange?: (tab: Tab) => void;
   onProblemUpdate?: (input: Problem) => void;
 }
 
@@ -26,15 +26,15 @@ export default function QuestionPreview({
     if (
       onTabChange &&
       ['question', 'files', 'test-cases'].includes(value) &&
-      updatedTabs.includes(value as UpdatedTab)
+      updatedTabs.includes(value as Tab)
     ) {
-      onTabChange(value as UpdatedTab);
+      onTabChange(value as Tab);
     }
   };
 
   return (
     <div className="mx-auto max-w-4xl p-5">
-      <p className="text-md mb-4 font-semibold">{question.problem?.title}</p>
+      <p className="text-md mb-4 font-semibold">{question.problem.title || 'Untitled Question'}</p>
       <Tabs defaultValue="question" onValueChange={handleTabChange}>
         <div className="mb-6 flex items-center justify-between border-b">
           <TabsList className="flex h-10 justify-start bg-transparent p-0">
@@ -86,7 +86,7 @@ export default function QuestionPreview({
           {/* Files Tab Content */}
           <TabsContent value="files">
             <section>
-              <FileContainer files={question?.files || []} />
+              <FileContainer files={question.files || []} />
             </section>
           </TabsContent>
 
@@ -97,7 +97,7 @@ export default function QuestionPreview({
                 <p className="text-md font-semibold">Test Cases</p>
               </div>
               <div className="divide-y divide-slate-100 rounded-lg border shadow-sm">
-                {question?.test_cases?.map((testCase, index) => (
+                {question.test_cases.map((testCase, index) => (
                   <div key={index} className="p-5">
                     <h3 className="mb-3 flex items-center font-medium">
                       <span className="mr-2 inline-block h-2 w-2 rounded-full bg-blue-500"></span>

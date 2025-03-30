@@ -1,133 +1,25 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { createChallenge } from '@/actions/challenges';
 import { upsertProblem } from '@/actions/problems';
-import { UpdatedTab, useChat } from '@/hooks/use-chat';
+import { useChat } from '@/hooks/use-chat';
 import { Settings } from 'lucide-react';
 import { Pencil } from 'lucide-react';
 
 import ChatInterface from '@/components/challenges/create/chat-interface';
 import QuestionPreview from '@/components/challenges/create/question-preview';
 
-import { Message } from '@/types/messages';
-import {
-  Problem,
-  UpsertProblemResponse,
-  defaultProblem,
-  upsertProblemRequestSchema,
-} from '@/types/problems';
-import { Question, defaultQuestion } from '@/types/question';
+import { Problem, UpsertProblemResponse, upsertProblemRequestSchema } from '@/types/problems';
 
 import { useDebouncedCallback } from '@/lib/utils';
 
 export default function Home() {
-  const [question, setQuestion] = useState<Question>(defaultQuestion);
-
-  const [updatedQuestion, setUpdatedQuestion] = useState<Question>(question);
-  const [updatedTabs, setUpdatedTabs] = useState<UpdatedTab[]>([]);
-
   const previewContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleResponse = useCallback((message: Message, messageId?: string) => {
-    console.log(message);
-    if (messageId) {
-      console.log('Response message ID:', messageId);
-    }
-  }, []);
-
-  const handleQuestionUpdate = useCallback((update: Question, changedTabs: UpdatedTab[]) => {
-    const scrollPosition = previewContainerRef.current?.scrollTop || 0;
-
-    // Only update if there are actual changes
-    if (update) {
-      setUpdatedQuestion((prevQuestion) => {
-        const updated: Question = {
-          id: prevQuestion.id,
-          problem: prevQuestion.problem
-            ? {
-                id: prevQuestion.problem.id,
-                title: prevQuestion.problem.title,
-                description: prevQuestion.problem.description,
-                requirements: prevQuestion.problem.requirements,
-              }
-            : defaultProblem,
-          files: prevQuestion.files,
-          test_cases: prevQuestion.test_cases,
-        };
-
-        let hasChanges = false;
-
-        if (update.problem && prevQuestion.problem) {
-          const newProblem = {
-            id: prevQuestion.problem.id,
-            title: update.problem.title ?? prevQuestion.problem.title,
-            description: update.problem.description ?? prevQuestion.problem.description,
-            requirements: update.problem.requirements ?? prevQuestion.problem.requirements,
-          };
-
-          // Only update if something actually changed
-          if (
-            newProblem.title !== prevQuestion.problem.title ||
-            newProblem.description !== prevQuestion.problem.description ||
-            JSON.stringify(newProblem.requirements) !==
-              JSON.stringify(prevQuestion.problem.requirements)
-          ) {
-            updated.problem = newProblem;
-            hasChanges = true;
-          }
-        }
-
-        if (update.test_cases) {
-          updated.test_cases = update.test_cases;
-          hasChanges = true;
-        }
-
-        if (update.files) {
-          updated.files = update.files;
-          hasChanges = true;
-        }
-
-        // Only return a new object if there were actually changes
-        return hasChanges ? updated : prevQuestion;
-      });
-    }
-
-    // Only update updatedTabs if there are new tabs to add
-    if (changedTabs.length > 0) {
-      setUpdatedTabs((prev) => {
-        const newTabs = [...new Set([...prev, ...changedTabs])];
-        // Only update if there are actually new tabs
-        return newTabs.length !== prev.length ? newTabs : prev;
-      });
-    }
-
-    // Restore scroll position after update
-    setTimeout(() => {
-      if (previewContainerRef.current) {
-        previewContainerRef.current.scrollTop = scrollPosition;
-      }
-    }, 0);
-  }, []);
-
-  const { messages, sendMessage, isLoading, clearUpdatedTab } = useChat({
-    onResponse: handleResponse,
-    onQuestionUpdate: handleQuestionUpdate,
-  });
-
-  useEffect(() => {
-    // Only update the question state when updatedQuestion actually changes
-    setQuestion(updatedQuestion);
-  }, [updatedQuestion]);
-
-  // Handle clearing a tab's updated status when it's viewed
-  const onTabChange = (tab: UpdatedTab) => {
-    clearUpdatedTab(tab);
-
-    // Also update our local state
-    setUpdatedTabs((prev) => prev.filter((t) => t !== tab));
-  };
+  const { question, messages, isLoading, updatedTabs, sendMessage, setQuestion, clearUpdatedTab } =
+    useChat();
 
   const handleUpsertProblem = useCallback(
     async (problemInput: Problem, currentQuestionId: string | undefined) => {
@@ -167,7 +59,7 @@ export default function Home() {
     const challenge = await createChallenge({
       name: 'Test Challenge',
       description: 'Test Description',
-      question_id: 'temp-id',
+      question_id: '',
     });
     console.log(challenge);
   };
@@ -201,7 +93,7 @@ export default function Home() {
           isLoading={isLoading}
           question={question}
           updatedTabs={updatedTabs}
-          onTabChange={onTabChange}
+          onTabChange={clearUpdatedTab}
           onProblemUpdate={onProblemUpdate}
         />
       </div>

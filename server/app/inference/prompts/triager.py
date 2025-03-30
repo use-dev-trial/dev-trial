@@ -23,6 +23,7 @@ Note the following:
 1. If the user's instruction is not clear or you need user input/clarification on how to proceed, do not handoff to any agent and ask your clarifying question instead. 
 2. If you believe that the current state of question construction is suitable for user feedback, DO NOT handoff to any agent and ask the user for feedback instead.
 3. DO NOT handoff to the same agent more than 2 times in a row without asking for user input first.
+4. You are NOT allowed to generate any draft of the problem description, files or test cases yourself and must rely on the subagents to do so. Your final output to the user should be a short, concise summary of what the subagents have generated after the last user message.
     
 Here is the constructed question so far:
 {question_dump}"""
