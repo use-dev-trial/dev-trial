@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { createChallenge } from '@/actions/challenges';
+import { upsertProblem } from '@/actions/problems';
 import { UpdatedTab, useChat } from '@/hooks/use-chat';
 import { Settings } from 'lucide-react';
 import { Pencil } from 'lucide-react';
@@ -11,20 +12,16 @@ import ChatInterface from '@/components/challenges/create/chat-interface';
 import QuestionPreview from '@/components/challenges/create/question-preview';
 
 import { Message } from '@/types/messages';
-import { Question } from '@/types/question';
+import {
+  Problem,
+  UpsertProblemResponse,
+  defaultProblem,
+  upsertProblemRequestSchema,
+} from '@/types/problems';
+import { Question, defaultQuestion } from '@/types/question';
 
 export default function Home() {
-  const [question, setQuestion] = useState<Question>({
-    id: 'temp-id',
-    problem: {
-      id: 'temp-id',
-      title: 'Untitled Question',
-      description: 'Add a description for your coding interview question.',
-      requirements: ['List your requirements here'],
-    },
-    files: null,
-    test_cases: null,
-  });
+  const [question, setQuestion] = useState<Question>(defaultQuestion);
 
   const [updatedQuestion, setUpdatedQuestion] = useState<Question>(question);
   const [updatedTabs, setUpdatedTabs] = useState<UpdatedTab[]>([]);
@@ -53,7 +50,7 @@ export default function Home() {
                 description: prevQuestion.problem.description,
                 requirements: prevQuestion.problem.requirements,
               }
-            : null,
+            : defaultProblem,
           files: prevQuestion.files,
           test_cases: prevQuestion.test_cases,
         };
@@ -123,11 +120,32 @@ export default function Home() {
   }, [updatedQuestion]);
 
   // Handle clearing a tab's updated status when it's viewed
-  const handleTabChange = (tab: UpdatedTab) => {
+  const onTabChange = (tab: UpdatedTab) => {
     clearUpdatedTab(tab);
 
     // Also update our local state
     setUpdatedTabs((prev) => prev.filter((t) => t !== tab));
+  };
+
+  const onProblemUpdate = async (input: Problem) => {
+    // Update the question content on the UI regardless of whether API call succeeds
+    setQuestion((prev) => ({ ...prev, problem: input }));
+
+    try {
+      const upsertProblemRequest = upsertProblemRequestSchema.parse({
+        ...input,
+        question_id: question.id,
+      });
+      const upsertProblemResponse: UpsertProblemResponse =
+        await upsertProblem(upsertProblemRequest);
+      setQuestion((prev) => ({
+        ...prev,
+        id: upsertProblemResponse.question_id,
+        problem: upsertProblemResponse,
+      })); // Register ID changes for both the question and/or problem (if they are not created before this invocation)
+    } catch (error) {
+      console.error('Error updating problem:', error);
+    }
   };
 
   const handleCreateChallenge = async () => {
@@ -168,7 +186,8 @@ export default function Home() {
           isLoading={isLoading}
           question={question}
           updatedTabs={updatedTabs}
-          onTabChange={handleTabChange}
+          onTabChange={onTabChange}
+          onProblemUpdate={onProblemUpdate}
         />
       </div>
     </main>
