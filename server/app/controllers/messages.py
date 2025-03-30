@@ -1,9 +1,10 @@
 import logging
 
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Depends
 
 from app.models.message import MessageRequest, MessageResponse
 from app.services.messages import MessagesService
+from app.utils.dependencies import verify_token
 
 log = logging.getLogger(__name__)
 
@@ -21,13 +22,10 @@ class MessagesController:
             "",
             response_model=MessageResponse,
         )
-        async def chat(input: MessageRequest, authorization: str = Header(...)) -> MessageResponse:
-            if not authorization.startswith("Bearer "):
-                raise HTTPException(status_code=401, detail="Invalid token format")
-
-            token: str = authorization.removeprefix("Bearer ").strip()
-
+        async def chat(
+            input: MessageRequest, token: str = Depends(verify_token)
+        ) -> MessageResponse:
             log.info(f"Sending message of id {input.id} to assistant...")
-            response: MessageResponse = await self.service.chat(input=input)
+            response: MessageResponse = await self.service.chat(input=input, token=token)
             log.info("Message to be sent back to user: %s", response.content)
             return response
