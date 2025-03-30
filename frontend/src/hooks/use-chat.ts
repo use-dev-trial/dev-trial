@@ -11,8 +11,8 @@ import {
   MessageResponse,
   messageRequestSchema,
   role,
-} from '@/lib/messages';
-import { Question } from '@/lib/question';
+} from '@/types/messages';
+import { Question } from '@/types/question';
 
 // Define the tabs that can be updated
 export type UpdatedTab = 'question' | 'files' | 'test-cases';

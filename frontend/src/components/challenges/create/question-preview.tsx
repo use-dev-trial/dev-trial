@@ -4,7 +4,7 @@ import FileContainer from '@/components/challenges/create/files-container';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-import { Question } from '@/lib/question';
+import { Question } from '@/types/question';
 
 interface QuestionPreviewProps {
   question: Question;

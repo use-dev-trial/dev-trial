@@ -3,8 +3,9 @@
 import { auth } from '@clerk/nextjs/server';
 import axios from 'axios';
 
+import { MessageRequest, MessageResponse, messageResponseSchema } from '@/types/messages';
+
 import { JWT_TEMPLATE_NAME } from '@/lib/constants';
-import { MessageRequest, MessageResponse, messageResponseSchema } from '@/lib/messages';
 
 export async function send(request: MessageRequest): Promise<MessageResponse> {
   const authInstance = await auth();
