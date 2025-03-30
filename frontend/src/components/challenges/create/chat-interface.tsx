@@ -3,7 +3,7 @@
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-import { UpdatedTab } from '@/hooks/use-chat';
+import { Tab } from '@/hooks/use-chat';
 import { Bot, Loader2, Send, User } from 'lucide-react';
 
 import SuggestionCard from '@/components/challenges/create/suggestion-card';
@@ -14,16 +14,16 @@ import { Message } from '@/types/messages';
 
 interface ChatInterfaceProps {
   messages: Message[];
+  isLoading: boolean;
+  updatedTabs: Tab[];
   onSendMessage: (message: string) => void;
-  isLoading?: boolean;
-  updatedTabs?: UpdatedTab[];
 }
 
 export default function ChatInterface({
   messages,
+  isLoading,
+  updatedTabs,
   onSendMessage,
-  isLoading = false,
-  updatedTabs = [],
 }: ChatInterfaceProps) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -50,7 +50,7 @@ export default function ChatInterface({
   }, [messages, isLoading]);
 
   // Helper function to get friendly tab name
-  const getTabDisplayName = (tab: UpdatedTab): string => {
+  const getTabDisplayName = (tab: Tab): string => {
     switch (tab) {
       case 'question':
         return 'Question';
