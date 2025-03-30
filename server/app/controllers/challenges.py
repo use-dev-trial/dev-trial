@@ -34,15 +34,15 @@ class ChallengesController:
             return response
 
         @router.post(
-            "/",
+            "",
             response_model=Challenge,
         )
         async def create_challenge(
             challenge: CreateChallengeRequest, client: Client = Depends(init_db_client)
         ) -> Challenge:
-            log.info("Creating challenge: %s", challenge)
+            log.info("Creating challenge: %s", challenge.name)
             response: Challenge = await self.service.create_challenge(
                 challenge=challenge, client=client
             )
-            log.info("Challenge: %s", response)
+            log.info("Created challenge: %s", response.name)
             return response
