@@ -14,22 +14,24 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
+import { CLIENT_ROUTES } from '@/lib/constants';
+
 import { CustomSidebarTrigger } from './custom-sidebar-trigger';
 
 const items = [
   {
     title: 'Create Challenge',
-    url: '/challenges/create',
+    url: CLIENT_ROUTES.CHALLENGES_CREATE,
     icon: Plus,
   },
   {
     title: 'Challenges',
-    url: '/challenges',
+    url: CLIENT_ROUTES.CHALLENGES,
     icon: Inbox,
   },
   {
     title: 'Settings',
-    url: '/settings',
+    url: CLIENT_ROUTES.SETTINGS,
     icon: Settings,
   },
 ];
