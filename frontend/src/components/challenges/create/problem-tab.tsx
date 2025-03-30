@@ -1,0 +1,49 @@
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+
+import { Problem } from '@/types/problems';
+
+interface ProblemTabProps {
+  problem: Problem;
+  onProblemUpdate: (input: Problem) => void;
+}
+
+export default function ProblemTab({ problem, onProblemUpdate }: ProblemTabProps) {
+  return (
+    <>
+      <section>
+        <div className="mb-4 flex items-center">
+          <p className="text-md font-semibold">Question Description</p>
+        </div>
+        <div className="rounded-lg border p-5 shadow-sm">
+          <Input
+            className="leading-relaxed"
+            onChange={(e) => onProblemUpdate({ ...problem, description: e.target.value })}
+            value={problem.description}
+          />
+        </div>
+      </section>
+
+      <section>
+        <div className="mb-4 flex items-center">
+          <p className="text-md font-semibold">Detailed Requirements</p>
+        </div>
+        <div className="rounded-lg border p-5 shadow-sm">
+          <ol className="list-none space-y-3">
+            {problem.requirements.map((requirement, index) => (
+              <li key={index} className="flex items-start">
+                <Badge
+                  variant="outline"
+                  className="mt-0.5 mr-2 border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-50"
+                >
+                  {index + 1}
+                </Badge>
+                <span>{requirement}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+    </>
+  );
+}

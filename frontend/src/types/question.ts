@@ -1,13 +1,6 @@
 import { z } from 'zod';
 
-export const problem = z.object({
-  id: z.string(),
-  title: z.string(),
-  description: z.string(),
-  requirements: z.array(z.string()),
-});
-
-export type Problem = z.infer<typeof problem>;
+import { problem } from '@/types/problems';
 
 export const file = z.object({
   id: z.string(),
@@ -26,9 +19,21 @@ export type TestCase = z.infer<typeof test_case>;
 
 export const question = z.object({
   id: z.string(),
-  problem: problem.nullable(),
-  files: z.array(file).nullable(),
-  test_cases: z.array(test_case).nullable(),
+  problem: problem,
+  files: z.array(file),
+  test_cases: z.array(test_case),
 });
 
 export type Question = z.infer<typeof question>;
+
+export const defaultQuestion: Question = {
+  id: '',
+  problem: {
+    id: '',
+    title: 'Untitled Question',
+    description: 'Add a description for your coding interview question.',
+    requirements: ['List your requirements here'],
+  },
+  files: [],
+  test_cases: [],
+};
