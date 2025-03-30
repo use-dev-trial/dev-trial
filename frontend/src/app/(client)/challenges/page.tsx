@@ -41,13 +41,11 @@ export default function ChallengePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white p-6 md:p-8">
+    <div className="min-h-screen p-6 md:p-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-8">
-          <h1 className="mb-2 text-2xl font-semibold text-gray-800 md:text-3xl">
-            Challenges Library
-          </h1>
-          <p className="max-w-3xl text-gray-600">
+          <h1 className="= mb-2 text-2xl font-semibold md:text-3xl">Challenges Library</h1>
+          <p className="max-w-3xl">
             Share coding challenges with your candidates and stack rank them.
           </p>
         </header>
