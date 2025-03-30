@@ -82,9 +82,9 @@ export default function Home() {
         <div className="flex-1 overflow-hidden">
           <ChatInterface
             messages={messages}
-            onSendMessage={sendMessage}
             isLoading={isLoading}
             updatedTabs={updatedTabs}
+            onSendMessage={sendMessage}
           />
         </div>
       </div>

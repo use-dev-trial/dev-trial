@@ -14,16 +14,16 @@ import { Message } from '@/types/messages';
 
 interface ChatInterfaceProps {
   messages: Message[];
+  isLoading: boolean;
+  updatedTabs: Tab[];
   onSendMessage: (message: string) => void;
-  isLoading?: boolean;
-  updatedTabs?: Tab[];
 }
 
 export default function ChatInterface({
   messages,
-  onSendMessage,
   isLoading,
   updatedTabs,
+  onSendMessage,
 }: ChatInterfaceProps) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);

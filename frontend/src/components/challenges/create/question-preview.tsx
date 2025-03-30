@@ -10,15 +10,15 @@ import { Question } from '@/types/question';
 interface QuestionPreviewProps {
   isLoading: boolean;
   question: Question;
-  updatedTabs?: Tab[];
-  onTabChange?: (tab: Tab) => void;
-  onProblemUpdate?: (input: Problem) => void;
+  updatedTabs: Tab[];
+  onTabChange: (tab: Tab) => void;
+  onProblemUpdate: (input: Problem) => void;
 }
 
 export default function QuestionPreview({
   isLoading,
   question,
-  updatedTabs = [],
+  updatedTabs,
   onTabChange,
   onProblemUpdate,
 }: QuestionPreviewProps) {
