@@ -9,6 +9,8 @@ interface ProblemTabProps {
 }
 
 export default function ProblemTab({ problem, onProblemUpdate }: ProblemTabProps) {
+  const requirements =
+    problem.requirements.length === 0 ? ['List your requirements here'] : problem.requirements;
   return (
     <>
       <section>
@@ -18,7 +20,7 @@ export default function ProblemTab({ problem, onProblemUpdate }: ProblemTabProps
         <Input
           className="rounded-lg leading-relaxed shadow-sm"
           onChange={(e) => onProblemUpdate({ ...problem, description: e.target.value })}
-          value={problem.description}
+          value={problem.description || 'Add a description for your coding interview question.'}
         />
       </section>
 
@@ -28,7 +30,7 @@ export default function ProblemTab({ problem, onProblemUpdate }: ProblemTabProps
         </div>
         <div className="rounded-lg border p-5 shadow-sm">
           <ol className="list-none space-y-3">
-            {problem.requirements.map((requirement, index) => (
+            {requirements.map((requirement, index) => (
               <li key={index} className="flex items-start">
                 <Badge
                   variant="outline"

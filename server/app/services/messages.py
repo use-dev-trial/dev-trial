@@ -20,13 +20,14 @@ log = logging.getLogger(__name__)
 
 
 MAX_TURNS = 3
+MAX_TURNS_DEFAULT_MESSAGE = "How does this look to you?"
 
 
 class MessagesService:
     async def chat(self, input: MessageRequest, client: Client) -> MessageResponse:
         existing_messages: list[TResponseInputItem] = (
             []
-            if input.id is None
+            if not input.id
             else await _retrieve_existing_messages(client=client, message_id=input.id)
         )
 
@@ -35,7 +36,14 @@ class MessagesService:
 
         if input.question_id is None:
             db_result = await client.table(Table.QUESTIONS).insert({}).execute()
-            question = Question(id=db_result.data[0]["id"])
+            question = Question(
+                id=db_result.data[0]["id"],
+                problem=Problem(
+                    id="", title="", description="", requirements=[]
+                ),  # default values are not permitted in the agent system
+                files=[],
+                test_cases=[],
+            )
         else:
             question = await retrieve_existing_question(
                 client=client, question_id=input.question_id
@@ -47,6 +55,7 @@ class MessagesService:
             num_turns += 1
             if num_turns > MAX_TURNS:
                 log.error(f"Max turns ({MAX_TURNS}) exceeded. Exiting agent system...")
+                result.final_output = MAX_TURNS_DEFAULT_MESSAGE
                 break
             result: RunResult = await Runner.run(
                 starting_agent=triager,
@@ -58,7 +67,7 @@ class MessagesService:
             )
             match result.last_agent.name:
                 case AgentNames.PROBLEM_GENERATOR:
-                    if not question.problem:
+                    if not question.problem.id:
                         problem: Problem = await _insert_problem(
                             client=client, result=result, question_id=question.id
                         )
@@ -122,7 +131,7 @@ class MessagesService:
 
         response_id: Optional[str] = None
 
-        if input.id is None:
+        if not input.id:
             # Create a new entry in the messages table
             db_result = (
                 await client.table(Table.MESSAGES)

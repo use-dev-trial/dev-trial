@@ -1,34 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { getChallenge } from '@/actions/challenges';
 // import { createChallenge } from '@/actions/challenges';
 import { upsertProblem } from '@/actions/problems';
-import { UpdatedTab, useChat } from '@/hooks/use-chat';
+import { useChat } from '@/hooks/use-chat';
 import { Settings } from 'lucide-react';
 import { Pencil } from 'lucide-react';
 
 import ChatInterface from '@/components/challenges/create/chat-interface';
 import QuestionPreview from '@/components/challenges/create/question-preview';
 
-import { Message } from '@/types/messages';
-import {
-  Problem,
-  UpsertProblemResponse,
-  defaultProblem,
-  upsertProblemRequestSchema,
-} from '@/types/problems';
-import { Question, defaultQuestion } from '@/types/question';
+import { Problem, UpsertProblemResponse, upsertProblemRequestSchema } from '@/types/problems';
 
 import { useDebouncedCallback } from '@/lib/utils';
 
 export default function Home() {
-  const [question, setQuestion] = useState<Question>(defaultQuestion);
-
-  const [updatedQuestion, setUpdatedQuestion] = useState<Question>(question);
-  const [updatedTabs, setUpdatedTabs] = useState<UpdatedTab[]>([]);
-
   const previewContainerRef = useRef<HTMLDivElement>(null);
 
   const handleResponse = useCallback((message: Message, messageId?: string) => {
@@ -137,6 +125,8 @@ export default function Home() {
     // Also update our local state
     setUpdatedTabs((prev) => prev.filter((t) => t !== tab));
   };
+  const { question, messages, isLoading, updatedTabs, sendMessage, setQuestion, clearUpdatedTab } =
+    useChat();
 
   const handleUpsertProblem = useCallback(
     async (problemInput: Problem, currentQuestionId: string | undefined) => {
@@ -176,7 +166,7 @@ export default function Home() {
   //   const challenge = await createChallenge({
   //     name: 'Test Challenge',
   //     description: 'Test Description',
-  //     question_id: 'temp-id',
+  //     question_id: '',
   //   });
   //   console.log(challenge);
   // };
@@ -199,9 +189,9 @@ export default function Home() {
         <div className="flex-1 overflow-hidden">
           <ChatInterface
             messages={messages}
-            onSendMessage={sendMessage}
             isLoading={isLoading}
             updatedTabs={updatedTabs}
+            onSendMessage={sendMessage}
           />
         </div>
       </div>
@@ -210,7 +200,7 @@ export default function Home() {
           isLoading={isLoading}
           question={question}
           updatedTabs={updatedTabs}
-          onTabChange={onTabChange}
+          onTabChange={clearUpdatedTab}
           onProblemUpdate={onProblemUpdate}
         />
       </div>

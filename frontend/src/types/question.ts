@@ -1,14 +1,7 @@
 import { z } from 'zod';
 
+import { file } from '@/types/files';
 import { problem } from '@/types/problems';
-
-export const file = z.object({
-  id: z.string(),
-  name: z.string(),
-  code: z.string(),
-});
-
-export type File = z.infer<typeof file>;
 
 export const test_case = z.object({
   id: z.string(),
@@ -30,9 +23,9 @@ export const defaultQuestion: Question = {
   id: '',
   problem: {
     id: '',
-    title: 'Untitled Question',
-    description: 'Add a description for your coding interview question.',
-    requirements: ['List your requirements here'],
+    title: '',
+    description: '',
+    requirements: [],
   },
   files: [],
   test_cases: [],
