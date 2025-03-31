@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 
 import { useEffect, useRef, useState } from 'react';
 
-import { getChallenge } from '@/actions/challenges';
+// import { getChallenge } from '@/actions/challenges';
 
 import { CodeSection } from '@/components/challenges/candidate-view/code-section';
 import { Footer } from '@/components/challenges/candidate-view/footer';
@@ -12,7 +12,7 @@ import { TopBar } from '@/components/challenges/candidate-view/header';
 import { QuestionSection } from '@/components/challenges/candidate-view/question-section';
 import { TestSection } from '@/components/challenges/candidate-view/test-section';
 
-import { GetChallengeResponse } from '@/types/challenges';
+// import { GetChallengeResponse } from '@/types/challenges';
 
 import { cn, formatTime } from '@/lib/utils';
 
@@ -25,17 +25,15 @@ export default function ChallengeInterface() {
   const [remainingTime, setRemainingTime] = useState(3600); // TODO: replace with challenge duration
   const containerRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
-  const [challenge, setChallenge] = useState<GetChallengeResponse | null>(null);
+  // const [challenge, setChallenge] = useState<GetChallengeResponse | null>(null);
 
   useEffect(() => {
     const fetchChallenge = async () => {
-      const challenge = await getChallenge(params.id as string);
-      setChallenge(challenge);
+      // const challenge = await getChallenge(params.id as string);
+      // setChallenge(challenge);
     };
     fetchChallenge();
   }, [params.id]);
-
-  console.log('challenge', challenge);
 
   // Handle countdown timer
   useEffect(() => {

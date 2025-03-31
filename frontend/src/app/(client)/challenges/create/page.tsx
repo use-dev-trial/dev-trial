@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { getChallenge } from '@/actions/challenges';
 // import { createChallenge } from '@/actions/challenges';
 import { upsertProblem } from '@/actions/problems';
 import { UpdatedTab, useChat } from '@/hooks/use-chat';
@@ -35,6 +36,14 @@ export default function Home() {
     if (messageId) {
       console.log('Response message ID:', messageId);
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchChallenge = async () => {
+      const challenge = await getChallenge('');
+      console.log('challenge', challenge);
+    };
+    fetchChallenge();
   }, []);
 
   const handleQuestionUpdate = useCallback((update: Question, changedTabs: UpdatedTab[]) => {

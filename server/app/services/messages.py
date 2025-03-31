@@ -418,19 +418,19 @@ async def retrieve_existing_question(client: Client, question_id: str) -> Questi
     )
 
     problem_task = (
-        client.table(Table.PROBLEMS).select("problems").eq("id", problem_id).execute()
+        client.table(Table.PROBLEMS).select("*").eq("id", problem_id).execute()
         if problem_id
         else asyncio.sleep(0)
     )
 
     file_task = (
-        client.table(Table.FILES).select("files").in_("id", file_ids).execute()
+        client.table(Table.FILES).select("*").in_("id", file_ids).execute()
         if file_ids
         else asyncio.sleep(0)
     )
 
     test_case_task = (
-        client.table(Table.TEST_CASES).select("test_cases").in_("id", test_case_ids).execute()
+        client.table(Table.TEST_CASES).select("*").in_("id", test_case_ids).execute()
         if test_case_ids
         else asyncio.sleep(0)
     )
@@ -442,7 +442,7 @@ async def retrieve_existing_question(client: Client, question_id: str) -> Questi
     # Parse results in parallel
     problem_task = asyncio.to_thread(
         lambda: (
-            Problem.model_validate(problem_result.data[0]["problems"])
+            Problem.model_validate(problem_result.data[0])
             if problem_result and problem_result.data
             else None
         )
@@ -450,7 +450,7 @@ async def retrieve_existing_question(client: Client, question_id: str) -> Questi
 
     files_task = asyncio.to_thread(
         lambda: (
-            [File.model_validate(row["files"]) for row in file_results.data]
+            [File.model_validate(row) for row in file_results.data]
             if file_results and file_results.data
             else []
         )
@@ -458,7 +458,7 @@ async def retrieve_existing_question(client: Client, question_id: str) -> Questi
 
     test_cases_task = asyncio.to_thread(
         lambda: (
-            [TestCase.model_validate(row["test_cases"]) for row in test_case_results.data]
+            [TestCase.model_validate(row) for row in test_case_results.data]
             if test_case_results and test_case_results.data
             else []
         )

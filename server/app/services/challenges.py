@@ -19,10 +19,12 @@ class ChallengesService:
 
         question_id_list_result = await (
             client.table(Table.CHALLENGE_QUESTION)
-            .select("*")
+            .select("question_id")
             .eq("challenge_id", challenge_id)
             .execute()
         )
+
+        log.info("question_id_list_result", len(question_id_list_result.data))
 
         questions = []
         for question_id in question_id_list_result.data:
