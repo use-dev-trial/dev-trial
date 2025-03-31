@@ -1,10 +1,11 @@
 import logging
 
+from fastapi import APIRouter, Depends
+from supabase._async.client import AsyncClient as Client
+
 from app.models.challenge import Challenge, CreateChallengeRequest, GetChallengeResponse
 from app.services.challenges import ChallengesService
 from app.utils.dependencies import init_db_client
-from fastapi import APIRouter, Depends
-from supabase._async.client import AsyncClient as Client
 
 log = logging.getLogger(__name__)
 

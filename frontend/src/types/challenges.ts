@@ -31,7 +31,7 @@ export const getChallengeResponseSchema = z.object({
   id: z.string(),
   name: z.string(),
   description: z.string(),
-  question: question,
+  question: question.array(),
 });
 
 export type GetChallengeResponse = z.infer<typeof getChallengeResponseSchema>;

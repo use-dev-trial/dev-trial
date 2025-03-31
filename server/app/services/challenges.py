@@ -1,9 +1,10 @@
 import logging
 
+from supabase._async.client import AsyncClient as Client
+
 from app.models.challenge import Challenge, CreateChallengeRequest, GetChallengeResponse
 from app.models.database import Table
 from app.services.messages import retrieve_existing_question
-from supabase._async.client import AsyncClient as Client
 
 log = logging.getLogger(__name__)
 
@@ -15,14 +16,28 @@ class ChallengesService:
         )
         if not select_challenge_result.data:
             raise ValueError(f"Challenge with id {challenge_id} not found.")
-        
-        question = await retrieve_existing_question(client=client, question_id=challenge_id)
+
+        question_id_list_result = await (
+            client.table(Table.CHALLENGE_QUESTION)
+            .select("*")
+            .eq("challenge_id", challenge_id)
+            .execute()
+        )
+
+        questions = []
+        for question_id in question_id_list_result.data:
+            question = await retrieve_existing_question(
+                client=client, question_id=question_id["question_id"]
+            )
+            questions.append(question)
+
+        log.info("questions", questions)
 
         return GetChallengeResponse(
             id=select_challenge_result.data[0]["id"],
             name=select_challenge_result.data[0]["name"],
             description=select_challenge_result.data[0]["description"],
-            question=question,
+            question=questions,
         )
 
     async def create_challenge(

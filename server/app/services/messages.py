@@ -37,7 +37,7 @@ class MessagesService:
             db_result = await client.table(Table.QUESTIONS).insert({}).execute()
             question = Question(id=db_result.data[0]["id"])
         else:
-            question = await _retrieve_existing_question(
+            question = await retrieve_existing_question(
                 client=client, question_id=input.question_id
             )
 
@@ -381,7 +381,7 @@ async def _update_problem(client: Client, result: RunResult, problem_id: str) ->
     )
 
 
-async def _retrieve_existing_question(client: Client, question_id: str) -> Question:
+async def retrieve_existing_question(client: Client, question_id: str) -> Question:
     problem_id_task = (
         client.table(Table.QUESTIONS).select("problem_id").eq("id", question_id).execute()
     )
