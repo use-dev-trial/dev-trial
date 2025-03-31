@@ -25,7 +25,7 @@ export default function QuestionPreview({
   const handleTabChange = (value: string) => {
     if (
       onTabChange &&
-      ['question', 'files', 'test-cases'].includes(value) &&
+      ['problem', 'files', 'test-cases'].includes(value) &&
       updatedTabs.includes(value as Tab)
     ) {
       onTabChange(value as Tab);
@@ -35,15 +35,15 @@ export default function QuestionPreview({
   return (
     <div className="mx-auto max-w-4xl p-5">
       <p className="text-md mb-4 font-semibold">{question.problem.title || 'Untitled Question'}</p>
-      <Tabs defaultValue="question" onValueChange={handleTabChange}>
+      <Tabs defaultValue="problem" onValueChange={handleTabChange}>
         <div className="mb-6 flex items-center justify-between border-b">
           <TabsList className="flex h-10 justify-start bg-transparent p-0">
             <TabsTrigger
-              value="question"
+              value="problem"
               className="rounded-md border-b-2 border-transparent px-4 data-[state=active]:border-blue-500 data-[state=active]:bg-transparent"
             >
-              Question
-              {updatedTabs.includes('question') && (
+              Problem
+              {updatedTabs.includes('problem') && (
                 <span className="ml-2 inline-flex h-2 w-2 animate-pulse rounded-full bg-amber-500"></span>
               )}
             </TabsTrigger>
@@ -77,7 +77,7 @@ export default function QuestionPreview({
         </div>
 
         <div className="overflow-auto">
-          <TabsContent value="question" className="space-y-6">
+          <TabsContent value="problem" className="space-y-6">
             <ProblemTab
               problem={question.problem}
               onProblemUpdate={onProblemUpdate || (() => {})}
@@ -96,7 +96,7 @@ export default function QuestionPreview({
               <div className="mb-4 flex items-center">
                 <p className="text-md font-semibold">Test Cases</p>
               </div>
-              <div className="divide-y divide-slate-100 rounded-lg border shadow-sm">
+              <div className="h-[60px] divide-y divide-slate-100 rounded-lg border shadow-sm">
                 {question.test_cases.map((testCase, index) => (
                   <div key={index} className="p-5">
                     <h3 className="mb-3 flex items-center font-medium">
