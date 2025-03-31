@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
+import { getChallenge } from '@/actions/challenges';
 // import { createChallenge } from '@/actions/challenges';
 import { upsertProblem } from '@/actions/problems';
 import { useChat } from '@/hooks/use-chat';
@@ -17,6 +18,14 @@ import { useDebouncedCallback } from '@/lib/utils';
 
 export default function Home() {
   const previewContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchChallenge = async () => {
+      const challenge = await getChallenge('');
+      console.log('challenge', challenge);
+    };
+    fetchChallenge();
+  }, []);
 
   const { question, messages, isLoading, updatedTabs, sendMessage, setQuestion, clearUpdatedTab } =
     useChat();
