@@ -16,7 +16,7 @@ import {
 import { Problem } from '@/types/problems';
 import { Question, TestCase, defaultQuestion } from '@/types/question';
 
-export type Tab = 'question' | 'files' | 'test-cases';
+export type Tab = 'problem' | 'files' | 'test-cases';
 
 const isProblemUpdated = (q1: Problem, q2: Problem): boolean => {
   // Dont account for id changes as we do not want to account for manual changes by the user
@@ -84,7 +84,7 @@ export function useChat() {
       const tabs: Tab[] = [];
 
       if (isProblemUpdated(question.problem, data.question.problem)) {
-        tabs.push('question');
+        tabs.push('problem');
       }
 
       if (areFilesUpdated(question.files, data.question.files)) {

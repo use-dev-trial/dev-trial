@@ -52,8 +52,8 @@ export default function ChatInterface({
   // Helper function to get friendly tab name
   const getTabDisplayName = (tab: Tab): string => {
     switch (tab) {
-      case 'question':
-        return 'Question';
+      case 'problem':
+        return 'Problem';
       case 'files':
         return 'Files';
       case 'test-cases':
