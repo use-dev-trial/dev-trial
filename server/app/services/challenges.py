@@ -2,7 +2,12 @@ import logging
 
 from supabase._async.client import AsyncClient as Client
 
-from app.models.challenge import Challenge, CreateChallengeRequest, GetChallengeResponse
+from app.models.challenge import (
+    Challenge,
+    CreateChallengeRequest,
+    GetAllChallengesResponse,
+    GetChallengeResponse,
+)
 from app.models.database import Table
 from app.services.messages import retrieve_existing_question
 
@@ -60,3 +65,22 @@ class ChallengesService:
             name=challenge.name,
             description=challenge.description,
         )
+
+    async def get_all_challenges(self, client: Client) -> GetAllChallengesResponse:
+        select_challenges_result = await client.table(Table.CHALLENGES).select("*").execute()
+
+        if not select_challenges_result.data:
+            # Return empty list if no challenges found
+            return GetAllChallengesResponse(challenges=[])
+
+        challenges = []
+        for challenge_data in select_challenges_result.data:
+            challenges.append(
+                Challenge(
+                    id=challenge_data["id"],
+                    name=challenge_data["name"],
+                    description=challenge_data["description"],
+                )
+            )
+
+        return GetAllChallengesResponse(challenges=challenges)

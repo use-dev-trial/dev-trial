@@ -6,8 +6,10 @@ import axios from 'axios';
 import {
   CreateChallengeRequest,
   CreateChallengeResponse,
+  GetAllChallengesResponse,
   GetChallengeResponse,
   createChallengeResponseSchema,
+  getAllChallengesResponseSchema,
   getChallengeResponseSchema,
 } from '@/types/challenges';
 
@@ -66,6 +68,30 @@ export async function createChallenge(
     return createChallengeResponseSchema.parse(response.data);
   } catch (error) {
     console.error('Error creating challenge:', error);
+    throw error;
+  }
+}
+
+export async function getAllChallenges(): Promise<GetAllChallengesResponse> {
+  const authInstance = await auth();
+  const token: string | null = await authInstance.getToken({
+    template: JWT_TEMPLATE_NAME,
+  });
+  if (!token) {
+    throw new Error('No Clerk token found');
+  }
+  try {
+    console.log('Getting all challenges');
+    const response = await axios.get(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/challenges`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log('response', response.data);
+    return getAllChallengesResponseSchema.parse(response.data);
+  } catch (error) {
+    console.error('Error getting all challenges:', error);
     throw error;
   }
 }

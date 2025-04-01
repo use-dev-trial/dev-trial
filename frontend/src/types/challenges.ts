@@ -35,3 +35,9 @@ export const getChallengeResponseSchema = z.object({
 });
 
 export type GetChallengeResponse = z.infer<typeof getChallengeResponseSchema>;
+
+export const getAllChallengesResponseSchema = z.object({
+  challenges: z.array(challenge),
+});
+
+export type GetAllChallengesResponse = z.infer<typeof getAllChallengesResponseSchema>;

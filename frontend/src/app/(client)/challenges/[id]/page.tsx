@@ -10,3 +10,5 @@ export default function ChallengeInterface() {
     </div>
   );
 }
+
+// TODO: use this for the candidates ranking interface: https://ui.bazza.dev/docs/data-table-filter
