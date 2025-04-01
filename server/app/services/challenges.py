@@ -1,7 +1,5 @@
 import logging
 
-from supabase._async.client import AsyncClient as Client
-
 from app.models.challenge import (
     Challenge,
     CreateChallengeRequest,
@@ -10,6 +8,7 @@ from app.models.challenge import (
 )
 from app.models.database import Table
 from app.services.messages import retrieve_existing_question
+from supabase._async.client import AsyncClient as Client
 
 log = logging.getLogger(__name__)
 
@@ -67,14 +66,6 @@ class ChallengesService:
         )
 
     async def get_all_challenges(self, client: Client) -> GetAllChallengesResponse:
-        """Retrieves all challenges from the database.
-
-        Args:
-            client: The Supabase client.
-
-        Returns:
-            GetAllChallengesResponse: A response containing a list of all challenges.
-        """
         select_challenges_result = await client.table(Table.CHALLENGES).select("*").execute()
 
         if not select_challenges_result.data:
