@@ -3,7 +3,12 @@ import logging
 from fastapi import APIRouter, Depends
 from supabase._async.client import AsyncClient as Client
 
-from app.models.challenge import Challenge, CreateChallengeRequest, GetChallengeResponse
+from app.models.challenge import (
+    Challenge,
+    CreateChallengeRequest,
+    GetAllChallengesResponse,
+    GetChallengeResponse,
+)
 from app.services.challenges import ChallengesService
 from app.utils.dependencies import init_db_client
 
@@ -31,6 +36,20 @@ class ChallengesController:
                 challenge_id=challenge_id, client=client
             )
             log.info("Challenge: %s", response)
+            return response
+
+        @router.get(
+            "",
+            response_model=GetAllChallengesResponse,
+        )
+        async def get_all_challenges(
+            client: Client = Depends(init_db_client),
+        ) -> GetAllChallengesResponse:
+            log.info("Getting all challenges...")
+            response: GetAllChallengesResponse = await self.service.get_all_challenges(
+                client=client
+            )
+            log.info("Retrieved %d challenges", len(response.challenges))
             return response
 
         @router.post(
