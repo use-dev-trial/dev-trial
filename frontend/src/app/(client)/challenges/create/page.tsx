@@ -12,6 +12,15 @@ import { Plus } from 'lucide-react';
 
 import ChatInterface from '@/components/challenges/create/chat-interface';
 import QuestionPreview from '@/components/challenges/create/question-preview';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 import { Problem, UpsertProblemResponse, upsertProblemRequestSchema } from '@/types/problems';
 import { Question, defaultQuestion } from '@/types/question';
@@ -24,6 +33,9 @@ export default function Home() {
   const [questions, setQuestions] = useState<Question[]>([defaultQuestion]);
   // State for the currently selected question index
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
+  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+  const [challengeTitle, setChallengeTitle] = useState('Test Challenge Title');
+  const [newChallengeTitle, setNewChallengeTitle] = useState('');
 
   useEffect(() => {
     const fetchChallenge = async () => {
@@ -98,6 +110,16 @@ export default function Home() {
     setQuestion(questions[index]);
   };
 
+  const handleOpenRenameDialog = () => {
+    setNewChallengeTitle(challengeTitle);
+    setIsRenameDialogOpen(true);
+  };
+
+  const handleSaveChallengeTitle = () => {
+    setChallengeTitle(newChallengeTitle);
+    setIsRenameDialogOpen(false);
+  };
+
   // const handleCreateChallenge = async () => {
   //   const challenge = await createChallenge({
   //     name: 'Test Challenge',
@@ -111,10 +133,13 @@ export default function Home() {
     <main className="flex h-screen">
       <div className="flex w-3/10 flex-col border-r">
         <div className="flex h-[60px] items-center justify-between border-b p-4">
-          <p className="text-md font-medium">Test Challenge Title</p>
+          <p className="text-md font-medium">{challengeTitle}</p>
           {/* <button onClick={handleCreateChallenge}>Create Challenge</button> */}
           <div className="flex items-center space-x-2">
-            <button className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-gray-700 dark:hover:text-gray-300">
+            <button
+              className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+              onClick={handleOpenRenameDialog}
+            >
               <Pencil size={16} />
             </button>
             <button className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-gray-700 dark:hover:text-gray-300">
@@ -166,6 +191,33 @@ export default function Home() {
           onProblemUpdate={onProblemUpdate}
         />
       </div>
+      <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Rename Challenge</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <Input
+              value={newChallengeTitle}
+              onChange={(e) => setNewChallengeTitle(e.target.value)}
+              placeholder="Enter chat name"
+              className="w-full"
+            />
+          </div>
+          <DialogFooter className="sm:justify-between">
+            <Button type="button" variant="outline" onClick={() => setIsRenameDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSaveChallengeTitle}
+              disabled={!newChallengeTitle.trim()}
+            >
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
