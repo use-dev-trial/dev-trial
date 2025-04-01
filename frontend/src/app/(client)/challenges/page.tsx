@@ -1,60 +1,63 @@
+'use client';
+
+import useChallenge from '@/hooks/use-challenge';
+
 import { ChallengeCard } from '@/components/challenges/card';
 
+import { CLIENT_ROUTES, GRADIENTS } from '@/lib/constants';
+import { formatDate } from '@/lib/utils';
+
 export default function ChallengePage() {
-  const challenges = [
-    {
-      id: '1',
-      name: 'Web Performance Challenge',
-      url: 'https://example.com/challenges/web-performance',
-      date: 'April 15, 2025',
-      description:
-        'Optimize a web application to achieve a perfect Lighthouse score. Focus on Core Web Vitals and implement best practices for modern web performance.',
-      gradient: 'from-blue-400 to-blue-600',
-    },
-    {
-      id: '2',
-      name: 'Accessibility Hackathon',
-      url: 'https://example.com/challenges/accessibility',
-      date: 'May 2, 2025',
-      description:
-        'Create or improve a web application to be fully accessible. Implement ARIA attributes, keyboard navigation, and ensure screen reader compatibility.',
-      gradient: 'from-green-400 to-green-600',
-    },
-    {
-      id: '3',
-      name: 'Responsive Design Challenge',
-      url: 'https://example.com/challenges/responsive',
-      date: 'May 20, 2025',
-      description:
-        'Build a fully responsive website that works flawlessly across all device sizes. Focus on mobile-first design principles and fluid layouts.',
-      gradient: 'from-purple-400 to-purple-600',
-    },
-    {
-      id: '4',
-      name: 'API Integration Marathon',
-      url: 'https://example.com/challenges/api-integration',
-      date: 'June 10, 2025',
-      description:
-        'Connect with at least three different public APIs to create a useful application. Demonstrate proper error handling and data management.',
-      gradient: 'from-orange-400 to-orange-600',
-    },
-  ];
+  const { challenges, isLoading, error } = useChallenge();
 
   return (
     <div className="min-h-screen p-6 md:p-8">
       <div className="mx-auto max-w-7xl">
         <header className="mb-8">
-          <h1 className="= mb-2 text-2xl font-semibold md:text-3xl">Challenges Library</h1>
+          <h1 className="mb-2 text-2xl font-semibold md:text-3xl">Challenges Library</h1>
           <p className="max-w-3xl">
             Share coding challenges with your candidates and stack rank them.
           </p>
         </header>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {challenges.map((challenge) => (
-            <ChallengeCard key={challenge.id} challenge={challenge} />
-          ))}
-        </div>
+        {isLoading && (
+          <div className="flex items-center justify-center py-10">
+            <div className="h-6 w-6 animate-spin rounded-full border-t-2 border-b-2 border-blue-500"></div>
+            <span className="ml-2">Loading challenges...</span>
+          </div>
+        )}
+
+        {error && (
+          <div className="rounded-md bg-red-50 p-4 text-red-800">
+            <p>Error loading challenges. Please try again later.</p>
+            <p className="text-sm">{error.message}</p>
+          </div>
+        )}
+
+        {!isLoading && !error && challenges.length === 0 && (
+          <div className="rounded-md bg-blue-50 p-6 text-center">
+            <h3 className="text-lg font-medium text-blue-800">No challenges yet</h3>
+            <p className="mt-2 text-blue-700">Create your first challenge to get started.</p>
+          </div>
+        )}
+
+        {!isLoading && challenges.length > 0 && (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {challenges.map((challenge, index) => (
+              <ChallengeCard
+                key={challenge.id}
+                challenge={{
+                  id: challenge.id,
+                  name: challenge.name,
+                  description: challenge.description,
+                  url: CLIENT_ROUTES.CHALLENGES_DETAIL(challenge.id),
+                  date: formatDate(),
+                  gradient: GRADIENTS[index % GRADIENTS.length],
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
