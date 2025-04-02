@@ -4,11 +4,10 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Tab } from '@/hooks/use-chat';
-import { Bot, Loader2, Send, User } from 'lucide-react';
+import { Bot, Loader2, Paperclip, Send, User } from 'lucide-react';
 
 import SuggestionCard from '@/components/challenges/create/suggestion-card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
 import { Message } from '@/types/messages';
 
@@ -145,50 +144,43 @@ export default function ChatInterface({
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="border-t p-4">
-        <form onSubmit={handleSubmit} className="flex space-x-2">
-          {/* TODO: input field should expand when typing */}
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={messages.length > 0 ? 'Ask followup...' : 'Type your message...'}
-            className="flex-1"
-            disabled={isLoading}
-          />
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            className="hover:bg-slate-100 dark:hover:bg-gray-700"
-            disabled={isLoading}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="lucide lucide-paperclip"
-            >
-              <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-            </svg>
-          </Button>
-          <Button
-            className="dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
-            type="submit"
-            size="icon"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-          </Button>
+      <div className="p-4">
+        <form onSubmit={handleSubmit} className="relative">
+          <div className="flex flex-col rounded-lg border focus-within:ring-2 focus-within:ring-gray-400/50">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder={messages.length > 0 ? 'Ask a follow up...' : 'Type your message...'}
+              className="min-h-20 w-full resize-none self-start rounded-lg border-0 px-4 py-3 text-sm shadow-none outline-none placeholder:text-gray-500 focus-visible:border-0 focus-visible:ring-0"
+              disabled={isLoading}
+              rows={1}
+              style={{ height: 'auto', minHeight: '80px' }}
+              onInput={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = 'auto';
+                target.style.height = `${Math.max(80, target.scrollHeight)}px`;
+              }}
+            />
+            <div className="flex justify-end space-x-1 pr-2 pb-2">
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-7 w-7 text-gray-400 hover:bg-gray-800 hover:text-gray-200"
+                disabled={isLoading}
+              >
+                <Paperclip size={16} />
+              </Button>
+              <Button
+                type="submit"
+                size="icon"
+                className="h-7 w-7 rounded-md bg-gray-700 hover:bg-gray-600"
+                disabled={isLoading}
+              >
+                {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+              </Button>
+            </div>
+          </div>
         </form>
       </div>
     </div>

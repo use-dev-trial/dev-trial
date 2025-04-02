@@ -7,7 +7,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { upsertProblem } from '@/actions/problems';
 import { useChat } from '@/hooks/use-chat';
 import { Settings } from 'lucide-react';
-import { Pencil } from 'lucide-react';
 import { Plus } from 'lucide-react';
 
 import ChatInterface from '@/components/challenges/create/chat-interface';
@@ -21,6 +20,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { Problem, UpsertProblemResponse, upsertProblemRequestSchema } from '@/types/problems';
 import { Question, defaultQuestion } from '@/types/question';
@@ -133,18 +133,36 @@ export default function Home() {
     <main className="flex h-screen">
       <div className="flex w-3/10 flex-col border-r">
         <div className="flex h-[60px] items-center justify-between border-b p-4">
-          <p className="text-md font-medium">{challengeTitle}</p>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <div
+                  className="rounded-full p-1.5 hover:underline"
+                  onClick={handleOpenRenameDialog}
+                >
+                  <p className="text-md font-medium">{challengeTitle}</p>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-sm">Rename</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
           {/* <button onClick={handleCreateChallenge}>Create Challenge</button> */}
           <div className="flex items-center space-x-2">
-            <button
-              className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-              onClick={handleOpenRenameDialog}
-            >
-              <Pencil size={16} />
-            </button>
-            <button className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-gray-700 dark:hover:text-gray-300">
-              <Settings size={16} />
-            </button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-gray-700 dark:hover:text-gray-300">
+                    <Settings size={16} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm">Settings</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
         <div className="flex-1 overflow-hidden">
@@ -158,7 +176,7 @@ export default function Home() {
       </div>
       <div ref={previewContainerRef} className="w-7/10 overflow-auto">
         {/* Question selector row */}
-        <div className="sticky top-0 z-10 flex h-[60px] items-center space-x-2 border-b bg-white p-3 dark:bg-gray-900">
+        <div className="sticky top-0 z-10 flex h-[60px] items-center space-x-2 border-b p-3">
           {questions.map((q, index) => (
             <button
               key={index}
@@ -174,13 +192,22 @@ export default function Home() {
             </button>
           ))}
           {questions.length < 3 && (
-            <button
-              onClick={addNewQuestion}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-              aria-label="Add new question"
-            >
-              <Plus size={16} />
-            </button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <div
+                    onClick={addNewQuestion}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                    aria-label="Add new question"
+                  >
+                    <Plus size={16} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p className="text-sm">Add new question</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
         <QuestionPreview
