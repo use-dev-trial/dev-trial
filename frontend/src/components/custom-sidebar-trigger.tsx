@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 
 import { PanelLeftIcon } from 'lucide-react';
 
-import { Button } from './ui/button';
 import { useSidebar } from './ui/sidebar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
