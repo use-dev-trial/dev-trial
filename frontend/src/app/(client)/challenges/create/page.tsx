@@ -136,12 +136,12 @@ export default function Home() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <button
+                <div
                   className="rounded-full p-1.5 hover:underline"
                   onClick={handleOpenRenameDialog}
                 >
                   <p className="text-md font-medium">{challengeTitle}</p>
-                </button>
+                </div>
               </TooltipTrigger>
               <TooltipContent>
                 <p className="text-sm">Rename</p>
@@ -154,9 +154,9 @@ export default function Home() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <button className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-gray-700 dark:hover:text-gray-300">
+                  <div className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-gray-700 dark:hover:text-gray-300">
                     <Settings size={16} />
-                  </button>
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="text-sm">Settings</p>
@@ -195,13 +195,13 @@ export default function Home() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <button
+                  <div
                     onClick={addNewQuestion}
                     className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                     aria-label="Add new question"
                   >
                     <Plus size={16} />
-                  </button>
+                  </div>
                 </TooltipTrigger>
                 <TooltipContent side="right">
                   <p className="text-sm">Add new question</p>

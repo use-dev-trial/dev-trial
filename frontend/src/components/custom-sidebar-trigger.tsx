@@ -37,20 +37,14 @@ export function CustomSidebarTrigger({ location = 'sidebar' }: CustomSidebarTrig
 
   if (location === 'layout') {
     return (
-      <div className="fixed top-0 left-0 z-40 flex h-screen w-10 flex-col items-center border-r py-2">
+      <div className="fixed top-0 left-0 z-40 flex h-screen w-10 flex-col items-center border-r py-5">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
-              <Button
-                variant="ghost"
-                size="icon"
-                data-sidebar="trigger"
-                className="size-7"
-                onClick={toggleSidebar}
-              >
-                <PanelLeftIcon />
+              <div data-sidebar="trigger" onClick={toggleSidebar}>
+                <PanelLeftIcon size={16} />
                 <span className="sr-only">Toggle Sidebar</span>
-              </Button>
+              </div>
             </TooltipTrigger>
             <TooltipContent side="right" className="flex items-center justify-center">
               <p className="mr-8 text-sm">Toggle Sidebar</p>
@@ -68,16 +62,10 @@ export function CustomSidebarTrigger({ location = 'sidebar' }: CustomSidebarTrig
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>
-          <Button
-            variant="ghost"
-            size="icon"
-            data-sidebar="trigger"
-            className="size-7"
-            onClick={toggleSidebar}
-          >
-            <PanelLeftIcon />
+          <div data-sidebar="trigger" onClick={toggleSidebar}>
+            <PanelLeftIcon size={16} />
             <span className="sr-only">Toggle Sidebar</span>
-          </Button>
+          </div>
         </TooltipTrigger>
         <TooltipContent side="right" className="flex items-center justify-center">
           <p className="mr-8 text-sm">Toggle Sidebar</p>
