@@ -131,7 +131,7 @@ export default function Home() {
 
   return (
     <main className="flex h-screen">
-      <div className="flex w-3/10 flex-col border-r">
+      <div className="flex w-3/10 min-w-[300px] flex-col border-r">
         <div className="flex h-[60px] items-center justify-between border-b p-4">
           <TooltipProvider>
             <Tooltip>
@@ -165,14 +165,12 @@ export default function Home() {
             </TooltipProvider>
           </div>
         </div>
-        <div className="flex-1 overflow-hidden">
-          <ChatInterface
-            messages={messages}
-            isLoading={isLoading}
-            updatedTabs={updatedTabs}
-            onSendMessage={sendMessage}
-          />
-        </div>
+        <ChatInterface
+          messages={messages}
+          isLoading={isLoading}
+          updatedTabs={updatedTabs}
+          onSendMessage={sendMessage}
+        />
       </div>
       <div ref={previewContainerRef} className="w-7/10 overflow-auto">
         {/* Question selector row */}
