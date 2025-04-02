@@ -203,7 +203,7 @@ export default function Home() {
                     <Plus size={16} />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent side="right">
                   <p className="text-sm">Add new question</p>
                 </TooltipContent>
               </Tooltip>
