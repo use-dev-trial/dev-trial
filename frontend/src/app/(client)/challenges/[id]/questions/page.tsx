@@ -4,10 +4,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { upsertProblem } from '@/actions/problems';
 import { useChat } from '@/hooks/use-chat';
-import { Settings } from 'lucide-react';
-import { Plus } from 'lucide-react';
 
+import AddQuestionTooltip from '@/components/challenges/create/add-question-tooltip';
 import ChatInterface from '@/components/challenges/create/chat-interface';
+import QuestionIndexButton from '@/components/challenges/create/question-index-button';
 import QuestionPreview from '@/components/challenges/create/question-preview';
 import RenameChallengeTitleDialog from '@/components/challenges/edit-title-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -15,6 +15,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Problem, UpsertProblemResponse, upsertProblemRequestSchema } from '@/types/problems';
 import { Question, defaultQuestion } from '@/types/questions';
 
+import { MAX_NUM_QUESTIONS } from '@/lib/constants';
 import { useDebouncedCallback } from '@/lib/utils';
 
 export default function Home() {
@@ -74,56 +75,29 @@ export default function Home() {
     debouncedSaveProblem(input, question.id);
   };
 
-  // Add a new question
-  const addNewQuestion = () => {
-    setQuestions((prev) => [...prev, defaultQuestion]);
-    setSelectedQuestionIndex((prev) => prev + 1);
-  };
-
-  // Handle selecting a question
-  const handleQuestionSelect = (index: number) => {
-    setSelectedQuestionIndex(index);
-    // Update the current question in useChat
-    setQuestion(questions[index]);
-  };
-
   const onRenameDialogToggle = () => {
     setIsRenameDialogOpen((prevIsRenameDialogOpen) => !prevIsRenameDialogOpen);
   };
 
+  const title = (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>
+          <div className="rounded-full p-1.5 hover:underline" onClick={onRenameDialogToggle}>
+            <p className="text-md font-medium">{challengeTitle}</p>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="text-sm">Rename</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+
   return (
     <main className="flex h-screen">
       <div className="flex w-3/10 min-w-[300px] flex-col border-r">
-        <div className="flex h-[60px] items-center justify-between border-b p-4">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <div className="rounded-full p-1.5 hover:underline" onClick={onRenameDialogToggle}>
-                  <p className="text-md font-medium">{challengeTitle}</p>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-sm">Rename</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-
-          {/* <button onClick={handleCreateChallenge}>Create Challenge</button> */}
-          <div className="flex items-center space-x-2">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className="rounded-full p-1.5 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-gray-700 dark:hover:text-gray-300">
-                    <Settings size={16} />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-sm">Settings</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </div>
+        <div className="flex h-[60px] items-center justify-between border-b p-4">{title}</div>
         <ChatInterface
           messages={messages}
           isLoading={isLoading}
@@ -132,39 +106,25 @@ export default function Home() {
         />
       </div>
       <div ref={previewContainerRef} className="w-7/10 overflow-auto">
-        {/* Question selector row */}
         <div className="sticky top-0 z-10 flex h-[60px] items-center space-x-2 border-b p-3">
-          {questions.map((q, index) => (
-            <button
+          {questions.map((_, index) => (
+            <QuestionIndexButton
               key={index}
-              onClick={() => handleQuestionSelect(index)}
-              className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
-                selectedQuestionIndex === index
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-              }`}
-              aria-label={`Question ${index + 1}`}
-            >
-              {index + 1}
-            </button>
+              isSelected={selectedQuestionIndex === index}
+              index={index}
+              onClick={() => {
+                setSelectedQuestionIndex(index);
+                setQuestion(questions[index]);
+              }}
+            />
           ))}
-          {questions.length < 3 && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div
-                    onClick={addNewQuestion}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                    aria-label="Add new question"
-                  >
-                    <Plus size={16} />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p className="text-sm">Add new question</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          {questions.length < MAX_NUM_QUESTIONS && (
+            <AddQuestionTooltip
+              onClick={() => {
+                setQuestions((prev) => [...prev, defaultQuestion]);
+                setSelectedQuestionIndex((prev) => prev + 1);
+              }}
+            />
           )}
         </div>
         <QuestionPreview
