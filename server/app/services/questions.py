@@ -3,7 +3,7 @@ from supabase._async.client import AsyncClient as Client
 from app.models.database import Table
 from app.models.file import File
 from app.models.problem import Problem
-from app.models.question import Question, QuestionDB
+from app.models.question import Question
 from app.models.test_case import TestCase
 
 
@@ -15,21 +15,26 @@ class QuestionsService:
         if not select_question_result.data:
             raise ValueError(f"Question with id {question_id} not found.")
 
-        question_db = QuestionDB.model_validate(select_question_result.data[0])
-
-        select_problem_result = (
-            await client.table(Table.PROBLEMS)
-            .select("*")
-            .eq("id", question_db.problem_id)
-            .execute()
-        )
-
         problem: Problem = Problem(
-            id=select_problem_result.data[0]["id"],
-            title=select_problem_result.data[0]["title"],
-            description=select_problem_result.data[0]["description"],
-            requirements=select_problem_result.data[0]["requirements"],
+            id="",
+            title="",
+            description="",
+            requirements=[],
         )
+        if select_question_result.data[0]["problem_id"]:
+            select_problem_result = (
+                await client.table(Table.PROBLEMS)
+                .select("*")
+                .eq("id", select_question_result.data[0]["problem_id"])
+                .execute()
+            )
+
+            problem = Problem(
+                id=select_problem_result.data[0]["id"],
+                title=select_problem_result.data[0]["title"],
+                description=select_problem_result.data[0]["description"],
+                requirements=select_problem_result.data[0]["requirements"],
+            )
 
         select_test_case_ids_result = (
             await client.table(Table.QUESTION_TEST_CASE)

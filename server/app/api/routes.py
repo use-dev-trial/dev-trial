@@ -5,9 +5,11 @@ from fastapi import APIRouter
 from app.controllers.challenges import ChallengesController
 from app.controllers.messages import MessagesController
 from app.controllers.problems import ProblemsController
+from app.controllers.questions import QuestionsController
 from app.services.challenges import ChallengesService
 from app.services.messages import MessagesService
 from app.services.problems import ProblemsService
+from app.services.questions import QuestionsService
 
 log = logging.getLogger(__name__)
 
