@@ -3,18 +3,13 @@
 import { createChallenge, getAllChallenges } from '@/actions/challenges';
 import { UseMutationResult, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { Challenge, CreateChallengeRequest, CreateChallengeResponse } from '@/types/challenges';
+import { Challenge, CreateChallengeRequest } from '@/types/challenges';
 
 interface useChallengeOptions {
   challenges: Challenge[] | [];
   isLoading: boolean;
   error: Error | null;
-  createChallengeMutation: UseMutationResult<
-    CreateChallengeResponse,
-    Error,
-    CreateChallengeRequest,
-    unknown
-  >;
+  createChallengeMutation: UseMutationResult<Challenge, Error, CreateChallengeRequest, unknown>;
 }
 
 export default function useChallenge(): useChallengeOptions {
