@@ -37,14 +37,8 @@ export default function useChallenge(): useChallengeOptions {
     onSuccess: (data) => {
       console.log('Successfully created a challenge');
       queryClient.setQueryData<Challenge[]>(['challenges'], (oldData) => {
-        const newChallenge: Challenge = {
-          id: data.id,
-          name: data.name,
-          description: data.description,
-        };
-
-        if (!oldData) return [newChallenge];
-        return [...oldData, newChallenge];
+        if (!oldData) return [data];
+        return [...oldData, data];
       });
     },
   });

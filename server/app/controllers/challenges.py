@@ -7,7 +7,6 @@ from app.models.challenge import (
     Challenge,
     CreateChallengeRequest,
     GetAllChallengesResponse,
-    GetChallengeResponse,
 )
 from app.services.challenges import ChallengesService
 from app.utils.dependencies import init_db_client
@@ -26,13 +25,13 @@ class ChallengesController:
 
         @router.get(
             "/{challenge_id}",
-            response_model=GetChallengeResponse,
+            response_model=Challenge,
         )
         async def get_challenge(
             challenge_id: str, client: Client = Depends(init_db_client)
-        ) -> GetChallengeResponse:
+        ) -> Challenge:
             log.info(f"Getting challenge with id {challenge_id}...")
-            response: GetChallengeResponse = await self.service.get_challenge(
+            response: Challenge = await self.service.get_challenge(
                 challenge_id=challenge_id, client=client
             )
             log.info("Challenge: %s", response)
