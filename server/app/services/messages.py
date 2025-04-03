@@ -453,7 +453,7 @@ async def retrieve_existing_question(client: Client, question_id: str) -> Questi
         lambda: (
             Problem.model_validate(problem_result.data[0])
             if problem_result and problem_result.data
-            else None
+            else Problem(id="", title="", description="", requirements=[])
         )
     )
 
