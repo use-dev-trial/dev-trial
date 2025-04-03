@@ -22,7 +22,7 @@ class QuestionsController:
         router = self.router
 
         @router.get(
-            "/{question_id}",
+            "/question_id/{question_id}",
             response_model=Question,
         )
         async def get_question_by_id(
@@ -36,7 +36,7 @@ class QuestionsController:
             return response
 
         @router.get(
-            "/{challenge_id}",
+            "/challenge_id/{challenge_id}",
             response_model=list[Question],
         )
         async def get_questions_by_challenge_id(

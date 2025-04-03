@@ -12,7 +12,7 @@ export async function getQuestionById(questionId: string): Promise<Question> {
   try {
     console.log('Getting question...');
     const response = await axios.get(
-      `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/questions/${questionId}`,
+      `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/questions/question_id/${questionId}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -34,7 +34,7 @@ export async function getQuestionsByChallengeId(challengeId: string): Promise<Qu
   try {
     console.log('Getting questions associated with challenge id...');
     const response = await axios.get(
-      `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/questions/${challengeId}`,
+      `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/questions/challenge_id/${challengeId}`,
       {
         headers: {
           'Content-Type': 'application/json',
