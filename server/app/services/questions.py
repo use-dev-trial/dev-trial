@@ -1,3 +1,5 @@
+import asyncio
+
 from supabase._async.client import AsyncClient as Client
 
 from app.models.database import Table
@@ -9,78 +11,82 @@ from app.models.test_case import TestCase
 
 class QuestionsService:
     async def get_question(self, question_id: str, client: Client) -> Question:
-        select_question_result = (
-            await client.table(Table.QUESTIONS).select("*").eq("id", question_id).execute()
+        question_task = client.table(Table.QUESTIONS).select("*").eq("id", question_id).execute()
+        test_case_ids_task = (
+            client.table(Table.QUESTION_TEST_CASE)
+            .select("test_case_id")
+            .eq("question_id", question_id)
+            .execute()
         )
-        if not select_question_result.data:
+        file_ids_task = (
+            client.table(Table.QUESTION_FILE)
+            .select("file_id")
+            .eq("question_id", question_id)
+            .execute()
+        )
+
+        question_result, test_case_ids_result, file_ids_result = await asyncio.gather(
+            question_task, test_case_ids_task, file_ids_task
+        )
+
+        if not question_result.data:
             raise ValueError(f"Question with id {question_id} not found.")
 
-        problem: Problem = Problem(
-            id="",
-            title="",
-            description="",
-            requirements=[],
+        question_data = question_result.data[0]
+        problem_id = question_data.get("problem_id")
+        test_case_ids = (
+            [row["test_case_id"] for row in test_case_ids_result.data]
+            if test_case_ids_result.data
+            else []
         )
-        if select_question_result.data[0]["problem_id"]:
-            select_problem_result = (
-                await client.table(Table.PROBLEMS)
-                .select("*")
-                .eq("id", select_question_result.data[0]["problem_id"])
-                .execute()
-            )
+        file_ids = [row["file_id"] for row in file_ids_result.data] if file_ids_result.data else []
 
-            problem = Problem(
-                id=select_problem_result.data[0]["id"],
-                title=select_problem_result.data[0]["title"],
-                description=select_problem_result.data[0]["description"],
-                requirements=select_problem_result.data[0]["requirements"],
-            )
-
-        select_test_case_ids_result = (
-            await client.table(Table.QUESTION_TEST_CASE)
-            .select("*")
-            .eq("question_id", question_id)
-            .execute()
+        problem_task = (
+            client.table(Table.PROBLEMS).select("*").eq("id", problem_id).execute()
+            if problem_id
+            else None
+        )
+        test_cases_task = (
+            client.table(Table.TEST_CASES).select("*").in_("id", test_case_ids).execute()
+            if test_case_ids
+            else None
+        )
+        files_task = (
+            client.table(Table.FILES).select("*").in_("id", file_ids).execute()
+            if file_ids
+            else None
         )
 
-        test_cases: list[TestCase] = []
-        for result in select_test_case_ids_result.data:
-            select_test_case_result = (
-                await client.table(Table.TEST_CASES)
-                .select("*")
-                .eq("id", result["test_case_id"])
-                .execute()
-            )
-            test_cases.append(
-                TestCase(
-                    id=select_test_case_result.data[0]["id"],
-                    description=select_test_case_result.data[0]["description"],
-                )
-            )
-
-        select_file_ids_result = (
-            await client.table(Table.QUESTION_FILE)
-            .select("*")
-            .eq("question_id", question_id)
-            .execute()
+        problem_result, test_cases_result, files_result = await asyncio.gather(
+            problem_task or asyncio.sleep(0),
+            test_cases_task or asyncio.sleep(0),
+            files_task or asyncio.sleep(0),
         )
 
-        files: list[File] = []
-        for result in select_file_ids_result.data:
-            select_file_result = (
-                await client.table(Table.FILES).select("*").eq("id", result["file_id"]).execute()
+        problem = (
+            Problem(
+                id=problem_result.data[0]["id"],
+                title=problem_result.data[0]["title"],
+                description=problem_result.data[0]["description"],
+                requirements=problem_result.data[0]["requirements"],
             )
-            files.append(
-                File(
-                    id=select_file_result.data[0]["id"],
-                    name=select_file_result.data[0]["name"],
-                    code=select_file_result.data[0]["code"],
-                )
-            )
-
-        return Question(
-            id=question_id,
-            problem=problem,
-            files=files,
-            test_cases=test_cases,
+            if problem_result and problem_result.data
+            else Problem(id="", title="", description="", requirements=[])
         )
+
+        test_cases = (
+            [
+                TestCase(id=row["id"], description=row["description"])
+                for row in test_cases_result.data
+            ]
+            if test_cases_result and test_cases_result.data
+            else []
+        )
+
+        files = (
+            [File(id=row["id"], name=row["name"], code=row["code"]) for row in files_result.data]
+            if files_result and files_result.data
+            else []
+        )
+
+        return Question(id=question_id, problem=problem, files=files, test_cases=test_cases)
