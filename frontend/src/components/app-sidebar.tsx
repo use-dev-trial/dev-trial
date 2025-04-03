@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 import { OrganizationSwitcher, UserButton } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
-import { Inbox, Plus, Settings } from 'lucide-react';
+import { Inbox, Settings } from 'lucide-react';
 
 import { ThemeToggle } from '@/components/shared/theme-toggle';
 import {
@@ -23,11 +23,6 @@ import { CLIENT_ROUTES } from '@/lib/constants';
 import { CustomSidebarTrigger } from './custom-sidebar-trigger';
 
 const items = [
-  {
-    title: 'Create Challenge',
-    url: CLIENT_ROUTES.CHALLENGES_CREATE,
-    icon: Plus,
-  },
   {
     title: 'Challenges',
     url: CLIENT_ROUTES.CHALLENGES,

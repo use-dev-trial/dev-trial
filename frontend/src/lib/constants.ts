@@ -4,7 +4,7 @@ export const JWT_TEMPLATE_NAME = 'supabase';
 
 export const CLIENT_ROUTES = {
   CHALLENGES: '/challenges',
-  CHALLENGES_CREATE: '/challenges/create',
+  QUESTIONS: '/questions',
   CHALLENGES_DETAIL: (id: string) => `/challenges/${id}`,
   SETTINGS: '/settings',
 };
