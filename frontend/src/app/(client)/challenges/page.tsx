@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import useChallenge from '@/hooks/use-challenge';
+import { Plus } from 'lucide-react';
 
 import { ChallengeCard } from '@/components/challenges/card';
 import { Card } from '@/components/ui/card';
@@ -41,20 +42,7 @@ export default function ChallengePage() {
           <div className="rounded-md bg-blue-50 p-6 text-center">
             <div className="mb-6 flex justify-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
-                <svg
-                  className="h-7 w-7 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
+                <Plus className="h-7 w-7 text-blue-600" />
               </div>
             </div>
             <h3 className="text-lg font-medium text-blue-800">No challenges yet</h3>
@@ -74,20 +62,7 @@ export default function ChallengePage() {
             <Link href={CLIENT_ROUTES.QUESTIONS('1')} className="block h-full">
               <Card className="flex h-full cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-gray-300 p-6 text-center transition-all duration-300 hover:border-blue-500 hover:bg-blue-50 hover:shadow-md">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                  <svg
-                    className="h-6 w-6 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                    />
-                  </svg>
+                  <Plus className="h-6 w-6 text-blue-600" />
                 </div>
                 <h3 className="mb-1 text-lg font-medium">Create Challenge</h3>
                 <p className="text-sm text-gray-500">Build a new coding challenge</p>
