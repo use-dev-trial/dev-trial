@@ -1,6 +1,6 @@
 'use client';
 
-import { createChallenge, getAllChallenges } from '@/actions/challenges';
+import { createChallenge, getAllChallenges, getChallenge } from '@/actions/challenges';
 import { UseMutationResult, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Challenge, CreateChallengeRequest } from '@/types/challenges';
@@ -10,9 +10,14 @@ interface useChallengeOptions {
   isLoading: boolean;
   error: Error | null;
   createChallengeMutation: UseMutationResult<Challenge, Error, CreateChallengeRequest, unknown>;
+
+  // Single challenge data
+  challenge: Challenge | null;
+  isChallengeLoading: boolean;
+  challengeError: Error | null;
 }
 
-export default function useChallenge(): useChallengeOptions {
+export default function useChallenge(challengeId?: string): useChallengeOptions {
   const queryClient = useQueryClient();
 
   const { data, error, isLoading } = useQuery<Challenge[]>({
@@ -21,12 +26,23 @@ export default function useChallenge(): useChallengeOptions {
     refetchOnWindowFocus: false,
   });
 
+  const {
+    data: challenge,
+    isLoading: isChallengeLoading,
+    error: challengeError,
+  } = useQuery<Challenge>({
+    queryKey: ['challenge', challengeId],
+    queryFn: () => getChallenge(challengeId as string),
+    enabled: !!challengeId,
+    refetchOnWindowFocus: false,
+    retry: 1,
+  });
+
   const createMutation = useMutation({
     mutationFn: (challengeParams: CreateChallengeRequest) => createChallenge(challengeParams),
     mutationKey: ['createChallenge'],
     onError: (err) => {
       console.error('Error creating challenge:', err.message);
-      // On error, just refetch the data
       queryClient.invalidateQueries({ queryKey: ['challenges'] });
     },
     onSuccess: (data) => {
@@ -43,5 +59,8 @@ export default function useChallenge(): useChallengeOptions {
     isLoading,
     error,
     createChallengeMutation: createMutation,
+    challenge: challenge || null,
+    isChallengeLoading,
+    challengeError: challengeError as Error | null,
   };
 }
