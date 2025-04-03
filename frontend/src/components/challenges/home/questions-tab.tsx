@@ -8,9 +8,11 @@ import AddQuestionDialog from '@/components/challenges/home/add-question-dialog'
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
-export default function QuestionsTab() {
+export default function QuestionsTab({ challengeId }: { challengeId: string }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [questions, setQuestions] = useState<string[]>([]);
+
+  // TODO: Fetch questions for the challenge using useQuestion hook
 
   const handleAddQuestion = (question: string) => {
     setQuestions([...questions, question]);
@@ -20,7 +22,9 @@ export default function QuestionsTab() {
   return (
     <div>
       <div className="flex flex-col items-center justify-center p-8 text-center">
-        <p className="text-muted-foreground mb-6">Create questions for your challenge</p>
+        <p className="text-muted-foreground mb-6">
+          Create questions for your challenge {challengeId}
+        </p>
         <Button className="bg-blue-500 hover:bg-blue-600" onClick={() => setIsDialogOpen(true)}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add Question
