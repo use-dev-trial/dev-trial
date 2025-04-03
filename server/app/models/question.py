@@ -6,6 +6,7 @@ from app.models.problem import Problem
 from app.models.test_case import TestCase
 
 
+# Avoid making the attribute Optional because we are sharing this model for inference
 class Question(BaseModel):
     id: str = Field(description="The ID of the question as it is stored in the database.")
     problem: Problem = Field(
@@ -19,5 +20,5 @@ class Question(BaseModel):
     )
 
 
-class QuestionDB(Question, DatabaseObjectMixin):
+class QuestionDB(DatabaseObjectMixin):
     pass

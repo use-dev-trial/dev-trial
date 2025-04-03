@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { question } from './question';
+import { question } from './questions';
 
 export const role = z.enum(['user', 'assistant']);
 

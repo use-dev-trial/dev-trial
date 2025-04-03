@@ -5,9 +5,11 @@ from fastapi import APIRouter
 from app.controllers.challenges import ChallengesController
 from app.controllers.messages import MessagesController
 from app.controllers.problems import ProblemsController
+from app.controllers.questions import QuestionsController
 from app.services.challenges import ChallengesService
 from app.services.messages import MessagesService
 from app.services.problems import ProblemsService
+from app.services.questions import QuestionsService
 
 log = logging.getLogger(__name__)
 
@@ -64,4 +66,19 @@ router.include_router(
     get_problems_controller_router(),
     tags=["problems"],
     prefix="/api/problems",
+)
+
+
+### Questions
+
+
+def get_questions_controller_router():
+    service = QuestionsService()
+    return QuestionsController(service=service).router
+
+
+router.include_router(
+    get_questions_controller_router(),
+    tags=["questions"],
+    prefix="/api/questions",
 )
