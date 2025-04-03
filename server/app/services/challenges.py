@@ -8,7 +8,6 @@ from app.models.challenge import (
     GetAllChallengesResponse,
 )
 from app.models.database import Table
-from app.services.messages import retrieve_existing_question
 
 log = logging.getLogger(__name__)
 
@@ -20,24 +19,6 @@ class ChallengesService:
         )
         if not select_challenge_result.data:
             raise ValueError(f"Challenge with id {challenge_id} not found.")
-
-        question_id_list_result = await (
-            client.table(Table.CHALLENGE_QUESTION)
-            .select("question_id")
-            .eq("challenge_id", challenge_id)
-            .execute()
-        )
-
-        log.info("question_id_list_result", len(question_id_list_result.data))
-
-        questions = []
-        for question_id in question_id_list_result.data:
-            question = await retrieve_existing_question(
-                client=client, question_id=question_id["question_id"]
-            )
-            questions.append(question)
-
-        log.info("questions", questions)
 
         return Challenge(
             id=select_challenge_result.data[0]["id"],

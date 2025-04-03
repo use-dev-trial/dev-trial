@@ -10,7 +10,25 @@ from app.models.test_case import TestCase
 
 
 class QuestionsService:
-    async def get_question(self, question_id: str, client: Client) -> Question:
+
+    async def get_questions_by_challenge_id(
+        self, challenge_id: str, client: Client
+    ) -> list[Question]:
+        question_id_list_result = await (
+            client.table(Table.CHALLENGE_QUESTION)
+            .select("question_id")
+            .eq("challenge_id", challenge_id)
+            .execute()
+        )
+
+        tasks = [
+            self.get_question_by_id(question_id=question["question_id"], client=client)
+            for question in question_id_list_result.data
+        ]
+
+        return await asyncio.gather(*tasks)
+
+    async def get_question_by_id(self, question_id: str, client: Client) -> Question:
         question_task = client.table(Table.QUESTIONS).select("*").eq("id", question_id).execute()
         test_case_ids_task = (
             client.table(Table.QUESTION_TEST_CASE)

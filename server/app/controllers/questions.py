@@ -22,15 +22,29 @@ class QuestionsController:
         router = self.router
 
         @router.get(
-            "/{question_id}",
+            "/question_id/{question_id}",
             response_model=Question,
         )
-        async def get_question(
+        async def get_question_by_id(
             question_id: str, client: Client = Depends(init_db_client)
         ) -> Question:
             log.info(f"Getting question with id {question_id}...")
-            response: Question = await self.service.get_question(
+            response: Question = await self.service.get_question_by_id(
                 question_id=question_id, client=client
             )
             log.info("Question: %s", response)
+            return response
+
+        @router.get(
+            "/challenge_id/{challenge_id}",
+            response_model=list[Question],
+        )
+        async def get_questions_by_challenge_id(
+            challenge_id: str, client: Client = Depends(init_db_client)
+        ) -> list[Question]:
+            log.info(f"Getting all questions associated with challenge id {challenge_id}...")
+            response: list[Question] = await self.service.get_questions_by_challenge_id(
+                challenge_id=challenge_id, client=client
+            )
+            log.info("Questions: %s", response)
             return response

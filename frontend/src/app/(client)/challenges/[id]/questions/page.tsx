@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { upsertProblem } from '@/actions/problems';
 // import { getChallenge } from '@/actions/challenges';
 // import { createChallenge } from '@/actions/challenges';
-import { upsertProblem } from '@/actions/problems';
+// import { getQuestionsByChallengeId } from '@/actions/questions';
 import { useChat } from '@/hooks/use-chat';
 import { Settings } from 'lucide-react';
 import { Plus } from 'lucide-react';
