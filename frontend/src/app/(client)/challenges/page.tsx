@@ -8,7 +8,7 @@ import { Plus } from 'lucide-react';
 import { ChallengeCard } from '@/components/challenges/card';
 import { Card } from '@/components/ui/card';
 
-import { CLIENT_ROUTES, GRADIENTS } from '@/lib/constants';
+import { CHALLENGE_CARD_GRADIENTS, CLIENT_ROUTES } from '@/lib/constants';
 import { formatDate } from '@/lib/utils';
 
 export default function ChallengePage() {
@@ -78,7 +78,7 @@ export default function ChallengePage() {
                   description: challenge.description,
                   url: CLIENT_ROUTES.CHALLENGES_DETAIL(challenge.id),
                   date: formatDate(),
-                  gradient: GRADIENTS[index % GRADIENTS.length],
+                  gradient: CHALLENGE_CARD_GRADIENTS[index % CHALLENGE_CARD_GRADIENTS.length],
                 }}
               />
             ))}
