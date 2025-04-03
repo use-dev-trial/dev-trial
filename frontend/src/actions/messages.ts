@@ -1,20 +1,14 @@
 'use server';
 
-import { auth } from '@clerk/nextjs/server';
 import axios from 'axios';
 
 import { MessageRequest, MessageResponse, messageResponseSchema } from '@/types/messages';
 
-import { JWT_TEMPLATE_NAME } from '@/lib/constants';
+import { getClerkToken } from '@/lib/clerk';
 
 export async function send(request: MessageRequest): Promise<MessageResponse> {
-  const authInstance = await auth();
-  const token: string | null = await authInstance.getToken({
-    template: JWT_TEMPLATE_NAME,
-  });
-  if (!token) {
-    throw new Error('No Clerk token found');
-  }
+  const token: string = await getClerkToken();
+
   try {
     console.log('Sending message:', request);
     const response = await axios.post(
