@@ -14,7 +14,7 @@ import {
   role,
 } from '@/types/messages';
 import { Problem } from '@/types/problems';
-import { Question, TestCase, defaultQuestion } from '@/types/question';
+import { Question, TestCase, defaultQuestion } from '@/types/questions';
 
 export type Tab = 'problem' | 'files' | 'test-cases';
 

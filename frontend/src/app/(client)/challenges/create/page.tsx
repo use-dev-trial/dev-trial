@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { Problem, UpsertProblemResponse, upsertProblemRequestSchema } from '@/types/problems';
-import { Question, defaultQuestion } from '@/types/question';
+import { Question, defaultQuestion } from '@/types/questions';
 
 import { useDebouncedCallback } from '@/lib/utils';
 

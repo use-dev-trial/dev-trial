@@ -65,3 +65,18 @@ router.include_router(
     tags=["problems"],
     prefix="/api/problems",
 )
+
+
+### Questions
+
+
+def get_questions_controller_router():
+    service = QuestionsService()
+    return QuestionsController(service=service).router
+
+
+router.include_router(
+    get_questions_controller_router(),
+    tags=["questions"],
+    prefix="/api/questions",
+)

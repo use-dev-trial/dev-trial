@@ -19,5 +19,6 @@ class Question(BaseModel):
     )
 
 
-class QuestionDB(Question, DatabaseObjectMixin):
-    pass
+class QuestionDB(DatabaseObjectMixin):
+    id: str = Field(description="The ID of the question as it is stored in the database.")
+    problem_id: str = Field(description="The ID of the problem associated with the question.")

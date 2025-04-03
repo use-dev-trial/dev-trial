@@ -5,7 +5,7 @@ import ProblemTab from '@/components/challenges/create/problem-tab';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { Problem } from '@/types/problems';
-import { Question } from '@/types/question';
+import { Question } from '@/types/questions';
 
 interface QuestionPreviewProps {
   isLoading: boolean;
