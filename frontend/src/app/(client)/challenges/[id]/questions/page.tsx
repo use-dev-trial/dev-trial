@@ -3,24 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { upsertProblem } from '@/actions/problems';
-// import { getChallenge } from '@/actions/challenges';
-// import { createChallenge } from '@/actions/challenges';
-// import { getQuestionsByChallengeId } from '@/actions/questions';
 import { useChat } from '@/hooks/use-chat';
 import { Settings } from 'lucide-react';
 import { Plus } from 'lucide-react';
 
 import ChatInterface from '@/components/challenges/create/chat-interface';
 import QuestionPreview from '@/components/challenges/create/question-preview';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import RenameChallengeTitleDialog from '@/components/challenges/edit-title-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { Problem, UpsertProblemResponse, upsertProblemRequestSchema } from '@/types/problems';
@@ -36,19 +25,6 @@ export default function Home() {
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [challengeTitle, setChallengeTitle] = useState('Test Challenge Title');
-  const [newChallengeTitle, setNewChallengeTitle] = useState('');
-
-  useEffect(() => {
-    const fetchChallenge = async () => {
-      // const challenge = await getChallenge('');
-      // console.log('challenge', challenge);
-      // // If the challenge has questions, update our questions state
-      // if (challenge && challenge.question && challenge.question.length > 0) {
-      //   setQuestions(challenge.question);
-      // }
-    };
-    fetchChallenge();
-  }, []);
 
   const { question, messages, isLoading, updatedTabs, sendMessage, setQuestion, clearUpdatedTab } =
     useChat();
@@ -111,24 +87,9 @@ export default function Home() {
     setQuestion(questions[index]);
   };
 
-  const handleOpenRenameDialog = () => {
-    setNewChallengeTitle(challengeTitle);
-    setIsRenameDialogOpen(true);
+  const onRenameDialogToggle = () => {
+    setIsRenameDialogOpen((prevIsRenameDialogOpen) => !prevIsRenameDialogOpen);
   };
-
-  const handleSaveChallengeTitle = () => {
-    setChallengeTitle(newChallengeTitle);
-    setIsRenameDialogOpen(false);
-  };
-
-  // const handleCreateChallenge = async () => {
-  //   const challenge = await createChallenge({
-  //     name: 'Test Challenge',
-  //     description: 'Test Description',
-  //     question_id: '',
-  //   });
-  //   console.log(challenge);
-  // };
 
   return (
     <main className="flex h-screen">
@@ -137,10 +98,7 @@ export default function Home() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <div
-                  className="rounded-full p-1.5 hover:underline"
-                  onClick={handleOpenRenameDialog}
-                >
+                <div className="rounded-full p-1.5 hover:underline" onClick={onRenameDialogToggle}>
                   <p className="text-md font-medium">{challengeTitle}</p>
                 </div>
               </TooltipTrigger>
@@ -217,33 +175,14 @@ export default function Home() {
           onProblemUpdate={onProblemUpdate}
         />
       </div>
-      <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Rename Challenge</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <Input
-              value={newChallengeTitle}
-              onChange={(e) => setNewChallengeTitle(e.target.value)}
-              placeholder="Enter chat name"
-              className="w-full"
-            />
-          </div>
-          <DialogFooter className="sm:justify-between">
-            <Button type="button" variant="outline" onClick={() => setIsRenameDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              onClick={handleSaveChallengeTitle}
-              disabled={!newChallengeTitle.trim()}
-            >
-              Save
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <RenameChallengeTitleDialog
+        currentTitle={challengeTitle}
+        isDialogOpen={isRenameDialogOpen}
+        onToggle={onRenameDialogToggle}
+        onSave={(newChallengeTitle: string) => {
+          setChallengeTitle(newChallengeTitle);
+        }}
+      />
     </main>
   );
 }
