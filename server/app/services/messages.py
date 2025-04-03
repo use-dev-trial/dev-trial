@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from typing import Optional
 
@@ -14,6 +13,7 @@ from app.models.message import MessageRequest, MessageResponse, Role
 from app.models.problem import Problem
 from app.models.question import Question
 from app.models.test_case import TestCase
+from app.services.questions import QuestionsService
 from app.utils.database import is_valid_uuid
 
 log = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class MessagesService:
                 test_cases=[],
             )
         else:
-            question = await retrieve_existing_question(
+            question = await QuestionsService().get_question_by_id(
                 client=client, question_id=input.question_id
             )
 
@@ -388,94 +388,6 @@ async def _update_problem(client: Client, result: RunResult, problem_id: str) ->
         description=result.final_output.description,
         requirements=result.final_output.requirements,
     )
-
-
-async def retrieve_existing_question(client: Client, question_id: str) -> Question:
-    problem_id_task = (
-        client.table(Table.QUESTIONS).select("problem_id").eq("id", question_id).execute()
-    )
-    file_ids_task = (
-        client.table(Table.QUESTION_FILE).select("file_id").eq("question_id", question_id).execute()
-    )
-    test_case_ids_task = (
-        client.table(Table.QUESTION_TEST_CASE)
-        .select("test_case_id")
-        .eq("question_id", question_id)
-        .execute()
-    )
-
-    problem_id_result, file_ids_result, test_case_ids_result = await asyncio.gather(
-        problem_id_task, file_ids_task, test_case_ids_task
-    )
-
-    problem_id_task = asyncio.to_thread(
-        lambda: problem_id_result.data[0]["problem_id"] if problem_id_result.data else None
-    )
-    file_ids_task = asyncio.to_thread(
-        lambda: [row["file_id"] for row in file_ids_result.data] if file_ids_result.data else []
-    )
-    test_case_ids_task = asyncio.to_thread(
-        lambda: (
-            [row["test_case_id"] for row in test_case_ids_result.data]
-            if test_case_ids_result.data
-            else []
-        )
-    )
-
-    problem_id, file_ids, test_case_ids = await asyncio.gather(
-        problem_id_task, file_ids_task, test_case_ids_task
-    )
-
-    problem_task = (
-        client.table(Table.PROBLEMS).select("*").eq("id", problem_id).execute()
-        if problem_id
-        else asyncio.sleep(0)
-    )
-
-    file_task = (
-        client.table(Table.FILES).select("*").in_("id", file_ids).execute()
-        if file_ids
-        else asyncio.sleep(0)
-    )
-
-    test_case_task = (
-        client.table(Table.TEST_CASES).select("*").in_("id", test_case_ids).execute()
-        if test_case_ids
-        else asyncio.sleep(0)
-    )
-
-    problem_result, file_results, test_case_results = await asyncio.gather(
-        problem_task, file_task, test_case_task
-    )
-
-    # Parse results in parallel
-    problem_task = asyncio.to_thread(
-        lambda: (
-            Problem.model_validate(problem_result.data[0])
-            if problem_result and problem_result.data
-            else Problem(id="", title="", description="", requirements=[])
-        )
-    )
-
-    files_task = asyncio.to_thread(
-        lambda: (
-            [File.model_validate(row) for row in file_results.data]
-            if file_results and file_results.data
-            else []
-        )
-    )
-
-    test_cases_task = asyncio.to_thread(
-        lambda: (
-            [TestCase.model_validate(row) for row in test_case_results.data]
-            if test_case_results and test_case_results.data
-            else []
-        )
-    )
-
-    problem, files, test_cases = await asyncio.gather(problem_task, files_task, test_cases_task)
-
-    return Question(id=question_id, problem=problem, files=files, test_cases=test_cases)
 
 
 async def _retrieve_existing_messages(client: Client, message_id: str) -> list[TResponseInputItem]:

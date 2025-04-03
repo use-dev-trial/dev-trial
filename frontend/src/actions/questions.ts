@@ -6,7 +6,7 @@ import { Question, question } from '@/types/questions';
 
 import { getClerkToken } from '@/lib/clerk';
 
-export async function getQuestion(questionId: string): Promise<Question> {
+export async function getQuestionById(questionId: string): Promise<Question> {
   const token: string = await getClerkToken();
 
   try {
@@ -20,10 +20,32 @@ export async function getQuestion(questionId: string): Promise<Question> {
         },
       },
     );
-    console.log('Get Question Response', response.data);
+    console.log('Get Question By Id Response', response.data);
     return question.parse(response.data);
   } catch (error) {
-    console.error('Error sending message:', error);
+    console.error('Error getting question by id:', error);
+    throw error;
+  }
+}
+
+export async function getQuestionsByChallengeId(challengeId: string): Promise<Question[]> {
+  const token: string = await getClerkToken();
+
+  try {
+    console.log('Getting questions associated with challenge id...');
+    const response = await axios.get(
+      `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/questions/${challengeId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    console.log('Get Questions By Challenge Id Response', response.data);
+    return response.data.map((q: Question) => question.parse(q));
+  } catch (error) {
+    console.error('Error getting questions by challenge id:', error);
     throw error;
   }
 }
