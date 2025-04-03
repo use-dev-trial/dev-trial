@@ -4,18 +4,16 @@ import { auth } from '@clerk/nextjs/server';
 import axios from 'axios';
 
 import {
+  Challenge,
   CreateChallengeRequest,
-  CreateChallengeResponse,
   GetAllChallengesResponse,
-  GetChallengeResponse,
-  createChallengeResponseSchema,
+  challenge,
   getAllChallengesResponseSchema,
-  getChallengeResponseSchema,
 } from '@/types/challenges';
 
 import { JWT_TEMPLATE_NAME } from '@/lib/constants';
 
-export async function getChallenge(challengeId: string): Promise<GetChallengeResponse> {
+export async function getChallenge(challengeId: string): Promise<Challenge> {
   const authInstance = await auth();
   const token: string | null = await authInstance.getToken({
     template: JWT_TEMPLATE_NAME,
@@ -35,16 +33,14 @@ export async function getChallenge(challengeId: string): Promise<GetChallengeRes
       },
     );
     console.log('response', response.data);
-    return getChallengeResponseSchema.parse(response.data);
+    return challenge.parse(response.data);
   } catch (error) {
     console.error('Error sending message:', error);
     throw error;
   }
 }
 
-export async function createChallenge(
-  challenge: CreateChallengeRequest,
-): Promise<CreateChallengeResponse> {
+export async function createChallenge(input: CreateChallengeRequest): Promise<Challenge> {
   const authInstance = await auth();
   const token: string | null = await authInstance.getToken({
     template: JWT_TEMPLATE_NAME,
@@ -57,7 +53,7 @@ export async function createChallenge(
     console.log('Creating challenge');
     const response = await axios.post(
       `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/challenges`,
-      challenge,
+      input,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +61,7 @@ export async function createChallenge(
         },
       },
     );
-    return createChallengeResponseSchema.parse(response.data);
+    return challenge.parse(response.data);
   } catch (error) {
     console.error('Error creating challenge:', error);
     throw error;
