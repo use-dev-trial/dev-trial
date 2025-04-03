@@ -11,16 +11,11 @@ import {
   getAllChallengesResponseSchema,
 } from '@/types/challenges';
 
+import { getClerkToken } from '@/lib/clerk';
 import { JWT_TEMPLATE_NAME } from '@/lib/constants';
 
 export async function getChallenge(challengeId: string): Promise<Challenge> {
-  const authInstance = await auth();
-  const token: string | null = await authInstance.getToken({
-    template: JWT_TEMPLATE_NAME,
-  });
-  if (!token) {
-    throw new Error('No Clerk token found');
-  }
+  const token: string = await getClerkToken();
   try {
     console.log('Getting challenge');
     const response = await axios.get(
