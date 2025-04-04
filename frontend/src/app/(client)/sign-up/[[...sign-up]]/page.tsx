@@ -1,10 +1,12 @@
 import { SignUp } from '@clerk/nextjs';
 
+import { CLIENT_ROUTES } from '@/lib/constants';
+
 function SignUpPage() {
   return (
     <div className="absolute top-0 left-0 z-50 flex h-screen w-full items-center justify-center bg-white">
       <div className="my-auto hidden align-middle md:block">
-        <SignUp forceRedirectUrl="/challenges" />
+        <SignUp forceRedirectUrl={CLIENT_ROUTES.CHALLENGES} />
       </div>
       <div className="my-auto block h-[60%] px-3 md:hidden">
         <h1 className="text-center text-2xl font-bold text-gray-800">
