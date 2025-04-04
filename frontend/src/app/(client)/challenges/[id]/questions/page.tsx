@@ -5,11 +5,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { upsertProblem } from '@/actions/problems';
 import { useChat } from '@/hooks/use-chat';
 
-import AddQuestionTooltip from '@/components/challenges/create/add-question-tooltip';
-import ChatInterface from '@/components/challenges/create/chat-interface';
-import QuestionIndexButton from '@/components/challenges/create/question-index-button';
-import QuestionPreview from '@/components/challenges/create/question-preview';
 import RenameChallengeTitleDialog from '@/components/challenges/edit-title-dialog';
+import AddQuestionTooltip from '@/components/challenges/questions/add-question-tooltip';
+import ChatInterface from '@/components/challenges/questions/chat-interface';
+import QuestionIndexButton from '@/components/challenges/questions/question-index-button';
+import QuestionPreview from '@/components/challenges/questions/question-preview';
+import QuestionTemplatesDialog from '@/components/challenges/questions/question-templates-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { Problem, UpsertProblemResponse, upsertProblemRequestSchema } from '@/types/problems';
@@ -20,9 +21,7 @@ import { useDebouncedCallback } from '@/lib/utils';
 
 export default function Home() {
   const previewContainerRef = useRef<HTMLDivElement>(null);
-  // State for multiple questions
   const [questions, setQuestions] = useState<Question[]>([defaultQuestion]);
-  // State for the currently selected question index
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [challengeTitle, setChallengeTitle] = useState('Test Challenge Title');
@@ -119,12 +118,13 @@ export default function Home() {
             />
           ))}
           {questions.length < MAX_NUM_QUESTIONS && (
-            <AddQuestionTooltip
-              onClick={() => {
-                setQuestions((prev) => [...prev, defaultQuestion]);
-                setSelectedQuestionIndex((prev) => prev + 1);
-              }}
-            />
+            <QuestionTemplatesDialog triggerButton={<AddQuestionTooltip onClick={() => {}} />} /> // Dummy onClick needed so as to forward the click event to the dialog
+            // <AddQuestionTooltip
+            //   onClick={() => {
+            //     setQuestions((prev) => [...prev, defaultQuestion]);
+            //     setSelectedQuestionIndex((prev) => prev + 1);
+            //   }}
+            // />
           )}
         </div>
         <QuestionPreview
