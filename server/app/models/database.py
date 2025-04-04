@@ -19,7 +19,7 @@ class Table(StrEnum):
 
 
 class DatabaseObjectMixin(BaseModel):
-    user_id: str = Field(description="The ID of the user who created the object.")
+    org_id: str = Field(description="The ID of the orgainsation which owns the object.")
     created_at: datetime = Field(description="The date and time when the question was created.")
     updated_at: datetime = Field(
         description="The date and time when the question was last updated."
