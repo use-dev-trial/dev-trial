@@ -4,11 +4,6 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import { ClerkProvider } from '@clerk/nextjs';
 
-import { AppSidebar } from '@/components/app-sidebar';
-import { CustomSidebarTrigger } from '@/components/custom-sidebar-trigger';
-import { QueryProvider } from '@/components/providers/query';
-import { SidebarProvider } from '@/components/ui/sidebar';
-
 import '../globals.css';
 
 const geistSans = Geist({
@@ -41,15 +36,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <QueryProvider>
-              <SidebarProvider>
-                <AppSidebar />
-                <div className="flex w-full flex-col peer-data-[state=collapsed]:pl-10">
-                  <CustomSidebarTrigger location="layout" />
-                  {children}
-                </div>
-              </SidebarProvider>
-            </QueryProvider>
+            {children}
           </ThemeProvider>
         </body>
       </html>
