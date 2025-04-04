@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Tab } from '@/hooks/use-chat';
 import { Bot, Loader2, Paperclip, Send, User } from 'lucide-react';
 
-import SuggestionCard from '@/components/challenges/create/suggestion-card';
+import SuggestionCard from '@/components/challenges/questions/suggestion-card';
 import { Button } from '@/components/ui/button';
 
 import { Message } from '@/types/messages';

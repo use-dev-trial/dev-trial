@@ -1,7 +1,7 @@
 import { Tab } from '@/hooks/use-chat';
 
-import FileContainer from '@/components/challenges/create/files-container';
-import ProblemTab from '@/components/challenges/create/problem-tab';
+import FileContainer from '@/components/challenges/questions/files-container';
+import ProblemTab from '@/components/challenges/questions/problem-tab';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { Problem } from '@/types/problems';
