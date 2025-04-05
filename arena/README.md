@@ -1,4 +1,4 @@
-# DevTrial Frontend
+# DevTrial Arena
 
 ## Set up environment variables
 
