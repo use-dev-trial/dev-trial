@@ -91,7 +91,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./forge
-        run: npm install
+        run: npm ci
 
       - name: Run Prettier
         working-directory: ./forge
@@ -122,7 +122,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./arena
-        run: npm install
+        run: npm ci
 
       - name: Run Prettier
         working-directory: ./arena
