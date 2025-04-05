@@ -20,11 +20,14 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "prettier.configPath": "./forge/.prettierrc.cjs",
   "prettier.requireConfig": true,
   "eslint.workingDirectories": [
     {
       "directory": "./forge",
+      "changeProcessCWD": true 
+    },
+    {
+      "directory": "./arena",
       "changeProcessCWD": true
     }
   ],
