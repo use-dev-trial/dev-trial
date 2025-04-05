@@ -90,7 +90,7 @@ export function AppSidebar() {
               appearance={{
                 baseTheme: theme === 'dark' ? dark : undefined,
               }}
-              hidePersonal // ✅ hides the "personal account" option
+              hidePersonal
             />
             <UserButton />
           </div>
