@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { file } from './files';
-import { problem } from './problems';
+import { file } from '@/types/files';
+import { problem } from '@/types/problems';
 
 export const test_case = z.object({
   id: z.string(),
