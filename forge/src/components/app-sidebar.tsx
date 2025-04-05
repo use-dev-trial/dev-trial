@@ -3,7 +3,15 @@
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
 
-import { OrganizationSwitcher, UserButton } from '@clerk/nextjs';
+import { useEffect } from 'react';
+
+import {
+  OrganizationSwitcher,
+  UserButton,
+  useOrganization,
+  useOrganizationList,
+  useSession,
+} from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
 import { Inbox, Settings } from 'lucide-react';
 
@@ -37,6 +45,18 @@ const items = [
 
 export function AppSidebar() {
   const { theme } = useTheme();
+  const { session, isLoaded: isSessionLoaded } = useSession();
+  const { isLoaded: isOrgLoaded } = useOrganization();
+  const { isLoaded: isOrgListLoaded, setActive } = useOrganizationList();
+
+  useEffect(() => {
+    if (!isSessionLoaded || !isOrgLoaded || !isOrgListLoaded || !session) return;
+    const hasActiveOrg = session.user;
+    const availableOrgs = session.user.organizationMemberships;
+    if (!hasActiveOrg && availableOrgs.length > 0) {
+      void setActive({ organization: availableOrgs[0].id });
+    }
+  }, [isSessionLoaded, isOrgListLoaded, setActive]);
 
   return (
     <Sidebar>
@@ -70,6 +90,7 @@ export function AppSidebar() {
               appearance={{
                 baseTheme: theme === 'dark' ? dark : undefined,
               }}
+              hidePersonal // ✅ hides the "personal account" option
             />
             <UserButton />
           </div>
