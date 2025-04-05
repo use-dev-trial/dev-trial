@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       server: ${{ steps.filter.outputs.server }} 
-      frontend: ${{ steps.filter.outputs.frontend }}
+      forge: ${{ steps.filter.outputs.forge }}
       arena: ${{ steps.filter.outputs.arena }}
     steps:
       - uses: actions/checkout@v4
@@ -24,8 +24,8 @@ jobs:
           filters: |
             server:
               - 'server/**'
-            frontend:
-              - 'frontend/**'
+            forge:
+              - 'forge/**'
             arena:
               - 'arena/**'
 
@@ -68,10 +68,10 @@ jobs:
         run: |
           poetry run black --check --diff .
 
-  frontend-CI:
+  forge-CI:
     needs: file-changes
-    if: ${{ needs.file-changes.outputs.frontend == 'true' }}
-    name: frontend-CI
+    if: ${{ needs.file-changes.outputs.forge == 'true' }}
+    name: forge-CI
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
@@ -90,19 +90,19 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        working-directory: ./frontend
+        working-directory: ./forge
         run: npm install
 
       - name: Run Prettier
-        working-directory: ./frontend
+        working-directory: ./forge
         run: npx prettier --check .
 
       - name: Run ESLint
-        working-directory: ./frontend
+        working-directory: ./forge
         run: npm run lint .
       
       - name: Build
-        working-directory: ./frontend
+        working-directory: ./forge
         run: npm run build
   
   arena-CI:

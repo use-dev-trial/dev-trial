@@ -1,4 +1,4 @@
-# DevTrial Frontend
+# DevTrial Forge
 
 ## Set up environment variables
 

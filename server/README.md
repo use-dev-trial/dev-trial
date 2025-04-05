@@ -1,6 +1,6 @@
-# Forge Server
+# DevTrial Server
 
-Forge Server is the backend service that provides the core functionality for Forge.
+DevTrial Server is the backend service that provides the core functionality for both Forge and Arena.
 
 ## Set up Poetry
 
