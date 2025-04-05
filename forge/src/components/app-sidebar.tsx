@@ -18,19 +18,19 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 
-import { CLIENT_ROUTES } from '@/lib/constants';
+import { ROUTES } from '@/lib/constants';
 
 import { CustomSidebarTrigger } from './custom-sidebar-trigger';
 
 const items = [
   {
     title: 'Challenges',
-    url: CLIENT_ROUTES.CHALLENGES,
+    url: ROUTES.CHALLENGES,
     icon: Inbox,
   },
   {
     title: 'Settings',
-    url: CLIENT_ROUTES.SETTINGS,
+    url: ROUTES.SETTINGS,
     icon: Settings,
   },
 ];

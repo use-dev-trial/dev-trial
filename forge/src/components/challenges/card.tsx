@@ -9,7 +9,7 @@ import { Check, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
-import { CLIENT_ROUTES } from '@/lib/constants';
+import { ROUTES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 interface Challenge {
@@ -68,7 +68,7 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
 
           <div className="mt-4 border-t pt-3">
             <Link
-              href={CLIENT_ROUTES.CHALLENGES_DETAIL(challenge.id)}
+              href={ROUTES.CHALLENGES_DETAIL(challenge.id)}
               className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
               rel="noopener noreferrer"
             >

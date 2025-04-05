@@ -1,12 +1,12 @@
 import { SignUp } from '@clerk/nextjs';
 
-import { CLIENT_ROUTES } from '@/lib/constants';
+import { ROUTES } from '@/lib/constants';
 
 export default function SignUpPage() {
   return (
     <div className="absolute top-0 left-0 z-50 flex h-screen w-full items-center justify-center">
       <div className="my-auto hidden align-middle md:block">
-        <SignUp forceRedirectUrl={CLIENT_ROUTES.CHALLENGES} />
+        <SignUp forceRedirectUrl={ROUTES.CHALLENGES} />
       </div>
       <div className="my-auto block h-[60%] px-3 md:hidden">
         <h1 className="text-center text-2xl font-bold">Welcome to DevTrial</h1>
