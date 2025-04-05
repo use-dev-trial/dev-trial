@@ -15,6 +15,7 @@ jobs:
     outputs:
       server: ${{ steps.filter.outputs.server }} 
       frontend: ${{ steps.filter.outputs.frontend }}
+      arena: ${{ steps.filter.outputs.arena }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v2
@@ -25,6 +26,8 @@ jobs:
               - 'server/**'
             frontend:
               - 'frontend/**'
+            arena:
+              - 'arena/**'
 
   server-CI:
     needs: file-changes
@@ -102,3 +105,33 @@ jobs:
         working-directory: ./frontend
         run: npm run build
   
+  arena-CI:
+    needs: file-changes
+    if: ${{ needs.file-changes.outputs.arena == 'true' }}
+    name: arena-CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: ./arena
+        run: npm install
+
+      - name: Run Prettier
+        working-directory: ./arena
+        run: npx prettier --check .
+
+      - name: Run ESLint
+        working-directory: ./arena
+        run: npm run lint .
+
+      - name: Build
+        working-directory: ./arena
+        run: npm run build
