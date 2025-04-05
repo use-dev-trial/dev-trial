@@ -1,6 +1,4 @@
 {
-  "typescript.tsdk": "./frontend/node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
   "eslint.format.enable": true,
   "editor.rulers": [
     100
@@ -22,11 +20,14 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "prettier.configPath": "./frontend/.prettierrc.cjs",
   "prettier.requireConfig": true,
   "eslint.workingDirectories": [
     {
-      "directory": "./frontend",
+      "directory": "./forge",
+      "changeProcessCWD": true 
+    },
+    {
+      "directory": "./arena",
       "changeProcessCWD": true
     }
   ],
