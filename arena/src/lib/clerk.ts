@@ -1,4 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
+
 import { JWT_TEMPLATE_NAME } from '@/lib/constants';
 
 export async function getClerkToken(): Promise<string> {

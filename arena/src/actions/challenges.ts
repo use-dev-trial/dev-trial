@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-import { challenge, Challenge } from '@/types/challenges';
+import { Challenge, challenge } from '@/types/challenges';
 
 import { getClerkToken } from '@/lib/clerk';
 

@@ -26,7 +26,6 @@ export default function useChallenge(challengeId?: string): useChallengeOptions 
     retry: 1,
   });
 
-
   return {
     challenge: challenge || null,
     isChallengeLoading,
