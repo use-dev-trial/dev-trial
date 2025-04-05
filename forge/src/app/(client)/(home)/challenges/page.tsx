@@ -8,7 +8,7 @@ import { Plus } from 'lucide-react';
 import { ChallengeCard } from '@/components/challenges/card';
 import { Card } from '@/components/ui/card';
 
-import { CHALLENGE_CARD_GRADIENTS, CLIENT_ROUTES } from '@/lib/constants';
+import { CHALLENGE_CARD_GRADIENTS, ROUTES } from '@/lib/constants';
 import { formatDate } from '@/lib/utils';
 
 export default function ChallengePage() {
@@ -48,7 +48,7 @@ export default function ChallengePage() {
             <h3 className="text-lg font-medium text-blue-800">No challenges yet</h3>
             <p className="mt-2 mb-6 text-blue-700">Create your first challenge to get started.</p>
             <Link
-              href={CLIENT_ROUTES.QUESTIONS('1')}
+              href={ROUTES.QUESTIONS('1')}
               className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
             >
               Create Challenge
@@ -59,7 +59,7 @@ export default function ChallengePage() {
         {!isLoading && challenges.length > 0 && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {/* Create Challenge Card */}
-            <Link href={CLIENT_ROUTES.QUESTIONS('1')} className="block h-full">
+            <Link href={ROUTES.QUESTIONS('1')} className="block h-full">
               <Card className="flex h-full cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-gray-300 p-6 text-center transition-all duration-300 hover:border-blue-500 hover:bg-blue-50 hover:shadow-md">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
                   <Plus className="h-6 w-6 text-blue-600" />
@@ -76,7 +76,7 @@ export default function ChallengePage() {
                   id: challenge.id,
                   name: challenge.name,
                   description: challenge.description,
-                  url: CLIENT_ROUTES.CHALLENGES_DETAIL(challenge.id),
+                  url: ROUTES.CHALLENGES_DETAIL(challenge.id),
                   date: formatDate(),
                   gradient: CHALLENGE_CARD_GRADIENTS[index % CHALLENGE_CARD_GRADIENTS.length],
                 }}
