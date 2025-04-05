@@ -1,7 +1,7 @@
 'use client';
 
 import { getChallenge } from '@/actions/challenges';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { Challenge } from '../types/challenges';
 
@@ -12,8 +12,6 @@ interface useChallengeOptions {
 }
 
 export default function useChallenge(challengeId?: string): useChallengeOptions {
-  const queryClient = useQueryClient();
-
   const {
     data: challenge,
     isLoading: isChallengeLoading,
