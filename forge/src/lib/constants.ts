@@ -1,8 +1,7 @@
 export const JWT_TEMPLATE_NAME = 'supabase';
 
-// Routes
-
 export const ROUTES = {
+  CHECK_ORG: '/sign-up/post',
   CHALLENGES: '/challenges',
   QUESTIONS: (id: string) => `/challenges/${id}/questions`,
   CHALLENGES_DETAIL: (id: string) => `/challenges/${id}`,
