@@ -3,10 +3,12 @@ import logging
 from fastapi import APIRouter
 
 from app.controllers.challenges import ChallengesController
+from app.controllers.clerk import ClerkController
 from app.controllers.messages import MessagesController
 from app.controllers.problems import ProblemsController
 from app.controllers.questions import QuestionsController
 from app.services.challenges import ChallengesService
+from app.services.clerk import ClerkService
 from app.services.messages import MessagesService
 from app.services.problems import ProblemsService
 from app.services.questions import QuestionsService
@@ -81,4 +83,18 @@ router.include_router(
     get_questions_controller_router(),
     tags=["questions"],
     prefix="/api/questions",
+)
+
+### Clerk
+
+
+def get_clerk_controller_router():
+    service = ClerkService()
+    return ClerkController(service=service).router
+
+
+router.include_router(
+    get_clerk_controller_router(),
+    tags=["clerk"],
+    prefix="/api/clerk",
 )

@@ -1,9 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-
+// import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
+import { createOrganization } from '@/actions/clerk';
+import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
@@ -20,7 +21,9 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 
-import { ROUTES } from '@/lib/constants';
+import { CreateOrganizationResponse, createOrganizationRequestSchema } from '@/types/clerk';
+
+// import { ROUTES } from '@/lib/constants';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -29,7 +32,8 @@ const formSchema = z.object({
 });
 
 export default function SettingsPage() {
-  const router = useRouter();
+  const { user } = useUser();
+  // const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,17 +42,15 @@ export default function SettingsPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Call your backend API to create an organization
-    // e.g., const res = await fetch('/api/create-organization', { method: 'POST', body: JSON.stringify({ name: orgName }) });
-    // const organization = await res.json();
-    // For demonstration, assume the new organization is returned as:
-    const organization = { name: values.name };
-    // Optionally, set the active organization (you might use a context or a cookie)
-    // Redirect the user to the dashboard (or next step in your flow)
-    console.log(organization);
-    router.push(values.name);
-    router.push(ROUTES.CHALLENGES);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const createOrganizationRequest = createOrganizationRequestSchema.parse({
+      user_id: user?.id,
+      name: values.name,
+    });
+    const createOrganizationResponse: CreateOrganizationResponse =
+      await createOrganization(createOrganizationRequest);
+    console.log(createOrganizationResponse.id);
+    // router.push(ROUTES.CHALLENGES);
   }
 
   return (
