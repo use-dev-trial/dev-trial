@@ -21,14 +21,10 @@ export default function SelectOrganizationPage() {
 
     const availableOrgMemberships = user?.organizationMemberships || [];
     const currentOrgId = session.lastActiveOrganizationId;
-    const intendedRedirectUrl = searchParams.get('redirect_url') || ROUTES.CHALLENGES;
 
     // If user already has an active org (maybe they landed here unexpectedly), redirect them
     if (currentOrgId) {
-      console.log(
-        `SelectOrgPage: Org ${currentOrgId} is already active. Redirecting to ${intendedRedirectUrl}`,
-      );
-      router.replace(intendedRedirectUrl);
+      router.replace(ROUTES.CHALLENGES);
       return;
     }
 
@@ -42,7 +38,7 @@ export default function SelectOrganizationPage() {
     if (firstOrgMembership?.organization?.id) {
       setActive({ organization: firstOrgMembership.organization.id })
         .then(() => {
-          router.replace(intendedRedirectUrl);
+          router.replace(ROUTES.CHALLENGES);
         })
         .catch((err) => {
           console.log('SelectOrgPage: Failed to set active organization', err);
