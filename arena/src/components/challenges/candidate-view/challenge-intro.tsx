@@ -6,10 +6,6 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 
 import { Challenge } from '@/types/challenges';
 
-// Base64 encoded fallback image for document icon
-const FALLBACK_ICON =
-  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xNC41IDJINmEyIDIgMCAwIDAtMiAydjE2YTIgMiAwIDAgMCAyIDJoMTJhMiAyIDAgMCAwIDItMlY3LjVMMTQuNSAyeiIvPjxwb2x5bGluZSBwb2ludHM9IjE0IDIgMTQgOCAyMCA4Ii8+PHBhdGggZD0iTTggMTNoOCIvPjxwYXRoIGQ9Ik04IDE3aDgiLz48cGF0aCBkPSJNOCA5aDEiLz48L3N2Zz4=';
-
 interface ChallengeIntroProps {
   challenge: Challenge;
   onStart: () => void;
