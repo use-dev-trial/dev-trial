@@ -1,11 +1,7 @@
-import os
-
 import httpx
 from fastapi import Header, HTTPException
 
 from app.utils.database import db_client
-
-CLERK_SECRET_KEY = os.getenv("CLERK_SECRET_KEY")
 
 
 async def init_db_client(authorization: str = Header(...)):
