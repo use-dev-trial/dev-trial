@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.12.12",
-    "@clerk/themes": "^2.2.26",
+    "@clerk/themes": "^2.2.27",
     "@hookform/resolvers": "^5.0.1",
     "@monaco-editor/react": "^4.7.0-rc.0",
     "@radix-ui/react-dialog": "^1.1.6",

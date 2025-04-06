@@ -2,15 +2,9 @@ import logging
 
 from fastapi import (
     APIRouter,
-    Depends,
 )
 
-from app.models.clerk import (
-    CreateOrganizationRequest,
-    CreateOrganizationResponse,
-)
 from app.services.clerk import ClerkService
-from app.utils.dependencies import get_bearer_token
 
 log = logging.getLogger(__name__)
 
@@ -23,22 +17,3 @@ class ClerkController:
 
     def setup_routes(self):
         router = self.router
-
-        @router.post(
-            "/organizations/create",
-            response_model=CreateOrganizationResponse,
-        )
-        async def create_organization(
-            input: CreateOrganizationRequest,
-            # Use the dependency to get authenticated state
-            bearer_token: str = Depends(
-                get_bearer_token
-            ),  # TODO: Authenticate https://github.com/clerk/clerk-sdk-python
-        ):
-
-            response: CreateOrganizationResponse = await self.service.create_organization(
-                input=input
-            )
-
-            log.info(f"Clerk organization created with ID: {response.id}")
-            return response
