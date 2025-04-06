@@ -7,6 +7,8 @@ A coding assessment tool that helps to screen large volumes of candidates.
 LeetCode-style assessments are becoming unreliable for mass screening because candidates can cheat with LLMs to instantly solve traditional problems without understanding them. DevTrial combats this by shifting from generic algorithm questions to realistic coding challenges that require deeper reasoning, integration, and decision-making—areas where AI alone struggles without human input. This ensures a more accurate evaluation of a candidate’s real-world coding skills, even in an AI-assisted world.
 
 Server URL - https://dev-trial-rg9q.onrender.com
+Arena URL - 
+Forge URL - 
 
 ## Comparison to LeetCode
 
