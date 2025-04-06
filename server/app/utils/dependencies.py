@@ -9,3 +9,9 @@ async def init_db_client(authorization: str = Header(...)):
         raise HTTPException(status_code=httpx.codes.UNAUTHORIZED, detail="Invalid token format")
 
     return await db_client(token=authorization.removeprefix("Bearer ").strip())
+
+
+async def get_bearer_token(authorization: str = Header(...)):
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=httpx.codes.UNAUTHORIZED, detail="Invalid token format")
+    return authorization.removeprefix("Bearer ").strip()

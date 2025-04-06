@@ -70,6 +70,9 @@ export function AppSidebar() {
               appearance={{
                 baseTheme: theme === 'dark' ? dark : undefined,
               }}
+              hidePersonal
+              createOrganizationMode="navigation"
+              createOrganizationUrl={ROUTES.CREATE_ORGANIZATION}
             />
             <UserButton />
           </div>
