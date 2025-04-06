@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'DevTrial Forge',
-  description: 'DevTrial Forge',
+  description: 'Create and share coding challenges with ease',
 };
 
 export default function RootLayout({

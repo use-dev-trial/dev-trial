@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'DevTrial Arena',
-  description: 'DevTrial Arena',
+  description: 'Test your coding skills in real-time coding challenges',
 };
 
 export default function RootLayout({
