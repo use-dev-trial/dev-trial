@@ -9,7 +9,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'DevTrial Forge',
+  title: 'Dev Trial Forge',
   description: 'Create and share coding challenges with ease',
 };
 
