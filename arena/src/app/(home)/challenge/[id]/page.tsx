@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 
 import { useEffect, useRef, useState } from 'react';
 
+import { ChallengeIntro } from '@/components/challenges/candidate-view/challenge-intro';
 // import { getChallenge } from '@/actions/challenges';
 
 import { CodeSection } from '@/components/challenges/candidate-view/code-section';
@@ -13,6 +14,7 @@ import { QuestionSection } from '@/components/challenges/candidate-view/question
 import { TestSection } from '@/components/challenges/candidate-view/test-section';
 
 // import { GetChallengeResponse } from '@/types/challenges';
+import { Challenge } from '@/types/challenges';
 
 import { cn, formatTime } from '@/lib/utils';
 
@@ -26,17 +28,36 @@ export default function ChallengeInterface() {
   const containerRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
   // const [challenge, setChallenge] = useState<GetChallengeResponse | null>(null);
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [isStarted, setIsStarted] = useState(false);
+  const [timerActive, setTimerActive] = useState(false);
 
   useEffect(() => {
     const fetchChallenge = async () => {
       // const challenge = await getChallenge(params.id as string);
       // setChallenge(challenge);
+
+      // Mock challenge data for development
+      setChallenge({
+        id: params.id as string,
+        name: 'Frontend Coding Challenge',
+        description:
+          '<p>In this challenge, you will build a responsive UI component using React and CSS. The component should adapt to different screen sizes and implement the functionality described in the specifications.</p><p>You will be evaluated on code quality, component design, and implementation of all required features.</p>',
+      });
     };
     fetchChallenge();
   }, [params.id]);
 
+  // Handle start button click
+  const handleStart = () => {
+    setIsStarted(true);
+    setTimerActive(true);
+  };
+
   // Handle countdown timer
   useEffect(() => {
+    if (!timerActive) return;
+
     const timer = setInterval(() => {
       setRemainingTime((prev) => {
         if (prev <= 0) {
@@ -48,7 +69,7 @@ export default function ChallengeInterface() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [timerActive]);
 
   // Handle horizontal mouse events for resizing
   const handleHorizontalMouseDown = () => {
@@ -117,6 +138,14 @@ export default function ChallengeInterface() {
       document.body.classList.remove('select-none');
     };
   }, [isHorizontalDragging, isVerticalDragging]);
+
+  if (!challenge) {
+    return <div className="flex h-screen items-center justify-center">Loading challenge...</div>;
+  }
+
+  if (!isStarted) {
+    return <ChallengeIntro challenge={challenge} onStart={handleStart} />;
+  }
 
   return (
     <div
