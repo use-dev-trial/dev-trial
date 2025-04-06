@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'DevTrial Arena',
+  title: 'Dev Trial Arena',
   description: 'Test your coding skills in real-time coding challenges',
 };
 
