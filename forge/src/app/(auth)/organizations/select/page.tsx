@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { useEffect } from 'react';
 
@@ -10,7 +10,6 @@ import { ROUTES } from '@/lib/constants';
 
 export default function SelectOrganizationPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { session, isLoaded: isSessionLoaded } = useSession();
   const { user, isLoaded: isUserLoaded } = useUser();
   const { isLoaded: isOrgListLoaded, setActive } = useOrganizationList();
@@ -58,7 +57,6 @@ export default function SelectOrganizationPage() {
     user?.organizationMemberships,
     setActive,
     router,
-    searchParams,
   ]);
 
   return (
