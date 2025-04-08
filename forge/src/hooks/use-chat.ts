@@ -56,14 +56,16 @@ const areTestCasesUpdated = (t1: TestCase[], t2: TestCase[]): boolean => {
 export function useChat() {
   const [question, setQuestion] = useState<Question>(defaultQuestion);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [lastMessageId, setLastMessageId] = useState<string>('');
   const [updatedTabs, setUpdatedTabs] = useState<Tab[]>([]);
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (params: { content: string; id: string }) => {
+    mutationFn: async (params: { content: string }) => {
       const messageRequest: MessageRequest = messageRequestSchema.parse({
+        id: lastMessageId,
+        question_id: question.id,
         content: params.content,
-        id: params.id,
       });
       return await send(messageRequest);
     },
@@ -77,6 +79,7 @@ export function useChat() {
         content: data.content,
       };
       setMessages((prev) => [...prev, assistantMessage]);
+      setLastMessageId(data.id);
 
       // Determine which tabs were updated
       const tabs: Tab[] = [];
@@ -104,7 +107,7 @@ export function useChat() {
 
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
-    mutation.mutate({ content, id: question.id });
+    mutation.mutate({ content });
   };
 
   const clearUpdatedTab = (tab: Tab) => {

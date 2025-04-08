@@ -34,7 +34,7 @@ class MessagesService:
         # Add user message to existing messages
         existing_messages.append({"role": Role.USER.value, "content": input.content})
 
-        if input.question_id is None:
+        if not input.question_id:
             db_result = await client.table(Table.QUESTIONS).insert({}).execute()
             question = Question(
                 id=db_result.data[0]["id"],
