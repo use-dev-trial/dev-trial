@@ -1,13 +1,13 @@
+import { Button } from '@/components/ui/button';
+
 export function Footer() {
   return (
-    <div className="flex items-end justify-end border-t border-gray-200 px-4 py-2 dark:border-gray-800 dark:bg-gray-900">
+    <div className="bg-background border-border flex items-end justify-end border-t px-4 py-2">
       <div className="flex items-end gap-2">
-        <button className="rounded-md border border-gray-300 px-4 py-2 text-sm dark:border-gray-700 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
+        <Button variant="outline" className="px-4 py-2 text-sm">
           Run Tests
-        </button>
-        <button className="rounded-md bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">
-          Submit Code
-        </button>
+        </Button>
+        <Button className="px-4 py-2 text-sm">Submit Code</Button>
       </div>
     </div>
   );

@@ -9,13 +9,13 @@ interface TopBarProps {
 
 export function TopBar({ remainingTime, formatTime }: TopBarProps) {
   return (
-    <header className="flex items-center justify-between border-b border-gray-200 px-4 py-2 dark:border-gray-800">
+    <header className="border-border bg-background flex items-center justify-between border-b px-4 py-2">
       <div className="flex items-center gap-2">
-        <h1 className="text-xl font-bold dark:text-white">Code Review Feedback</h1>
+        <h1 className="text-foreground text-xl font-bold">Code Review Feedback</h1>
       </div>
       <div className="flex items-center gap-2">
-        <Clock className="h-4 w-4 dark:text-gray-300" />
-        <span className="mr-4 font-mono dark:text-gray-300">{formatTime(remainingTime)}</span>
+        <Clock className="text-muted-foreground h-4 w-4" />
+        <span className="text-muted-foreground mr-4 font-mono">{formatTime(remainingTime)}</span>
         <ThemeToggle />
       </div>
     </header>
