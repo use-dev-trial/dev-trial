@@ -9,7 +9,9 @@ import { Bot, Loader2, Paperclip, Send, User } from 'lucide-react';
 import SuggestionCard from '@/components/challenges/questions/suggestion-card';
 import { Button } from '@/components/ui/button';
 
-import { Message } from '@/types/messages';
+import { Message, role } from '@/types/messages';
+
+// Assuming Message type definition exists here
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -27,28 +29,40 @@ export default function ChatInterface({
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const triggerSendMessage = () => {
     if (input.trim() && !isLoading) {
       onSendMessage(input);
       setInput('');
+      if (textareaRef.current) {
+        textareaRef.current.style.height = '80px';
+      }
     }
   };
 
-  // Auto-scroll to bottom when messages change or loading state changes
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    triggerSendMessage();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault(); // Prevent adding a newline character
+      triggerSendMessage();
+    }
+  };
+
   useEffect(() => {
     if (messagesEndRef.current && messagesContainerRef.current) {
       const scrollToBottom = () => {
         messagesContainerRef.current!.scrollTop = messagesContainerRef.current!.scrollHeight;
       };
-
-      // Use requestAnimationFrame for smoother scrolling after render is complete
-      window.requestAnimationFrame(scrollToBottom);
+      const rafId = window.requestAnimationFrame(scrollToBottom);
+      return () => window.cancelAnimationFrame(rafId);
     }
   }, [messages, isLoading]);
 
-  // Helper function to get friendly tab name
   const getTabDisplayName = (tab: Tab): string => {
     switch (tab) {
       case 'problem':
@@ -62,12 +76,19 @@ export default function ChatInterface({
     }
   };
 
+  const handleTextareaInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    const target = e.target as HTMLTextAreaElement;
+    target.style.height = 'auto';
+    target.style.height = `${Math.max(80, target.scrollHeight)}px`;
+  };
+
   return (
     <div className="flex h-full flex-col">
       <div ref={messagesContainerRef} className="flex-1 space-y-4 overflow-y-auto p-4">
-        {messages.length === 0 ? (
+        {messages.length === 0 && !isLoading && (
           <div className="mt-8 text-center">
-            <p className="mb-6 text-sm">
+            <p className="mb-6 text-sm text-gray-600 dark:text-gray-400">
               Start by describing your coding interview question similar to the examples below.
             </p>
             <div className="flex flex-col space-y-2">
@@ -94,88 +115,93 @@ export default function ChatInterface({
               </SuggestionCard>
             </div>
           </div>
-        ) : (
-          messages.map((message, index) => (
-            <div key={index} className="flex items-start space-x-2">
-              <div
-                className={`flex-shrink-0 rounded-full p-1.5 ${
-                  message.role === 'user'
-                    ? 'bg-gradient-to-br from-red-600 to-yellow-400'
-                    : 'bg-gradient-to-br from-blue-500 to-blue-100'
-                }`}
-              >
-                {message.role === 'user' ? (
-                  <User className="h-3.5 w-3.5 text-white" />
-                ) : (
-                  <Bot className="h-3.5 w-3.5 text-white" />
-                )}
-              </div>
-              <div
-                className={`max-w-[85%] rounded-lg p-3 ${
-                  message.role === 'user'
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'shadow-sm'
-                }`}
-              >
-                {message.content}
-              </div>
-            </div>
-          ))
         )}
-        {isLoading && (
-          <div className="flex items-start space-x-2">
-            <div className="flex-shrink-0 rounded-full bg-gradient-to-br from-blue-500 to-blue-100 p-1.5">
-              <Bot className="h-3.5 w-3.5" />
+
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={`flex items-start space-x-3 ${message.role === 'user' ? 'justify-end' : ''}`}
+          >
+            {message.role === role.Values.assistant && (
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-300">
+                <Bot className="h-4 w-4 text-white" />
+              </div>
+            )}
+            <div
+              className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
+                message.role === role.Values.user
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'bg-gray-100 text-gray-800 shadow-sm dark:bg-gray-700 dark:text-gray-200'
+              }`}
+            >
+              {message.content}
             </div>
-            <div className="flex items-center space-x-2 rounded-lg p-3 shadow-sm">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="animate-pulse text-sm">thinking...</span>
+            {message.role === role.Values.user && (
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-600 to-yellow-400">
+                <User className="h-4 w-4 text-white" />
+              </div>
+            )}
+          </div>
+        ))}
+
+        {isLoading && (
+          <div className="flex items-start space-x-3">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-300 p-1.5">
+              <Bot className="h-4 w-4 text-white" />
+            </div>
+            <div className="flex items-center space-x-2 rounded-lg bg-gray-100 px-3 py-2 text-sm shadow-sm dark:bg-gray-700">
+              <Loader2 className="h-4 w-4 animate-spin text-gray-600 dark:text-gray-400" />
+              <span className="animate-pulse text-sm text-gray-600 dark:text-gray-400">
+                thinking...
+              </span>
             </div>
           </div>
         )}
-        {updatedTabs.length > 0 && (
-          <div className="sticky right-0 bottom-0 mb-3 flex items-center justify-center">
-            <div className="rounded-lg bg-amber-100 px-3 py-1.5 text-xs font-medium text-amber-800 shadow-sm">
+
+        {updatedTabs.length > 0 && !isLoading && (
+          <div className="sticky bottom-2 flex items-center justify-center px-4">
+            <div className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-800 shadow-sm dark:bg-amber-900/50 dark:text-amber-300">
               {updatedTabs.map(getTabDisplayName).join(', ')} Updated
-              <span className="ml-1.5 inline-flex h-2 w-2 animate-pulse rounded-full bg-amber-500"></span>
+              <span className="ml-1.5 inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500"></span>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4">
-        <form onSubmit={handleSubmit} className="relative">
-          <div className="flex flex-col rounded-lg border focus-within:ring-2 focus-within:ring-gray-400/50">
+      <div className="border-t p-4 dark:border-gray-700">
+        <form onSubmit={handleFormSubmit} className="relative">
+          <div className="flex flex-col overflow-hidden rounded-lg border focus-within:ring-2 focus-within:ring-blue-500/50 dark:border-gray-600 dark:focus-within:ring-blue-400/40">
             <textarea
+              ref={textareaRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={messages.length > 0 ? 'Ask a follow up...' : 'Type your message...'}
-              className="min-h-20 w-full resize-none self-start rounded-lg border-0 px-4 py-3 text-sm shadow-none outline-none placeholder:text-gray-500 focus-visible:border-0 focus-visible:ring-0"
+              onChange={handleTextareaInput}
+              onKeyDown={handleKeyDown}
+              placeholder={
+                messages.length > 0 ? 'Ask a follow up...' : 'Describe your coding question...'
+              }
+              className="w-full resize-none rounded-lg border-0 bg-transparent p-2 px-4 py-3 text-sm outline-none placeholder:text-gray-500 focus:ring-0 focus-visible:ring-0 dark:text-gray-100 dark:placeholder:text-gray-400"
               disabled={isLoading}
               rows={1}
-              style={{ height: 'auto', minHeight: '80px' }}
-              onInput={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                target.style.height = 'auto';
-                target.style.height = `${Math.max(80, target.scrollHeight)}px`;
-              }}
+              style={{ minHeight: '80px', maxHeight: '200px' }}
             />
-            <div className="flex justify-end space-x-1 pr-2 pb-2">
+            <div className="flex items-center justify-end space-x-1 border-t p-2 dark:border-gray-600">
               <Button
                 type="button"
                 size="icon"
                 variant="ghost"
-                className="h-7 w-7 text-gray-400 hover:bg-gray-800 hover:text-gray-200"
+                className="h-8 w-8 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
                 disabled={isLoading}
+                aria-label="Attach file"
               >
                 <Paperclip size={16} />
               </Button>
               <Button
                 type="submit"
                 size="icon"
-                className="h-7 w-7 rounded-md bg-gray-700 hover:bg-gray-600"
-                disabled={isLoading}
+                className="h-8 w-8 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 dark:bg-blue-500 dark:hover:bg-blue-600"
+                disabled={isLoading || !input.trim()}
+                aria-label="Send message"
               >
                 {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
               </Button>
