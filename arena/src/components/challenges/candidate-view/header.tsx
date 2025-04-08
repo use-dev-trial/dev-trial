@@ -9,13 +9,19 @@ interface TopBarProps {
 
 export function TopBar({ remainingTime, formatTime }: TopBarProps) {
   return (
-    <header className="flex items-center justify-between border-b border-gray-200 px-4 py-2 dark:border-gray-800">
+    <header className="border-border bg-background flex items-center justify-between border-b px-4 py-4">
       <div className="flex items-center gap-2">
-        <h1 className="text-xl font-bold dark:text-white">Code Review Feedback</h1>
+        <h1 className="text-foreground text-xl font-bold">Dev Trial Arena</h1>
+        <Clock className="text-muted-foreground ml-2 h-4 w-4" />
+        <span className="text-muted-foreground ml-2 font-mono">{formatTime(remainingTime)}</span>
       </div>
+      <p>Challenge Name</p>
       <div className="flex items-center gap-2">
-        <Clock className="h-4 w-4 dark:text-gray-300" />
-        <span className="mr-4 font-mono dark:text-gray-300">{formatTime(remainingTime)}</span>
+        <p className="text-muted-foreground mr-2">Question 1 of 3</p>
+        <button className="rounded-md bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">
+          Submit Code
+          {/* If current question number is equal to total questions, show "Submit" button else show "Next" button */}
+        </button>
         <ThemeToggle />
       </div>
     </header>

@@ -8,7 +8,6 @@ import { ChallengeIntro } from '@/components/challenges/candidate-view/challenge
 // import { getChallenge } from '@/actions/challenges';
 
 import { CodeSection } from '@/components/challenges/candidate-view/code-section';
-import { Footer } from '@/components/challenges/candidate-view/footer';
 import { TopBar } from '@/components/challenges/candidate-view/header';
 import { QuestionSection } from '@/components/challenges/candidate-view/question-section';
 import { TestSection } from '@/components/challenges/candidate-view/test-section';
@@ -150,7 +149,7 @@ export default function ChallengeInterface() {
   return (
     <div
       className={cn(
-        'flex h-screen flex-col',
+        'bg-background flex h-screen flex-col',
         (isHorizontalDragging || isVerticalDragging) && 'select-none',
       )}
     >
@@ -161,8 +160,8 @@ export default function ChallengeInterface() {
         {/* Horizontal Resizer */}
         <div
           className={cn(
-            'absolute top-0 bottom-0 z-10 w-1 cursor-col-resize bg-gray-300 transition-colors hover:bg-blue-500/50 active:bg-blue-500/70 dark:bg-gray-700',
-            isHorizontalDragging && 'bg-blue-500',
+            'bg-border hover:bg-primary/50 active:bg-primary/70 absolute top-0 bottom-0 z-10 w-1 cursor-col-resize transition-colors',
+            isHorizontalDragging && 'bg-primary',
           )}
           style={{ left: `${leftPanelWidth}%` }}
           onMouseDown={handleHorizontalMouseDown}
@@ -182,7 +181,7 @@ export default function ChallengeInterface() {
           <TestSection height={bottomPanelHeight} isVerticalDragging={isVerticalDragging} />
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
