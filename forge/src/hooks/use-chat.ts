@@ -61,10 +61,11 @@ export function useChat() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (params: { content: string; id?: string }) => {
+    mutationFn: async (params: { content: string }) => {
       const messageRequest: MessageRequest = messageRequestSchema.parse({
+        id: lastMessageId,
+        question_id: question.id,
         content: params.content,
-        id: params.id || lastMessageId,
       });
       return await send(messageRequest);
     },
@@ -106,7 +107,7 @@ export function useChat() {
 
   const sendMessage = async (content: string) => {
     if (!content.trim()) return;
-    mutation.mutate({ content, id: lastMessageId });
+    mutation.mutate({ content });
   };
 
   const clearUpdatedTab = (tab: Tab) => {
