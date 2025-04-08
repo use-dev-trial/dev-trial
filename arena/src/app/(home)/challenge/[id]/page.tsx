@@ -8,7 +8,6 @@ import { ChallengeIntro } from '@/components/challenges/candidate-view/challenge
 // import { getChallenge } from '@/actions/challenges';
 
 import { CodeSection } from '@/components/challenges/candidate-view/code-section';
-import { Footer } from '@/components/challenges/candidate-view/footer';
 import { TopBar } from '@/components/challenges/candidate-view/header';
 import { QuestionSection } from '@/components/challenges/candidate-view/question-section';
 import { TestSection } from '@/components/challenges/candidate-view/test-section';
