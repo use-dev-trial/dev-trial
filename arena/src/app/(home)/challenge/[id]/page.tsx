@@ -182,7 +182,7 @@ export default function ChallengeInterface() {
           <TestSection height={bottomPanelHeight} isVerticalDragging={isVerticalDragging} />
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
