@@ -158,4 +158,3 @@ class QuestionsService:
             question_id=question_id, client=client
         )
         print(test_cases)
-        pass
