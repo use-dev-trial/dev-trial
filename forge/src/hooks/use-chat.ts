@@ -53,7 +53,11 @@ const areTestCasesUpdated = (t1: TestCase[], t2: TestCase[]): boolean => {
   return false;
 };
 
-export function useChat() {
+interface UseChatProps {
+  challenge_id: string;
+}
+
+export function useChat({ challenge_id }: UseChatProps) {
   const [question, setQuestion] = useState<Question>(defaultQuestion);
   const [messages, setMessages] = useState<Message[]>([]);
   const [lastMessageId, setLastMessageId] = useState<string>('');
@@ -64,6 +68,7 @@ export function useChat() {
     mutationFn: async (params: { content: string }) => {
       const messageRequest: MessageRequest = messageRequestSchema.parse({
         id: lastMessageId,
+        challenge_id: challenge_id,
         question_id: question.id,
         content: params.content,
       });

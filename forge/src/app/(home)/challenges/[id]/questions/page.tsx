@@ -27,7 +27,7 @@ export default function Home() {
   const [challengeTitle, setChallengeTitle] = useState('Test Challenge Title');
 
   const { question, messages, isLoading, updatedTabs, sendMessage, setQuestion, clearUpdatedTab } =
-    useChat();
+    useChat({ challenge_id: challenge_id });
 
   // Keep the questions state in sync with the useChat question
   useEffect(() => {
