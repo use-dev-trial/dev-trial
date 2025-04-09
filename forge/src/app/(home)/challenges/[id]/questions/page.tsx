@@ -1,5 +1,7 @@
 'use client';
 
+import { useParams } from 'next/navigation';
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { upsertProblem } from '@/actions/problems';
@@ -20,6 +22,9 @@ import { MAX_NUM_QUESTIONS } from '@/lib/constants';
 import { useDebouncedCallback } from '@/lib/utils';
 
 export default function Home() {
+  const params = useParams();
+  const challenge_id = params.id as string;
+
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [questions, setQuestions] = useState<Question[]>([defaultQuestion]);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
