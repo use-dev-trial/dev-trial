@@ -38,6 +38,40 @@ class QuestionsService:
 
         return await asyncio.gather(*tasks)
 
+    async def get_test_cases_by_question_id(
+        self, question_id: str, client: Client
+    ) -> list[TestCase]:
+        test_case_ids_result = await (
+            client.table(Table.QUESTION_TEST_CASE)
+            .select("test_case_id")
+            .eq("question_id", question_id)
+            .execute()
+        )
+
+        test_case_ids = (
+            [row["test_case_id"] for row in test_case_ids_result.data]
+            if test_case_ids_result.data
+            else []
+        )
+
+        if not test_case_ids:
+            return []
+
+        test_cases_result = await (
+            client.table(Table.TEST_CASES).select("*").in_("id", test_case_ids).execute()
+        )
+
+        test_cases = (
+            [
+                TestCase(id=row["id"], description=row["description"])
+                for row in test_cases_result.data
+            ]
+            if test_cases_result.data
+            else []
+        )
+
+        return test_cases
+
     async def get_question_by_id(self, question_id: str, client: Client) -> Question:
         question_task = client.table(Table.QUESTIONS).select("*").eq("id", question_id).execute()
         test_case_ids_task = (
@@ -118,3 +152,9 @@ class QuestionsService:
         )
 
         return Question(id=question_id, problem=problem, files=files, test_cases=test_cases)
+
+    async def run_tests(self, question_id: str, files: list[File], client: Client) -> None:
+        test_cases = await self.get_test_cases_by_question_id(
+            question_id=question_id, client=client
+        )
+        print(test_cases)
