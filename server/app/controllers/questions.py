@@ -22,6 +22,16 @@ class QuestionsController:
         router = self.router
 
         @router.get(
+            "",
+            response_model=list[Question],
+        )
+        async def get_all_questions(client: Client = Depends(init_db_client)) -> list[Question]:
+            log.info("Getting all questions...")
+            response: list[Question] = await self.service.get_all_questions(client=client)
+            log.info("Questions: %s", response)
+            return response
+
+        @router.get(
             "/question_id/{question_id}",
             response_model=Question,
         )

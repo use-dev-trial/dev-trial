@@ -1,3 +1,7 @@
+import { useEffect } from 'react';
+
+import { getAllQuestions } from '@/actions/questions';
+
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,11 +15,19 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
+import { Question } from '@/types/questions';
+
 interface QuestionTemplatesDialogProps {
   triggerButton: React.ReactNode;
 }
 
 export default function QuestionTemplatesDialog({ triggerButton }: QuestionTemplatesDialogProps) {
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      const questions: Question[] = await getAllQuestions();
+    };
+    fetchQuestions();
+  }, []);
   return (
     <Dialog>
       <DialogTrigger asChild>{triggerButton}</DialogTrigger>

@@ -11,6 +11,10 @@ from app.models.test_case import TestCase
 
 class QuestionsService:
 
+    async def get_questions(self, client: Client) -> list[Question]:
+        question_list_result = await client.table(Table.QUESTIONS).select("*").execute()
+        return [Question.model_validate(**row) for row in question_list_result.data]
+
     async def get_questions_by_challenge_id(
         self, challenge_id: str, client: Client
     ) -> list[Question]:
