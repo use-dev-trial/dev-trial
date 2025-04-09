@@ -22,3 +22,9 @@ class Question(BaseModel):
 
 class QuestionDB(DatabaseObjectMixin):
     pass
+
+
+class RunTestsRequest(BaseModel):
+    files: list[File] = Field(
+        description="The files which the candidate has modified.",
+    )

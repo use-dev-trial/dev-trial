@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Depends
 from supabase._async.client import AsyncClient as Client
 
-from app.models.question import Question
+from app.models.question import Question, RunTestsRequest
 from app.services.questions import QuestionsService
 from app.utils.dependencies import init_db_client
 
@@ -60,8 +60,14 @@ class QuestionsController:
         @router.post(
             "/run-tests/{question_id}",
         )
-        async def run_tests(question_id: str, client: Client = Depends(init_db_client)) -> None:
+        async def run_tests(
+            question_id: str,
+            run_tests_request: RunTestsRequest,
+            client: Client = Depends(init_db_client),
+        ) -> None:
             log.info(f"Running tests for question {question_id}...")
-            await self.service.run_tests(question_id=question_id, client=client)
+            await self.service.run_tests(
+                question_id=question_id, files=run_tests_request.files, client=client
+            )
             log.info("Tests run successfully")
             return None
