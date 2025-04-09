@@ -1,49 +1,81 @@
-import { Button } from '@/components/ui/button';
+'use client';
+
+import { useEffect, useState } from 'react';
+
+import { getAllQuestions } from '@/actions/questions';
+import { Plus } from 'lucide-react';
+
+import { QuestionCard } from '@/components/challenges/questions/question-card';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+import type { Question } from '@/types/questions';
 
 interface QuestionTemplatesDialogProps {
-  triggerButton: React.ReactNode;
+  onSelectQuestion: (question: Question) => void;
 }
+export default function QuestionTemplatesDialog({
+  onSelectQuestion,
+}: QuestionTemplatesDialogProps) {
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [open, setOpen] = useState(false);
 
-export default function QuestionTemplatesDialog({ triggerButton }: QuestionTemplatesDialogProps) {
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      const fetchedQuestions: Question[] = await getAllQuestions();
+      setQuestions(fetchedQuestions);
+    };
+    fetchQuestions();
+  }, []);
+
+  const handleSelectQuestion = (question: Question) => {
+    onSelectQuestion(question);
+    setOpen(false);
+  };
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>{triggerButton}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
-          <DialogDescription>
-            Make changes to your profile here. Click save when you&apos;re done.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
-            <Input id="name" value="Pedro Duarte" className="col-span-3" />
+    <TooltipProvider>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div
+                className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                aria-label="Add new question"
+                onClick={() => setOpen(true)}
+              >
+                <Plus size={16} />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p className="text-sm">Add new question</p>
+            </TooltipContent>
+          </Tooltip>
+        </DialogTrigger>
+
+        <DialogContent className="flex max-h-[80vh] flex-col sm:max-w-[80vw]">
+          <DialogHeader>
+            <DialogTitle>Select a Question Template</DialogTitle>
+          </DialogHeader>
+          <div className="flex-grow overflow-y-auto pr-4">
+            <div className="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-3">
+              {questions.map((question) => (
+                <QuestionCard
+                  key={question.id}
+                  question={question}
+                  onClick={() => handleSelectQuestion(question)}
+                />
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="username" className="text-right">
-              Username
-            </Label>
-            <Input id="username" value="@peduarte" className="col-span-3" />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button type="submit">Save changes</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </TooltipProvider>
   );
 }
