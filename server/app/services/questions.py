@@ -118,3 +118,6 @@ class QuestionsService:
         )
 
         return Question(id=question_id, problem=problem, files=files, test_cases=test_cases)
+
+    async def run_tests(self, question_id: str, client: Client) -> None:
+        pass
