@@ -6,8 +6,8 @@ import { upsertProblem } from '@/actions/problems';
 import { useChat } from '@/hooks/use-chat';
 
 import RenameChallengeTitleDialog from '@/components/challenges/edit-title-dialog';
-import AddQuestionTooltip from '@/components/challenges/questions/add-question-tooltip';
 import ChatInterface from '@/components/challenges/questions/chat-interface';
+import DeleteQuestionDialog from '@/components/challenges/questions/delete-question-dialog';
 import QuestionIndexButton from '@/components/challenges/questions/question-index-button';
 import QuestionPreview from '@/components/challenges/questions/question-preview';
 import QuestionTemplatesDialog from '@/components/challenges/questions/question-templates-dialog';
@@ -105,27 +105,37 @@ export default function Home() {
         />
       </div>
       <div ref={previewContainerRef} className="w-7/10 overflow-auto">
-        <div className="sticky top-0 z-10 flex h-[60px] items-center space-x-2 border-b p-3">
-          {questions.map((_, index) => (
-            <QuestionIndexButton
-              key={index}
-              isSelected={selectedQuestionIndex === index}
-              index={index}
-              onClick={() => {
-                setSelectedQuestionIndex(index);
-                setQuestion(questions[index]);
-              }}
-            />
-          ))}
-          {questions.length < MAX_NUM_QUESTIONS && (
-            <QuestionTemplatesDialog
-              triggerButton={<AddQuestionTooltip onClick={() => {}} />} // Dummy onClick needed so as to forward the click event to the dialog
-              onSelectQuestion={(question: Question) => {
-                setQuestions((prev) => [...prev, question]);
-                setSelectedQuestionIndex((prev) => prev + 1);
-              }}
-            />
-          )}
+        <div className="sticky top-0 z-10 flex h-[60px] items-center justify-between border-b p-3">
+          <div className="flex items-center space-x-2">
+            {questions.map((_, index) => (
+              <QuestionIndexButton
+                key={index}
+                isSelected={selectedQuestionIndex === index}
+                index={index}
+                onClick={() => {
+                  setSelectedQuestionIndex(index);
+                  setQuestion(questions[index]);
+                }}
+              />
+            ))}
+            {questions.length < MAX_NUM_QUESTIONS && (
+              <QuestionTemplatesDialog
+                onSelectQuestion={(question: Question) => {
+                  setQuestions((prev) => [...prev, question]);
+                  setSelectedQuestionIndex((prev) => prev + 1);
+                }}
+              />
+            )}
+          </div>
+          <DeleteQuestionDialog
+            onConfirmBtnClick={() => {
+              setQuestions((prev) => {
+                const filtered = prev.filter((q) => q.id !== questions[selectedQuestionIndex].id);
+                return filtered.length === 0 ? [defaultQuestion] : filtered;
+              });
+              setSelectedQuestionIndex((prev) => Math.max(prev - 1, 0));
+            }}
+          />
         </div>
         <QuestionPreview
           isLoading={isLoading}
