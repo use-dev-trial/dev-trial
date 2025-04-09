@@ -1,5 +1,7 @@
 'use client';
 
+import { useParams } from 'next/navigation';
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { upsertProblem } from '@/actions/problems';
@@ -20,6 +22,9 @@ import { MAX_NUM_QUESTIONS } from '@/lib/constants';
 import { useDebouncedCallback } from '@/lib/utils';
 
 export default function Home() {
+  const params = useParams();
+  const challenge_id = params.id as string;
+
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [questions, setQuestions] = useState<Question[]>([defaultQuestion]);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
@@ -27,7 +32,7 @@ export default function Home() {
   const [challengeTitle, setChallengeTitle] = useState('Test Challenge Title');
 
   const { question, messages, isLoading, updatedTabs, sendMessage, setQuestion, clearUpdatedTab } =
-    useChat();
+    useChat({ challenge_id: challenge_id });
 
   // Keep the questions state in sync with the useChat question
   useEffect(() => {

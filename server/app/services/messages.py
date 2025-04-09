@@ -9,7 +9,7 @@ from app.inference.constants import AgentNames
 from app.inference.state import AgentState
 from app.models.database import Table
 from app.models.file import File
-from app.models.message import MessageRequest, MessageResponse, Role
+from app.models.message import ChallengeQuestion, MessageRequest, MessageResponse, Role
 from app.models.problem import Problem
 from app.models.question import Question
 from app.models.test_case import TestCase
@@ -44,6 +44,11 @@ class MessagesService:
                 files=[],
                 test_cases=[],
             )
+            await client.table(Table.CHALLENGE_QUESTION).insert(
+                ChallengeQuestion(
+                    challenge_id=input.challenge_id, question_id=question.id
+                ).model_dump()
+            ).execute()
         else:
             question = await QuestionsService().get_question_by_id(
                 client=client, question_id=input.question_id
