@@ -118,13 +118,13 @@ export default function Home() {
             />
           ))}
           {questions.length < MAX_NUM_QUESTIONS && (
-            <QuestionTemplatesDialog triggerButton={<AddQuestionTooltip onClick={() => {}} />} /> // Dummy onClick needed so as to forward the click event to the dialog
-            // <AddQuestionTooltip
-            //   onClick={() => {
-            //     setQuestions((prev) => [...prev, defaultQuestion]);
-            //     setSelectedQuestionIndex((prev) => prev + 1);
-            //   }}
-            // />
+            <QuestionTemplatesDialog
+              triggerButton={<AddQuestionTooltip onClick={() => {}} />} // Dummy onClick needed so as to forward the click event to the dialog
+              onSelectQuestion={(question: Question) => {
+                setQuestions((prev) => [...prev, question]);
+                setSelectedQuestionIndex((prev) => prev + 1);
+              }}
+            />
           )}
         </div>
         <QuestionPreview

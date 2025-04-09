@@ -49,25 +49,3 @@ export async function getQuestionsByChallengeId(challengeId: string): Promise<Qu
     throw error;
   }
 }
-
-export async function getAllQuestions(): Promise<Question[]> {
-  const token: string = await getClerkToken();
-
-  try {
-    console.log('Getting all questions...');
-    const response = await axios.get(
-      `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/questions`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-    console.log('Get All Questions Response', response.data);
-    return response.data.map((q: Question) => question.parse(q));
-  } catch (error) {
-    console.error('Error getting all questions:', error);
-    throw error;
-  }
-}

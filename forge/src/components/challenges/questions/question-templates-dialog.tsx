@@ -1,48 +1,64 @@
+'use client';
+
+import type React from 'react';
+import { useEffect, useState } from 'react';
+
+import { getAllQuestions } from '@/actions/questions';
+
+import { QuestionCard } from '@/components/challenges/questions/question-card';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+
+import type { Question } from '@/types/questions';
 
 interface QuestionTemplatesDialogProps {
   triggerButton: React.ReactNode;
+  onSelectQuestion: (question: Question) => void;
 }
 
-export default function QuestionTemplatesDialog({ triggerButton }: QuestionTemplatesDialogProps) {
+export default function QuestionTemplatesDialog({
+  triggerButton,
+  onSelectQuestion,
+}: QuestionTemplatesDialogProps) {
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      const fetchedQuestions: Question[] = await getAllQuestions();
+      setQuestions(fetchedQuestions);
+    };
+    fetchQuestions();
+  }, []);
+
+  const handleQuestionClick = (question: Question) => {
+    onSelectQuestion(question);
+    setOpen(false);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{triggerButton}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="flex max-h-[80vh] flex-col sm:max-w-[80vw]">
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
-          <DialogDescription>
-            Make changes to your profile here. Click save when you&apos;re done.
-          </DialogDescription>
+          <DialogTitle>Select a Question Template</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
-            <Input id="name" value="Pedro Duarte" className="col-span-3" />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="username" className="text-right">
-              Username
-            </Label>
-            <Input id="username" value="@peduarte" className="col-span-3" />
+        <div className="flex-grow overflow-y-auto pr-4">
+          <div className="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-3">
+            {questions.map((question) => (
+              <QuestionCard key={question.id} question={question} onClick={handleQuestionClick} />
+            ))}
           </div>
         </div>
-        <DialogFooter>
-          <Button type="submit">Save changes</Button>
-        </DialogFooter>
+        <div className="mt-4 flex justify-end">
+          <Button onClick={() => setOpen(false)}>Cancel</Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

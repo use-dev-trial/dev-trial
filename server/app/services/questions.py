@@ -11,9 +11,15 @@ from app.models.test_case import TestCase
 
 class QuestionsService:
 
-    async def get_questions(self, client: Client) -> list[Question]:
-        question_list_result = await client.table(Table.QUESTIONS).select("*").execute()
-        return [Question.model_validate(**row) for row in question_list_result.data]
+    async def get_all_questions(self, client: Client) -> list[Question]:
+        question_id_list_result = await client.table(Table.QUESTIONS).select("id").execute()
+
+        tasks = [
+            self.get_question_by_id(question_id=question["id"], client=client)
+            for question in question_id_list_result.data
+        ]
+
+        return await asyncio.gather(*tasks)
 
     async def get_questions_by_challenge_id(
         self, challenge_id: str, client: Client
