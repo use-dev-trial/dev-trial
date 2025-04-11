@@ -22,7 +22,7 @@ export async function getChallenge(challengeId: string): Promise<Challenge> {
     console.log('Get Challenge Response', response.data);
     return challenge.parse(response.data);
   } catch (error) {
-    console.error('Error sending message:', error);
+    console.error('Error getting challenge by challenge id:', error);
     throw error;
   }
 }

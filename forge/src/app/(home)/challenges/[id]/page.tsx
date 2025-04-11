@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 
 import { useState } from 'react';
 
-import useChallenge from '@/hooks/use-challenge';
+import { useSingleChallenge } from '@/hooks/challenges/use-single-challenge';
 
 import QuestionsTab from '@/components/challenges/home/questions-tab';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,13 +13,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 export default function ChallengeInterface() {
   const [activeTab, setActiveTab] = useState('questions');
   const params = useParams();
-  const { challenge, isChallengeLoading, challengeError } = useChallenge(params.id as string);
+  const { challenge, isLoading, error } = useSingleChallenge(params.id as string);
 
   return (
     <div className="container mx-auto px-4 py-6">
-      {isChallengeLoading ? (
+      {isLoading ? (
         <div className="flex items-center justify-center p-8">Loading challenge data...</div>
-      ) : challengeError ? (
+      ) : error ? (
         <div className="p-4 text-red-500">Failed to load challenge data</div>
       ) : (
         <>

@@ -7,12 +7,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { upsertProblem } from '@/actions/problems';
 import { useChat } from '@/hooks/use-chat';
 
-import RenameChallengeTitleDialog from '@/components/challenges/edit-title-dialog';
 import ChatInterface from '@/components/challenges/questions/chat-interface';
 import DeleteQuestionDialog from '@/components/challenges/questions/delete-question-dialog';
 import QuestionIndexButton from '@/components/challenges/questions/question-index-button';
 import QuestionPreview from '@/components/challenges/questions/question-preview';
 import QuestionTemplatesDialog from '@/components/challenges/questions/question-templates-dialog';
+import RenameChallengeTitleDialog from '@/components/challenges/questions/rename-challenge-title-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { Problem, UpsertProblemResponse, upsertProblemRequestSchema } from '@/types/problems';
