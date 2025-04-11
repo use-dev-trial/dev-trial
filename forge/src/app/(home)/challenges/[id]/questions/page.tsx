@@ -44,14 +44,21 @@ export default function Home() {
   const [challengeName, setChallengeName] = useState('');
 
   const {
-    question,
+    updatedQuestion, // do not refer to this directly. Use questions[selectedQuestionIndex] instead
     messages,
     isLoading: isLoadingChat,
     updatedTabs,
     sendMessage,
-    setQuestion,
     clearUpdatedTab,
-  } = useChat({ challenge_id: challenge_id });
+  } = useChat({ challenge_id, question: questions[selectedQuestionIndex] });
+
+  useEffect(() => {
+    setQuestions((prev) => {
+      const newQuestions = [...prev];
+      newQuestions[selectedQuestionIndex] = updatedQuestion;
+      return newQuestions;
+    });
+  }, [updatedQuestion, selectedQuestionIndex]);
 
   useEffect(() => {
     if (isLoadingChallenge) {
@@ -87,7 +94,7 @@ export default function Home() {
         const upsertProblemResponse: UpsertProblemResponse =
           await upsertProblem(upsertProblemRequest);
 
-        setQuestion((prev) => ({
+        setQuestions((prev) => ({
           ...prev,
           id: upsertProblemResponse.question_id,
           problem: upsertProblemResponse,
@@ -102,8 +109,12 @@ export default function Home() {
   const debouncedSaveProblem = useDebouncedCallback(handleUpsertProblem, 1000);
 
   const onProblemUpdate = async (input: Problem) => {
-    setQuestion((prev) => ({ ...prev, problem: input }));
-    debouncedSaveProblem(input, question.id);
+    setQuestions((prev) => {
+      const newQuestions = [...prev];
+      newQuestions[selectedQuestionIndex].problem = input;
+      debouncedSaveProblem(input, newQuestions[selectedQuestionIndex].id);
+      return newQuestions;
+    });
   };
 
   const onRenameDialogToggle = () => {
@@ -154,7 +165,6 @@ export default function Home() {
                 index={index}
                 onClick={() => {
                   setSelectedQuestionIndex(index);
-                  setQuestion(questions[index]);
                 }}
               />
             ))}

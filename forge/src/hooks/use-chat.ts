@@ -55,10 +55,11 @@ const areTestCasesUpdated = (t1: TestCase[], t2: TestCase[]): boolean => {
 
 interface UseChatProps {
   challenge_id: string;
+  question: Question;
 }
 
-export function useChat({ challenge_id }: UseChatProps) {
-  const [question, setQuestion] = useState<Question>(defaultQuestion);
+export function useChat({ challenge_id, question }: UseChatProps) {
+  const [updatedQuestion, setUpdatedQuestion] = useState<Question>(defaultQuestion);
   const [messages, setMessages] = useState<Message[]>([]);
   const [lastMessageId, setLastMessageId] = useState<string>('');
   const [updatedTabs, setUpdatedTabs] = useState<Tab[]>([]);
@@ -100,8 +101,8 @@ export function useChat({ challenge_id }: UseChatProps) {
       if (areTestCasesUpdated(question.test_cases, data.question.test_cases)) {
         tabs.push('test-cases');
       }
+      setUpdatedQuestion(data.question);
       setUpdatedTabs(tabs);
-      setQuestion(data.question);
 
       queryClient.invalidateQueries({ queryKey: ['messages'] });
     },
@@ -120,12 +121,11 @@ export function useChat({ challenge_id }: UseChatProps) {
   };
 
   return {
-    question,
+    updatedQuestion,
     messages,
     isLoading: mutation.isPending,
     updatedTabs,
     sendMessage,
-    setQuestion,
     clearUpdatedTab,
   };
 }
