@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { upsertProblem } from '@/actions/problems';
 import { useChat } from '@/hooks/use-chat';
@@ -33,17 +33,6 @@ export default function Home() {
 
   const { question, messages, isLoading, updatedTabs, sendMessage, setQuestion, clearUpdatedTab } =
     useChat({ challenge_id: challenge_id });
-
-  // Keep the questions state in sync with the useChat question
-  useEffect(() => {
-    if (question && question.id) {
-      setQuestions((prevQuestions) => {
-        const updatedQuestions = [...prevQuestions];
-        updatedQuestions[selectedQuestionIndex] = question;
-        return updatedQuestions;
-      });
-    }
-  }, [question, selectedQuestionIndex]);
 
   const handleUpsertProblem = useCallback(
     async (problemInput: Problem, currentQuestionId: string | undefined) => {
