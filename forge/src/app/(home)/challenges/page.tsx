@@ -7,6 +7,7 @@ import { Plus } from 'lucide-react';
 
 import { ChallengeCard } from '@/components/challenges/card';
 import CreateChallengeDialog from '@/components/challenges/create-challenge-dialog';
+import Loader from '@/components/shared/loader';
 import { Card } from '@/components/ui/card';
 
 import { CHALLENGE_CARD_GRADIENTS, ROUTES } from '@/lib/constants';
@@ -32,12 +33,7 @@ export default function ChallengePage() {
           </p>
         </header>
 
-        {isLoading && (
-          <div className="flex items-center justify-center py-10">
-            <div className="h-6 w-6 animate-spin rounded-full border-t-2 border-b-2 border-blue-500"></div>
-            <span className="ml-2">Loading challenges...</span>
-          </div>
-        )}
+        {isLoading && <Loader text="challenges" />}
 
         {error && (
           <div className="rounded-md bg-red-50 p-4 text-red-800">

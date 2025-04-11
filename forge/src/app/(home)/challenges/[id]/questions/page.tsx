@@ -1,11 +1,14 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { upsertProblem } from '@/actions/problems';
+import { useSingleChallenge } from '@/hooks/challenges/use-single-challenge';
 import { useChat } from '@/hooks/use-chat';
+import { toast } from 'sonner';
 
 import ChatInterface from '@/components/challenges/questions/chat-interface';
 import DeleteQuestionDialog from '@/components/challenges/questions/delete-question-dialog';
@@ -13,41 +16,69 @@ import QuestionIndexButton from '@/components/challenges/questions/question-inde
 import QuestionPreview from '@/components/challenges/questions/question-preview';
 import QuestionTemplatesDialog from '@/components/challenges/questions/question-templates-dialog';
 import RenameChallengeTitleDialog from '@/components/challenges/questions/rename-challenge-title-dialog';
+import Loader from '@/components/shared/loader';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { Problem, UpsertProblemResponse, upsertProblemRequestSchema } from '@/types/problems';
 import { Question, defaultQuestion } from '@/types/questions';
 
-import { MAX_NUM_QUESTIONS } from '@/lib/constants';
+import { MAX_NUM_QUESTIONS, ROUTES } from '@/lib/constants';
 import { useDebouncedCallback } from '@/lib/utils';
 
 export default function Home() {
+  const router = useRouter();
   const params = useParams();
   const challenge_id = params.id as string;
+
+  const {
+    challenge,
+    isLoading: isLoadingChallenge,
+    error: challengeError,
+    error: errorChallenge,
+  } = useSingleChallenge(challenge_id);
 
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [questions, setQuestions] = useState<Question[]>([defaultQuestion]);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
-  const [challengeTitle, setChallengeTitle] = useState('Test Challenge Title');
+  const [challengeName, setChallengeName] = useState('');
 
-  const { question, messages, isLoading, updatedTabs, sendMessage, setQuestion, clearUpdatedTab } =
-    useChat({ challenge_id: challenge_id });
+  const {
+    question,
+    messages,
+    isLoading: isLoadingChat,
+    updatedTabs,
+    sendMessage,
+    setQuestion,
+    clearUpdatedTab,
+  } = useChat({ challenge_id: challenge_id });
 
-  // Keep the questions state in sync with the useChat question
   useEffect(() => {
-    if (question && question.id) {
-      setQuestions((prevQuestions) => {
-        const updatedQuestions = [...prevQuestions];
-        updatedQuestions[selectedQuestionIndex] = question;
-        return updatedQuestions;
-      });
+    if (isLoadingChallenge) {
+      return;
     }
-  }, [question, selectedQuestionIndex]);
+
+    if (challengeError) {
+      console.error('Error fetching challenge:', challenge_id, errorChallenge);
+      toast('Failed to load challenge');
+      router.replace(ROUTES.CHALLENGES);
+      return;
+    }
+
+    if (!isLoadingChallenge && !challengeError && !challenge) {
+      console.warn('Challenge fetch succeeded but returned no data for ID:', challenge_id);
+      toast('The requested challenge could not be found.');
+      router.replace(ROUTES.CHALLENGES);
+      return;
+    }
+
+    if (challenge) {
+      setChallengeName(challenge.name);
+    }
+  }, [isLoadingChallenge, challengeError, errorChallenge, challenge, challenge_id, router, toast]);
 
   const handleUpsertProblem = useCallback(
     async (problemInput: Problem, currentQuestionId: string | undefined) => {
-      console.log('Debounced API call executing...');
       try {
         const upsertProblemRequest = upsertProblemRequestSchema.parse({
           ...problemInput,
@@ -61,10 +92,8 @@ export default function Home() {
           id: upsertProblemResponse.question_id,
           problem: upsertProblemResponse,
         })); // Register ID changes for both the question and/or problem (if they are not created before this invocation)
-        console.log('Problem saved successfully:', upsertProblemResponse.question_id);
       } catch (error) {
         console.error('Error updating problem via debounced call:', error);
-        // Can consider reversing the optimistic UI update
       }
     },
     [],
@@ -73,9 +102,7 @@ export default function Home() {
   const debouncedSaveProblem = useDebouncedCallback(handleUpsertProblem, 1000);
 
   const onProblemUpdate = async (input: Problem) => {
-    // Update the question content on the UI regardless of whether API call succeeds
     setQuestion((prev) => ({ ...prev, problem: input }));
-
     debouncedSaveProblem(input, question.id);
   };
 
@@ -83,12 +110,20 @@ export default function Home() {
     setIsRenameDialogOpen((prevIsRenameDialogOpen) => !prevIsRenameDialogOpen);
   };
 
+  if (isLoadingChallenge || challengeError) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader text="questions" />
+      </div>
+    );
+  }
+
   const title = (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>
           <div className="rounded-full p-1.5 hover:underline" onClick={onRenameDialogToggle}>
-            <p className="text-md font-medium">{challengeTitle}</p>
+            <p className="text-md font-medium">{challengeName}</p>
           </div>
         </TooltipTrigger>
         <TooltipContent>
@@ -104,7 +139,7 @@ export default function Home() {
         <div className="flex h-[60px] items-center justify-between border-b p-4">{title}</div>
         <ChatInterface
           messages={messages}
-          isLoading={isLoading}
+          isLoading={isLoadingChat}
           updatedTabs={updatedTabs}
           onSendMessage={sendMessage}
         />
@@ -143,7 +178,7 @@ export default function Home() {
           />
         </div>
         <QuestionPreview
-          isLoading={isLoading}
+          isLoading={isLoadingChat}
           question={questions[selectedQuestionIndex]}
           updatedTabs={updatedTabs}
           onTabChange={clearUpdatedTab}
@@ -151,11 +186,11 @@ export default function Home() {
         />
       </div>
       <RenameChallengeTitleDialog
-        currentTitle={challengeTitle}
+        currentTitle={challengeName}
         isDialogOpen={isRenameDialogOpen}
         onToggle={onRenameDialogToggle}
         onSave={(newChallengeTitle: string) => {
-          setChallengeTitle(newChallengeTitle);
+          setChallengeName(newChallengeTitle);
         }}
       />
     </main>
