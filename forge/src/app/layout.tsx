@@ -4,6 +4,8 @@ import { Inter } from 'next/font/google';
 
 import { ClerkProvider } from '@clerk/nextjs';
 
+import { Toaster } from '@/components/ui/sonner';
+
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -30,6 +32,7 @@ export default function RootLayout({
           >
             {children}
           </ThemeProvider>
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>

@@ -24,13 +24,13 @@ export default function SelectOrganizationPage() {
 
     // If user already has an active org (maybe they landed here unexpectedly), redirect them
     if (currentOrgId) {
-      router.replace(ROUTES.CHALLENGES);
+      router.push(ROUTES.CHALLENGES);
       return;
     }
 
     // If user has no orgs, redirect to create org page
     if (availableOrgMemberships.length === 0) {
-      router.replace(ROUTES.CREATE_ORGANIZATION);
+      router.push(ROUTES.CREATE_ORGANIZATION);
       return;
     }
 
@@ -38,11 +38,11 @@ export default function SelectOrganizationPage() {
     if (firstOrgMembership?.organization?.id) {
       setActive({ organization: firstOrgMembership.organization.id })
         .then(() => {
-          router.replace(ROUTES.CHALLENGES);
+          router.push(ROUTES.CHALLENGES);
         })
         .catch((err) => {
           console.log('SelectOrgPage: Failed to set active organization', err);
-          router.replace(ROUTES.CHALLENGES);
+          router.push(ROUTES.CHALLENGES);
         });
     }
   }, [
