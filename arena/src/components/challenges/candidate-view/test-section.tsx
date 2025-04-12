@@ -1,21 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Play } from 'lucide-react';
+
+import { TestCase } from '@/types/questions';
 
 import { cn } from '@/lib/utils';
 
 interface TestSectionProps {
   height: number;
   isVerticalDragging?: boolean;
+  testCases?: TestCase[];
 }
 
-export function TestSection({ height, isVerticalDragging }: TestSectionProps) {
+export function TestSection({ height, isVerticalDragging, testCases }: TestSectionProps) {
   const [activeTest, setActiveTest] = useState(1);
+  const [formattedTestCases, setFormattedTestCases] = useState<
+    Record<
+      number,
+      {
+        input: string;
+        expectedOutput: string;
+      }
+    >
+  >({});
 
-  // Test cases data
-  const testCases = {
+  // Default test cases data if none provided
+  const defaultTestCases = {
     1: {
       input: `{"a":true,"b":false,"c":null}`,
       expectedOutput: 'true',
@@ -34,7 +46,26 @@ export function TestSection({ height, isVerticalDragging }: TestSectionProps) {
     },
   };
 
-  const currentTest = testCases[activeTest as keyof typeof testCases];
+  // Initialize test cases based on provided data or defaults
+  useEffect(() => {
+    if (testCases && testCases.length > 0) {
+      const formattedCases: Record<number, { input: string; expectedOutput: string }> = {};
+      testCases.forEach((testCase, index) => {
+        formattedCases[index + 1] = {
+          input: testCase.description || `Test Case ${index + 1}`,
+          expectedOutput: 'Expected result',
+        };
+      });
+      setFormattedTestCases(formattedCases);
+      setActiveTest(1);
+    } else {
+      setFormattedTestCases(defaultTestCases);
+      setActiveTest(1);
+    }
+  }, [testCases, defaultTestCases]);
+
+  const testNumbers = Object.keys(formattedTestCases).map(Number);
+  const currentTest = formattedTestCases[activeTest] || { input: '', expectedOutput: '' };
 
   return (
     <div
@@ -51,7 +82,7 @@ export function TestSection({ height, isVerticalDragging }: TestSectionProps) {
 
       {/* Test Tabs */}
       <div className="border-border flex gap-2 border-b p-2">
-        {[1, 2, 3, 4].map((testNum) => (
+        {testNumbers.map((testNum) => (
           <div
             key={testNum}
             className={cn(

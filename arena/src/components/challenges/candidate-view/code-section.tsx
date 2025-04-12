@@ -2,10 +2,12 @@
 
 import { useTheme } from 'next-themes';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Editor from '@monaco-editor/react';
 import { ChevronRight, FileText, X } from 'lucide-react';
+
+import { File } from '@/types/files';
 
 import { cn } from '@/lib/utils';
 
@@ -14,6 +16,7 @@ interface CodeSectionProps {
   bottomPanelHeight: number;
   isVerticalDragging: boolean;
   handleVerticalMouseDown: () => void;
+  files?: File[];
 }
 
 export function CodeSection({
@@ -21,84 +24,82 @@ export function CodeSection({
   bottomPanelHeight,
   isVerticalDragging,
   handleVerticalMouseDown,
+  files,
 }: CodeSectionProps) {
-  const [activeTab, setActiveTab] = useState('CodeReviewFeedback.js');
+  const [activeTab, setActiveTab] = useState('');
   const { theme } = useTheme();
+  const [codeContent, setCodeContent] = useState<Record<string, string>>({});
 
-  const codeContent = {
-    'CodeReviewFeedback.js': `import React from "react";
-
-const FeedbackSystem = () => {
-  return (
-    <div className="my-0 mx-auto text-center w-mx-1200">
-      <div className="flex wrap justify-content-center mt-30 gap-30">
-        <div className="pa-10 w-300 card">
-          <h2>Readability</h2>
-          <div className="flex my-30 mx-0 justify-content-around">
-            <button className="py-10 px-15" data-testid="upvote-btn-0">
-              👍 Upvote
-            </button>
-            <button className="py-10 px-15 danger" data-testid="downvote-btn-0">
-              👎 Downvote
-            </button>
-          </div>
-          <p className="my-10 mx-0" data-testid="upvote-count-0">
-            Upvotes: <strong>{0}</strong>
-          </p>
-          <p className="my-10 mx-0" data-testid="downvote-count-0">
-            Downvotes: <strong>{0}</strong>
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default FeedbackSystem;`,
-    'App.js': `import React from 'react';
-import FeedbackSystem from './CodeReviewFeedback';
-
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Code Review Feedback</h1>
-      </header>
-      <main>
-        <FeedbackSystem />
-      </main>
-    </div>
-  );
-}
-
-export default App;`,
-  };
-
-  const getFileExtension = (filename: string) => {
-    return filename.split('.').pop() || '';
-  };
-
-  const getLanguage = (filename: string) => {
-    const ext = getFileExtension(filename);
-    switch (ext) {
-      case 'py':
-        return 'python';
-      case 'js':
-        return 'javascript';
-      case 'jsx':
-        return 'javascript';
-      case 'ts':
-        return 'typescript';
-      case 'tsx':
-        return 'typescript';
-      case 'json':
-        return 'json';
-      case 'md':
-        return 'markdown';
-      default:
-        return 'javascript';
+  // Initialize code content and active tab based on provided files
+  useEffect(() => {
+    if (files && files.length > 0) {
+      const fileContentMap: Record<string, string> = {};
+      files.forEach((file) => {
+        fileContentMap[file.name] = file.code;
+      });
+      setCodeContent(fileContentMap);
+      setActiveTab(files[0].name);
+    } else {
+      // Set empty state when no files are provided
+      setCodeContent({});
+      setActiveTab('');
     }
-  };
+  }, [files]);
+
+  // const getFileExtension = (filename: string) => {
+  //   return filename.split('.').pop() || '';
+  // };
+
+  // const getLanguage = (filename: string) => {
+  //   const ext = getFileExtension(filename);
+  //   switch (ext) {
+  //     case 'py':
+  //       return 'python';
+  //     case 'js':
+  //       return 'javascript';
+  //     case 'jsx':
+  //       return 'javascript';
+  //     case 'ts':
+  //       return 'typescript';
+  //     case 'tsx':
+  //       return 'typescript';
+  //     case 'json':
+  //       return 'json';
+  //     case 'md':
+  //       return 'markdown';
+  //     default:
+  //       return 'javascript';
+  //   }
+  // };
+
+  // If no files are provided, show a placeholder
+  if (Object.keys(codeContent).length === 0) {
+    return (
+      <div
+        className={cn('flex h-full flex-col overflow-hidden', isVerticalDragging && 'select-none')}
+        style={{ width: `${width}%` }}
+      >
+        <div className="border-border bg-muted flex border-b px-4 py-2">
+          <span className="text-foreground text-sm">No files available</span>
+        </div>
+        <div
+          className="bg-background flex flex-1 items-center justify-center"
+          style={{ height: `${100 - bottomPanelHeight}%` }}
+        >
+          <p className="text-muted-foreground">No code files are available for this question</p>
+        </div>
+
+        {/* Vertical Resizer */}
+        <div
+          className={cn(
+            'bg-border hover:bg-primary/50 active:bg-primary/70 relative z-10 h-1 cursor-row-resize transition-colors',
+            isVerticalDragging && 'bg-primary',
+          )}
+          onMouseDown={handleVerticalMouseDown}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -143,8 +144,8 @@ export default App;`,
       <div className="bg-background flex-1" style={{ height: `${100 - bottomPanelHeight}%` }}>
         <Editor
           height="100%"
-          language={getLanguage(activeTab)}
-          value={codeContent[activeTab as keyof typeof codeContent]}
+          language="python"
+          value={codeContent[activeTab]}
           theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
           options={{
             readOnly: true,
