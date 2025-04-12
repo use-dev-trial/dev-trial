@@ -1,8 +1,9 @@
 import { z } from 'zod';
 
-export const metricsSchema = z.object({
+export const metricSchema = z.object({
   id: z.string(),
-  metrics: z.array(z.string()),
+  question_id: z.string(),
+  content: z.string(),
 });
 
-export type Metrics = z.infer<typeof metricsSchema>;
+export type Metric = z.infer<typeof metricSchema>;

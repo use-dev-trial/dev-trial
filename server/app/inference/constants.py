@@ -7,3 +7,4 @@ class AgentNames(StrEnum):
     PROBLEM_GENERATOR = "ProblemGenerator"
     TEST_GENERATOR = "TestGenerator"
     SYNTHESIZER = "Synthesizer"
+    EVALUATOR = "Evaluator"

@@ -4,7 +4,6 @@ from typing import Optional
 from agents import RunConfig, Runner, RunResult, TResponseInputItem
 from supabase._async.client import AsyncClient as Client
 
-from app.inference.agents import triager
 from app.inference.constants import AgentNames
 from app.inference.state import AgentState
 from app.models.database import Table
