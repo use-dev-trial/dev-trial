@@ -1,11 +1,12 @@
 import asyncio
 
+from supabase._async.client import AsyncClient as Client
+
 from app.models.database import Table
 from app.models.file import File
 from app.models.problem import Problem
 from app.models.question import Question
 from app.models.test_case import TestCase
-from supabase._async.client import AsyncClient as Client
 
 
 class QuestionsService:

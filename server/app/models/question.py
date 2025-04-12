@@ -1,8 +1,9 @@
+from pydantic import BaseModel, Field
+
 from app.models.database import DatabaseObjectMixin
 from app.models.file import File
 from app.models.problem import Problem
 from app.models.test_case import TestCase
-from pydantic import BaseModel, Field
 
 
 # Avoid making the attribute Optional because we are sharing this model for inference
