@@ -4,8 +4,10 @@ import axios from 'axios';
 
 import { Question, RunTestsInput, question } from '@/types/questions';
 
+import { getClerkToken } from '@/lib/clerk';
+
 export async function getQuestionById(questionId: string): Promise<Question> {
-  const token: string = 'await getClerkToken();';
+  const token: string = await getClerkToken();
   try {
     console.log('Getting question...');
     const response = await axios.get(
