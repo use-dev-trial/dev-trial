@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import { useState } from 'react';
 
 import { useAllQuestions } from '@/hooks/questions/use-all-question';
@@ -17,7 +19,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
+import { ROUTES } from '@/lib/constants';
+
 export default function QuestionsTab({ challengeId }: { challengeId: string }) {
+  const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [expandedQuestionId, setExpandedQuestionId] = useState<string | null>(null);
   const { questions } = useAllQuestions({
@@ -154,7 +159,7 @@ export default function QuestionsTab({ challengeId }: { challengeId: string }) {
       <AddQuestionDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        onAddQuestion={() => {}}
+        onAddQuestion={() => router.push(ROUTES.QUESTIONS(challengeId))}
       />
     </div>
   );
