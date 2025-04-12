@@ -5,6 +5,7 @@ import { KeyboardEvent, useState } from 'react';
 import { useCreateChallenge } from '@/hooks/challenges/use-create-challenge';
 import { toast } from 'sonner';
 
+import Loader from '@/components/shared/loader';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -46,6 +47,7 @@ export default function CreateChallengeDialog({
 
     createChallenge(createChallengeRequest, {
       onSuccess: (createdChallenge: Challenge) => {
+        onOpenChange(false);
         console.log('Challenge creation successful:', createdChallenge);
         router.push(ROUTES.QUESTIONS(createdChallenge.id));
       },
@@ -61,6 +63,10 @@ export default function CreateChallengeDialog({
       handleCreateChallenge();
     }
   };
+
+  if (isPending) {
+    return <Loader text={'challenge'} />;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
