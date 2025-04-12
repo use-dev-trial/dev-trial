@@ -21,17 +21,27 @@ async def db_client(
     token: str,
 ) -> Client:
     supabase_url = os.environ["SUPABASE_URL"]
-    supabase_key = os.environ["SUPABASE_ANON_KEY"]
-    return await create_client(
-        supabase_url=supabase_url,
-        supabase_key=supabase_key,
-        options=AsyncClientOptions(
-            headers={
-                "Authorization": f"Bearer {token}",
-                "apiKey": supabase_key,
-            }
-        ),
-    )
+
+    # Development
+    if os.environ.get("ADMIN_ACCESS") == "true":
+        supabase_key = os.environ["SUPABASE_SERVICE_KEY"]
+        return await create_client(
+            supabase_url=supabase_url,
+            supabase_key=supabase_key,
+        )
+    # Production
+    else:
+        supabase_key = os.environ["SUPABASE_ANON_KEY"]
+        return await create_client(
+            supabase_url=supabase_url,
+            supabase_key=supabase_key,
+            options=AsyncClientOptions(
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    "apiKey": supabase_key,
+                }
+            ),
+        )
 
 
 """
