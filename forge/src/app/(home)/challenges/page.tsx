@@ -61,7 +61,7 @@ export default function ChallengePage() {
         {!isLoading && challenges.length > 0 && (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card
-              className="flex h-full cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-gray-300 p-6 text-center transition-all duration-300 hover:border-blue-500 hover:bg-blue-50 hover:shadow-md"
+              className="hover:bg-blue-350 flex h-full cursor-pointer flex-col items-center justify-center rounded-md border border-dashed border-gray-300 p-6 text-center transition-all duration-300 hover:border-blue-500 hover:shadow-md"
               onClick={onCreateChallengeDialogToggle}
             >
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
