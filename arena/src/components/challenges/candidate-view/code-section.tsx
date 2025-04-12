@@ -30,57 +30,7 @@ export function CodeSection({
   const { theme } = useTheme();
   const [codeContent, setCodeContent] = useState<Record<string, string>>({});
 
-  // Default code content if no files are provided
-  const defaultCodeContent = {
-    'CodeReviewFeedback.js': `import React from "react";
-
-const FeedbackSystem = () => {
-  return (
-    <div className="my-0 mx-auto text-center w-mx-1200">
-      <div className="flex wrap justify-content-center mt-30 gap-30">
-        <div className="pa-10 w-300 card">
-          <h2>Readability</h2>
-          <div className="flex my-30 mx-0 justify-content-around">
-            <button className="py-10 px-15" data-testid="upvote-btn-0">
-              👍 Upvote
-            </button>
-            <button className="py-10 px-15 danger" data-testid="downvote-btn-0">
-              👎 Downvote
-            </button>
-          </div>
-          <p className="my-10 mx-0" data-testid="upvote-count-0">
-            Upvotes: <strong>{0}</strong>
-          </p>
-          <p className="my-10 mx-0" data-testid="downvote-count-0">
-            Downvotes: <strong>{0}</strong>
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default FeedbackSystem;`,
-    'App.js': `import React from 'react';
-import FeedbackSystem from './CodeReviewFeedback';
-
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Code Review Feedback</h1>
-      </header>
-      <main>
-        <FeedbackSystem />
-      </main>
-    </div>
-  );
-}
-
-export default App;`,
-  };
-
-  // Initialize code content and active tab based on provided files or default
+  // Initialize code content and active tab based on provided files
   useEffect(() => {
     if (files && files.length > 0) {
       const fileContentMap: Record<string, string> = {};
@@ -90,8 +40,9 @@ export default App;`,
       setCodeContent(fileContentMap);
       setActiveTab(files[0].name);
     } else {
-      setCodeContent(defaultCodeContent);
-      setActiveTab(Object.keys(defaultCodeContent)[0]);
+      // Set empty state when no files are provided
+      setCodeContent({});
+      setActiveTab('');
     }
   }, [files]);
 
@@ -120,6 +71,35 @@ export default App;`,
         return 'javascript';
     }
   };
+
+  // If no files are provided, show a placeholder
+  if (Object.keys(codeContent).length === 0) {
+    return (
+      <div
+        className={cn('flex h-full flex-col overflow-hidden', isVerticalDragging && 'select-none')}
+        style={{ width: `${width}%` }}
+      >
+        <div className="border-border bg-muted flex border-b px-4 py-2">
+          <span className="text-foreground text-sm">No files available</span>
+        </div>
+        <div
+          className="bg-background flex flex-1 items-center justify-center"
+          style={{ height: `${100 - bottomPanelHeight}%` }}
+        >
+          <p className="text-muted-foreground">No code files are available for this question</p>
+        </div>
+
+        {/* Vertical Resizer */}
+        <div
+          className={cn(
+            'bg-border hover:bg-primary/50 active:bg-primary/70 relative z-10 h-1 cursor-row-resize transition-colors',
+            isVerticalDragging && 'bg-primary',
+          )}
+          onMouseDown={handleVerticalMouseDown}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
