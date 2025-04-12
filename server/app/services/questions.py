@@ -1,5 +1,7 @@
 import asyncio
 
+from dotenv import load_dotenv
+from e2b_code_interpreter import Sandbox
 from supabase._async.client import AsyncClient as Client
 
 from app.models.database import Table
@@ -7,6 +9,8 @@ from app.models.file import File
 from app.models.problem import Problem
 from app.models.question import Question
 from app.models.test_case import TestCase
+
+load_dotenv()
 
 
 class QuestionsService:
@@ -158,4 +162,6 @@ class QuestionsService:
             question_id=question_id, client=client
         )
         code = code.replace("xxxx", f"'{test_cases[0].description}'")
-        return "Tests run successfully"
+        sbx = Sandbox()
+        execution = sbx.run_code(code)
+        return execution.logs.stdout[0]

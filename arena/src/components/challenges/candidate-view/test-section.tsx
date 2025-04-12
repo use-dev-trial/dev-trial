@@ -65,11 +65,12 @@ export function TestSection({
       const code = getCode();
       const input: RunTestsInput = { code };
 
-      await runTests(questionId, input);
+      const result = await runTests(questionId, input);
+      setOutput(result);
 
       // Note: The current implementation of runTests doesn't return results
       // In a real implementation, you would receive and display the actual test results
-      setOutput('Tests completed. Check console for details.');
+      // setOutput('Tests completed. Check console for details.');
     } catch (error) {
       console.error('Error running tests:', error);
       setOutput(`Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
