@@ -7,6 +7,7 @@ from app.models.question import Question
 
 
 class Role(StrEnum):
+    SYSTEM = "system"
     ASSISTANT = "assistant"
     USER = "user"
 
