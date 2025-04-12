@@ -14,12 +14,9 @@ log = logging.getLogger(__name__)
 
 class ChallengesService:
     async def get_challenge(self, client: Client, challenge_id: str) -> Challenge:
-        print(client)
-        print(challenge_id)
         select_challenge_result = (
             await client.table(Table.CHALLENGES).select("*").eq("id", challenge_id).execute()
         )
-        print(select_challenge_result)
         if not select_challenge_result.data:
             raise ValueError(f"Challenge with id {challenge_id} not found.")
 
