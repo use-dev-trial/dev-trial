@@ -2,7 +2,6 @@ import logging
 import os
 import uuid
 
-from supabase import AsyncClientOptions
 from supabase._async.client import AsyncClient as Client
 from supabase._async.client import create_client
 
@@ -25,12 +24,12 @@ async def db_client(
     return await create_client(
         supabase_url=supabase_url,
         supabase_key=supabase_key,
-        options=AsyncClientOptions(
-            headers={
-                "Authorization": f"Bearer {token}",
-                "apiKey": supabase_key,
-            }
-        ),
+        # options=AsyncClientOptions(
+        #     headers={
+        #         "Authorization": f"Bearer {token}",
+        #         "apiKey": supabase_key,
+        #     }
+        # ),
     )
 
 
