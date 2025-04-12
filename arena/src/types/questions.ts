@@ -30,3 +30,9 @@ export const defaultQuestion: Question = {
   files: [],
   test_cases: [],
 };
+
+export const runTestsInput = z.object({
+  code: z.string(),
+});
+
+export type RunTestsInput = z.infer<typeof runTestsInput>;
