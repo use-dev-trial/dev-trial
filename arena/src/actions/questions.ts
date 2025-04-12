@@ -46,7 +46,7 @@ export async function getQuestionsByChallengeId(challengeId: string): Promise<Qu
   }
 }
 
-export async function runTests(questionId: string, input: RunTestsInput): Promise<void> {
+export async function runTests(questionId: string, input: RunTestsInput): Promise<string> {
   const token: string = 'await getClerkToken();';
   try {
     const response = await axios.post(
@@ -60,6 +60,7 @@ export async function runTests(questionId: string, input: RunTestsInput): Promis
       },
     );
     console.log('Run Tests Response', response.data);
+    return response.data;
   } catch (error) {
     console.error('Error running tests:', error);
     throw error;
