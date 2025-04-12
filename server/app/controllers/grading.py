@@ -6,7 +6,7 @@ from fastapi import (
 )
 from supabase._async.client import AsyncClient as Client
 
-from app.models.grading import Metrics
+from app.models.grading import Metric
 from app.services.grading import GradingService
 from app.utils.dependencies import init_db_client
 
@@ -25,7 +25,7 @@ class GradingController:
         @router.post(
             "/metrics",
         )
-        async def upsert_metrics(input: Metrics, client: Client = Depends(init_db_client)):
-            log.info(f"Upserting grading metrics for question {input.id}...")
-            await self.service.upsert_metrics(input=input, client=client)
-            log.info(f"Grading metrics for question {input.id} have been successfully created.")
+        async def upsert_metric(input: Metric, client: Client = Depends(init_db_client)):
+            log.info(f"Upserting grading metric for question {input.id}...")
+            await self.service.upsert_metric(input=input, client=client)
+            log.info(f"Grading metric for question {input.id} have been successfully created.")

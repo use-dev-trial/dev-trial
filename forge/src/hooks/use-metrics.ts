@@ -1,20 +1,20 @@
 'use client';
 
-import { upsertMetrics } from '@/actions/grading';
+import { upsertMetric } from '@/actions/grading';
 import { UseMutationResult, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { Metrics } from '@/types/grading';
+import { Metric } from '@/types/grading';
 
 interface useMetricsResult {
-  upsertMetrics: UseMutationResult<void, Error, Metrics>['mutateAsync'];
+  upsertMetrics: UseMutationResult<void, Error, Metric>['mutateAsync'];
   isPending: boolean;
   error: Error | null;
 }
 
 export function useMetrics(): useMetricsResult {
   const queryClient = useQueryClient();
-  const mutation = useMutation<void, Error, Metrics>({
-    mutationFn: upsertMetrics,
+  const mutation = useMutation<void, Error, Metric>({
+    mutationFn: upsertMetric,
     onError: (err) => {
       console.error('Error upserting metrics:', err.message);
     },

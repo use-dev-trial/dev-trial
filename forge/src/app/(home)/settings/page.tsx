@@ -8,8 +8,9 @@ export default function SettingsPage() {
   const { upsertMetrics, isPending, error } = useMetrics();
   useEffect(() => {
     upsertMetrics({
-      id: '3c19f3aa-f2cb-4366-9913-3170d4f8a248', // question id
-      metrics: ['Candidate code is well-formatted', 'Candidate code is well-structured'],
+      id: 'd954978b-2f2e-487b-af0e-955a6f1e2314', // metric id (empty string if it is a fresh insert, actual id if it is an update)
+      question_id: '2e581ead-b38e-47e1-8bb3-993194b48dd3', // question id
+      content: 'Candidate code is as good as the ones suveen write',
     });
   }, []);
   console.log('isPending', isPending);

@@ -2,15 +2,15 @@
 
 import axios from 'axios';
 
-import { Metrics } from '@/types/grading';
+import { Metric } from '@/types/grading';
 
 import { getClerkToken } from '@/lib/clerk';
 
-export async function upsertMetrics(request: Metrics) {
+export async function upsertMetric(request: Metric) {
   const token: string = await getClerkToken();
 
   try {
-    console.log('Upserting metrics...');
+    console.log('Upserting metric...');
     await axios.post(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/grading/metrics`, request, {
       headers: {
         'Content-Type': 'application/json',
@@ -18,7 +18,7 @@ export async function upsertMetrics(request: Metrics) {
       },
     });
   } catch (error) {
-    console.error('Error upserting metrics:', error);
+    console.error('Error upserting metric:', error);
     throw error;
   }
 }
