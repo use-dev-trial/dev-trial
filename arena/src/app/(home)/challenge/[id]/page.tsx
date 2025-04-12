@@ -8,6 +8,7 @@ import useChallenge from '@/hooks/use-challenge';
 
 import { ChallengeInterface } from '@/components/challenges/candidate-view/challenge-interface';
 import { ChallengeIntro } from '@/components/challenges/candidate-view/challenge-intro';
+import Loader from '@/components/shared/loader';
 
 export default function ChallengeInterfacePage() {
   const params = useParams();
@@ -16,7 +17,11 @@ export default function ChallengeInterfacePage() {
   const [isStarted, setIsStarted] = useState(false);
 
   if (isChallengeLoading) {
-    return <div className="flex h-screen items-center justify-center">Loading challenge...</div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader text={'challenge'} />
+      </div>
+    );
   }
 
   if (!challenge) {
