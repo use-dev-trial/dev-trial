@@ -22,7 +22,7 @@ export function useSingleChallenge(challengeId: string) {
   });
 
   return {
-    challenge: challenge || null,
+    challenge,
     isLoading,
     isFetching,
     error: error as Error | null,

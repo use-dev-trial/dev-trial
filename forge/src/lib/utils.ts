@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 import { type ClassValue, clsx } from 'clsx';
+import * as EmailValidator from 'email-validator';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -20,6 +21,10 @@ export const formatDate = () => {
     month: 'long',
     day: 'numeric',
   });
+};
+
+export const isValidEmail = (email: string) => {
+  return EmailValidator.validate(email);
 };
 
 // A generic type for any function
