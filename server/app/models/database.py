@@ -11,6 +11,7 @@ class Table(StrEnum):
     TEST_CASES = "test_cases"
     CHALLENGES = "challenges"
     QUESTIONS = "questions"
+    METRICS = "metrics"
 
     # Join Tables
     CHALLENGE_QUESTION = "challenge_question"
