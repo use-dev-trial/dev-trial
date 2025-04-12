@@ -2,10 +2,12 @@
 
 import { useTheme } from 'next-themes';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Editor from '@monaco-editor/react';
 import { ChevronRight, FileText, X } from 'lucide-react';
+
+import { File } from '@/types/files';
 
 import { cn } from '@/lib/utils';
 
@@ -14,6 +16,7 @@ interface CodeSectionProps {
   bottomPanelHeight: number;
   isVerticalDragging: boolean;
   handleVerticalMouseDown: () => void;
+  files?: File[];
 }
 
 export function CodeSection({
@@ -21,11 +24,14 @@ export function CodeSection({
   bottomPanelHeight,
   isVerticalDragging,
   handleVerticalMouseDown,
+  files,
 }: CodeSectionProps) {
-  const [activeTab, setActiveTab] = useState('CodeReviewFeedback.js');
+  const [activeTab, setActiveTab] = useState('');
   const { theme } = useTheme();
+  const [codeContent, setCodeContent] = useState<Record<string, string>>({});
 
-  const codeContent = {
+  // Default code content if no files are provided
+  const defaultCodeContent = {
     'CodeReviewFeedback.js': `import React from "react";
 
 const FeedbackSystem = () => {
@@ -73,6 +79,21 @@ function App() {
 
 export default App;`,
   };
+
+  // Initialize code content and active tab based on provided files or default
+  useEffect(() => {
+    if (files && files.length > 0) {
+      const fileContentMap: Record<string, string> = {};
+      files.forEach((file) => {
+        fileContentMap[file.name] = file.code;
+      });
+      setCodeContent(fileContentMap);
+      setActiveTab(files[0].name);
+    } else {
+      setCodeContent(defaultCodeContent);
+      setActiveTab(Object.keys(defaultCodeContent)[0]);
+    }
+  }, [files]);
 
   const getFileExtension = (filename: string) => {
     return filename.split('.').pop() || '';
@@ -143,8 +164,8 @@ export default App;`,
       <div className="bg-background flex-1" style={{ height: `${100 - bottomPanelHeight}%` }}>
         <Editor
           height="100%"
-          language={getLanguage(activeTab)}
-          value={codeContent[activeTab as keyof typeof codeContent]}
+          language="python"
+          value={codeContent[activeTab]}
           theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
           options={{
             readOnly: true,

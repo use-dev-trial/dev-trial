@@ -4,11 +4,8 @@ import axios from 'axios';
 
 import { Question, question } from '@/types/questions';
 
-import { getClerkToken } from '@/lib/clerk';
-
 export async function getQuestionById(questionId: string): Promise<Question> {
-  const token: string = await getClerkToken();
-
+  const token: string = 'await getClerkToken();';
   try {
     console.log('Getting question...');
     const response = await axios.get(
@@ -29,8 +26,7 @@ export async function getQuestionById(questionId: string): Promise<Question> {
 }
 
 export async function getQuestionsByChallengeId(challengeId: string): Promise<Question[]> {
-  const token: string = await getClerkToken();
-
+  const token: string = 'await getClerkToken();';
   try {
     console.log('Getting questions associated with challenge id...');
     const response = await axios.get(
