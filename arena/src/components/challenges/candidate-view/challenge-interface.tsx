@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 
 import { useQuestion } from '@/hooks/use-question';
 
-import { CodeSection } from '@/components/challenges/candidate-view/code-section';
+import {
+  CodeSection,
+  CodeSectionHandle,
+} from '@/components/challenges/candidate-view/code-section';
 import { TopBar } from '@/components/challenges/candidate-view/header';
 import { QuestionSection } from '@/components/challenges/candidate-view/question-section';
 import { TestSection } from '@/components/challenges/candidate-view/test-section';
@@ -24,6 +27,7 @@ export function ChallengeInterface({ challengeId }: ChallengeInterfaceProps) {
   const [remainingTime, setRemainingTime] = useState(3600); // 1 hour default
   const containerRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
+  const codeSectionRef = useRef<CodeSectionHandle>(null);
   const [timerActive] = useState(true);
 
   // Handle countdown timer
@@ -51,6 +55,11 @@ export function ChallengeInterface({ challengeId }: ChallengeInterfaceProps) {
   // Handle vertical mouse events for resizing
   const handleVerticalMouseDown = () => {
     setIsVerticalDragging(true);
+  };
+
+  // Function to get code from the CodeSection component
+  const getCode = () => {
+    return codeSectionRef.current?.getCode() || '';
   };
 
   useEffect(() => {
@@ -150,6 +159,7 @@ export function ChallengeInterface({ challengeId }: ChallengeInterfaceProps) {
           style={{ width: `${100 - leftPanelWidth}%`, height: '100%' }}
         >
           <CodeSection
+            ref={codeSectionRef}
             width={100}
             bottomPanelHeight={bottomPanelHeight}
             isVerticalDragging={isVerticalDragging}
@@ -160,6 +170,8 @@ export function ChallengeInterface({ challengeId }: ChallengeInterfaceProps) {
             height={bottomPanelHeight}
             isVerticalDragging={isVerticalDragging}
             testCases={firstQuestion.test_cases}
+            questionId={firstQuestion.id}
+            getCode={getCode}
           />
         </div>
       </div>

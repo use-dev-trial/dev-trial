@@ -1,11 +1,10 @@
 import logging
 
-from fastapi import APIRouter, Depends
-from supabase._async.client import AsyncClient as Client
-
 from app.models.question import Question, RunTestsRequest
 from app.services.questions import QuestionsService
 from app.utils.dependencies import init_db_client
+from fastapi import APIRouter, Depends
+from supabase._async.client import AsyncClient as Client
 
 log = logging.getLogger(__name__)
 
@@ -64,10 +63,10 @@ class QuestionsController:
             question_id: str,
             run_tests_request: RunTestsRequest,
             client: Client = Depends(init_db_client),
-        ) -> None:
+        ) -> str:
             log.info(f"Running tests for question {question_id}...")
-            await self.service.run_tests(
-                question_id=question_id, files=run_tests_request.files, client=client
+            result: str = await self.service.run_tests(
+                question_id=question_id, code=run_tests_request.code, client=client
             )
             log.info("Tests run successfully")
-            return None
+            return result

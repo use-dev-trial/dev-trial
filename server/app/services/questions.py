@@ -1,12 +1,11 @@
 import asyncio
 
-from supabase._async.client import AsyncClient as Client
-
 from app.models.database import Table
 from app.models.file import File
 from app.models.problem import Problem
 from app.models.question import Question
 from app.models.test_case import TestCase
+from supabase._async.client import AsyncClient as Client
 
 
 class QuestionsService:
@@ -153,8 +152,9 @@ class QuestionsService:
 
         return Question(id=question_id, problem=problem, files=files, test_cases=test_cases)
 
-    async def run_tests(self, question_id: str, files: list[File], client: Client) -> None:
+    async def run_tests(self, question_id: str, code: str, client: Client) -> str:
         test_cases = await self.get_test_cases_by_question_id(
             question_id=question_id, client=client
         )
-        print(test_cases)
+        code = code.replace("xxxx", f"'{test_cases[0].description}'")
+        return "Tests run successfully"

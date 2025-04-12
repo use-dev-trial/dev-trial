@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-
 from app.models.database import DatabaseObjectMixin
 from app.models.file import File
 from app.models.problem import Problem
 from app.models.test_case import TestCase
+from pydantic import BaseModel, Field
 
 
 # Avoid making the attribute Optional because we are sharing this model for inference
@@ -25,6 +24,6 @@ class QuestionDB(DatabaseObjectMixin):
 
 
 class RunTestsRequest(BaseModel):
-    files: list[File] = Field(
-        description="The files which the candidate has modified.",
+    code: str = Field(
+        description="The code which the candidate has written.",
     )
