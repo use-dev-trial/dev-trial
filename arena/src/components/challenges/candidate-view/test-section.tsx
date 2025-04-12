@@ -62,7 +62,7 @@ export function TestSection({ height, isVerticalDragging, testCases }: TestSecti
       setFormattedTestCases(defaultTestCases);
       setActiveTest(1);
     }
-  }, [testCases]);
+  }, [testCases, defaultTestCases]);
 
   const testNumbers = Object.keys(formattedTestCases).map(Number);
   const currentTest = formattedTestCases[activeTest] || { input: '', expectedOutput: '' };

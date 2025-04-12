@@ -46,31 +46,31 @@ export function CodeSection({
     }
   }, [files]);
 
-  const getFileExtension = (filename: string) => {
-    return filename.split('.').pop() || '';
-  };
+  // const getFileExtension = (filename: string) => {
+  //   return filename.split('.').pop() || '';
+  // };
 
-  const getLanguage = (filename: string) => {
-    const ext = getFileExtension(filename);
-    switch (ext) {
-      case 'py':
-        return 'python';
-      case 'js':
-        return 'javascript';
-      case 'jsx':
-        return 'javascript';
-      case 'ts':
-        return 'typescript';
-      case 'tsx':
-        return 'typescript';
-      case 'json':
-        return 'json';
-      case 'md':
-        return 'markdown';
-      default:
-        return 'javascript';
-    }
-  };
+  // const getLanguage = (filename: string) => {
+  //   const ext = getFileExtension(filename);
+  //   switch (ext) {
+  //     case 'py':
+  //       return 'python';
+  //     case 'js':
+  //       return 'javascript';
+  //     case 'jsx':
+  //       return 'javascript';
+  //     case 'ts':
+  //       return 'typescript';
+  //     case 'tsx':
+  //       return 'typescript';
+  //     case 'json':
+  //       return 'json';
+  //     case 'md':
+  //       return 'markdown';
+  //     default:
+  //       return 'javascript';
+  //   }
+  // };
 
   // If no files are provided, show a placeholder
   if (Object.keys(codeContent).length === 0) {
