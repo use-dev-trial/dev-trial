@@ -6,15 +6,8 @@ import { UseMutationResult, useMutation, useQueryClient } from '@tanstack/react-
 import { Challenge, CreateChallengeRequest } from '@/types/challenges';
 
 interface UseCreateChallengeResult {
-  createChallenge: UseMutationResult<Challenge, Error, CreateChallengeRequest, unknown>['mutate'];
-  createChallengeAsync: UseMutationResult<
-    Challenge,
-    Error,
-    CreateChallengeRequest,
-    unknown
-  >['mutateAsync'];
+  createChallenge: UseMutationResult<Challenge, Error, CreateChallengeRequest>['mutateAsync'];
   isPending: boolean;
-  isSuccess: boolean;
   error: Error | null;
 }
 
@@ -33,10 +26,8 @@ export function useCreateChallenge(): UseCreateChallengeResult {
   });
 
   return {
-    createChallenge: mutation.mutate,
-    createChallengeAsync: mutation.mutateAsync,
+    createChallenge: mutation.mutateAsync,
     isPending: mutation.isPending,
-    isSuccess: mutation.isSuccess,
     error: mutation.error,
   };
 }

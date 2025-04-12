@@ -35,7 +35,7 @@ export default function CreateChallengeDialog({
   const [description, setDescription] = useState('');
   const { createChallenge, isPending, error } = useCreateChallenge();
 
-  const handleCreateChallenge = () => {
+  const handleCreateChallenge = async () => {
     if (!name.trim() || !description.trim() || isPending) {
       return;
     }
@@ -45,17 +45,13 @@ export default function CreateChallengeDialog({
       description: description.trim(),
     });
 
-    createChallenge(createChallengeRequest, {
-      onSuccess: (createdChallenge: Challenge) => {
-        onOpenChange(false);
-        console.log('Challenge creation successful:', createdChallenge);
-        router.push(ROUTES.QUESTIONS(createdChallenge.id));
-      },
-      onError: (error) => {
-        console.error('Challenge creation failed:', error);
-        toast("We couldn't create your challenge. Please try again later.");
-      },
-    });
+    try {
+      const createdChallenge: Challenge = await createChallenge(createChallengeRequest);
+      onOpenChange(false);
+      router.push(ROUTES.QUESTIONS(createdChallenge.id));
+    } catch {
+      toast("We couldn't create your challenge. Please try again later.");
+    }
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {

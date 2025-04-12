@@ -4,11 +4,13 @@ from fastapi import APIRouter
 
 from app.controllers.challenges import ChallengesController
 from app.controllers.clerk import ClerkController
+from app.controllers.grading import GradingController
 from app.controllers.messages import MessagesController
 from app.controllers.problems import ProblemsController
 from app.controllers.questions import QuestionsController
 from app.services.challenges import ChallengesService
 from app.services.clerk import ClerkService
+from app.services.grading import GradingService
 from app.services.messages import MessagesService
 from app.services.problems import ProblemsService
 from app.services.questions import QuestionsService
@@ -83,6 +85,20 @@ router.include_router(
     get_questions_controller_router(),
     tags=["questions"],
     prefix="/api/questions",
+)
+
+### Grading
+
+
+def get_grading_controller_router():
+    service = GradingService()
+    return GradingController(service=service).router
+
+
+router.include_router(
+    get_grading_controller_router(),
+    tags=["grading"],
+    prefix="/api/grading",
 )
 
 ### Clerk
