@@ -64,9 +64,9 @@ class QuestionsController:
             question_id: str,
             run_tests_request: RunTestsRequest,
             client: Client = Depends(init_db_client),
-        ) -> str:
+        ) -> list[str]:
             log.info(f"Running tests for question {question_id}...")
-            result: str = await self.service.run_tests(
+            result: list[str] = await self.service.run_tests(
                 question_id=question_id, code=run_tests_request.code, client=client
             )
             log.info("Tests run successfully")

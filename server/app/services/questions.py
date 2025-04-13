@@ -167,11 +167,20 @@ class QuestionsService:
 
         return Question(id=question_id, problem=problem, files=files, test_cases=test_cases)
 
-    async def run_tests(self, question_id: str, code: str, client: Client) -> str:
+    async def run_tests(self, question_id: str, code: str, client: Client) -> list[str]:
         test_cases = await self.get_test_cases_by_question_id(
             question_id=question_id, client=client
         )
-        code = code.replace("xxxx", f"'{test_cases[0].description}'")
+
+        code_execution_input = ""
+        for test_case in test_cases:
+            code_execution_input += f"main('{test_case.input}')\n    "
+
+        code = code.replace("main(xxxx)", code_execution_input)
+
         sbx = Sandbox()
         execution = sbx.run_code(code)
-        return execution.logs.stdout[0]
+        output = execution.logs.stdout[0]
+        result = []
+        result.extend([line for line in output.split("\n") if line])
+        return result

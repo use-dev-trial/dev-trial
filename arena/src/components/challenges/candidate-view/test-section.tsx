@@ -29,6 +29,12 @@ export function TestSection({
   const [outputs, setOutputs] = useState<Record<number, string | null>>({});
   const [passedTests, setPassedTests] = useState<Record<number, boolean>>({});
   const [failedTests, setFailedTests] = useState<Record<number, boolean>>({});
+  const [formattedTestCases, setFormattedTestCases] = useState<
+    Record<
+      number,
+      { input: string; expected: string; output: string | string[] | null; passed: boolean }
+    >
+  >({});
 
   // Reset active test index when test cases change
   useEffect(() => {
@@ -53,6 +59,9 @@ export function TestSection({
   const hasCurrentTestFailed =
     currentOutput !== null && currentOutput !== currentTest.expected_output;
 
+  // Get current formatted test case
+  const currentFormattedTest = formattedTestCases[activeTestIndex];
+
   const handleRunTests = async () => {
     try {
       setIsRunningTests(true);
@@ -66,46 +75,80 @@ export function TestSection({
       setOutputs(initialOutputs);
       setPassedTests({});
       setFailedTests({});
+      setFormattedTestCases({});
 
       const code = getCode();
       const input: RunTestsInput = { code };
 
-      // Run tests for all test cases
-      const newOutputs: Record<number, string | null> = {};
       const newPassedTests: Record<number, boolean> = {};
       const newFailedTests: Record<number, boolean> = {};
+      const newFormattedTestCases: Record<
+        number,
+        { input: string; expected: string; output: string | string[] | null; passed: boolean }
+      > = {};
 
-      // In a real implementation, this would make separate calls for each test case
-      // or receive results for all test cases at once
+      const newOutputs = await runTests(questionId, input);
+
       for (const testNum of testNumbers) {
         try {
-          const result = await runTests(questionId, input);
-          newOutputs[testNum] = result;
-
-          // Check if test passed or failed
           const testCase = testCases[testNum];
-          if (result === testCase.expected_output) {
+          // Parse the output if it's a string that might be an array representation
+          let processedOutput = newOutputs[testNum] || null;
+
+          // If the output is a string that looks like an array with newlines
+          if (typeof processedOutput === 'string' && processedOutput.includes('\n')) {
+            // Split by newline and filter out empty strings
+            const splitOutput = processedOutput.split('\n').filter((line) => line.trim() !== '');
+            processedOutput = splitOutput;
+          }
+
+          if (newOutputs.includes(testCase.expected_output)) {
+            // test outputs are not mapped correctly
             newPassedTests[testNum] = true;
           } else {
             newFailedTests[testNum] = true;
           }
+
+          // Store formatted test cases with results
+          newFormattedTestCases[testNum] = {
+            input: testCase.input,
+            expected: testCase.expected_output,
+            output: processedOutput,
+            passed: newOutputs.includes(testCase.expected_output),
+          };
         } catch (error) {
           console.error(`Error running test ${testNum}:`, error);
           newOutputs[testNum] =
             `Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`;
           newFailedTests[testNum] = true;
+
+          // Store error information in formatted test cases
+          newFormattedTestCases[testNum] = {
+            input: testCases[testNum].input,
+            expected: testCases[testNum].expected_output,
+            output: newOutputs[testNum] || null,
+            passed: false,
+          };
         }
       }
 
       setOutputs(newOutputs);
       setPassedTests(newPassedTests);
       setFailedTests(newFailedTests);
+      setFormattedTestCases(newFormattedTestCases);
     } catch (error) {
       console.error('Error running tests:', error);
     } finally {
       setIsRunningTests(false);
     }
   };
+
+  // Log formatted test cases when they change (for demonstration purposes)
+  useEffect(() => {
+    if (Object.keys(formattedTestCases).length > 0) {
+      console.log('Formatted test cases after tests run:', formattedTestCases);
+    }
+  }, [formattedTestCases]);
 
   return (
     <div
@@ -136,7 +179,7 @@ export function TestSection({
                 'cursor-pointer rounded px-3 py-1 text-xs',
                 activeTestIndex === index
                   ? 'bg-background text-foreground border border-gray-300'
-                  : 'bg-muted text-muted-foreground',
+                  : 'bg-muted text-muted-foreground border',
                 passedTests[index] && 'border-green-500',
                 failedTests[index] && 'border-red-500',
               )}
@@ -176,6 +219,11 @@ export function TestSection({
               )}
             >
               {currentOutput !== null ? currentOutput : '"No Output"'}
+              {currentFormattedTest && (
+                <div className="mt-2 text-xs text-gray-500">
+                  <div>Test result: {currentFormattedTest.passed ? 'Passed' : 'Failed'}</div>
+                </div>
+              )}
             </div>
           </div>
         </div>

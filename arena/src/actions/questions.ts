@@ -48,7 +48,7 @@ export async function getQuestionsByChallengeId(challengeId: string): Promise<Qu
   }
 }
 
-export async function runTests(questionId: string, input: RunTestsInput): Promise<string> {
+export async function runTests(questionId: string, input: RunTestsInput): Promise<string[]> {
   const token: string = 'await getClerkToken();';
   try {
     const response = await axios.post(
