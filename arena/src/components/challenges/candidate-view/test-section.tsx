@@ -20,44 +20,26 @@ interface TestSectionProps {
 export function TestSection({
   height,
   isVerticalDragging,
-  testCases,
+  testCases = [],
   questionId,
   getCode,
 }: TestSectionProps) {
-  const [activeTest, setActiveTest] = useState(1);
-  const [formattedTestCases, setFormattedTestCases] = useState<
-    Record<
-      number,
-      {
-        input: string;
-        expectedOutput: string;
-      }
-    >
-  >({});
+  const [activeTestIndex, setActiveTestIndex] = useState(0);
   const [isRunningTests, setIsRunningTests] = useState(false);
   const [output, setOutput] = useState<string | null>(null);
 
-  // Initialize test cases based on provided data or defaults
+  // Reset active test index when test cases change
   useEffect(() => {
     if (testCases && testCases.length > 0) {
-      const formattedCases: Record<number, { input: string; expectedOutput: string }> = {};
-      testCases.forEach((testCase, index) => {
-        formattedCases[index + 1] = {
-          input: testCase.description || `Test Case ${index + 1}`,
-          expectedOutput: 'Hello, Alice!',
-        };
-      });
-      setFormattedTestCases(formattedCases);
-      setActiveTest(1);
-    } else {
-      setActiveTest(1);
+      setActiveTestIndex(0);
     }
   }, [testCases]);
 
-  const testNumbers = Object.keys(formattedTestCases).map(Number);
-  const currentTest = formattedTestCases[activeTest] || {
+  const currentTest = testCases[activeTestIndex] || {
+    id: '',
+    description: '',
     input: '',
-    expectedOutput: 'Hello, Alice!',
+    expected_output: '',
   };
 
   const handleRunTests = async () => {
@@ -104,18 +86,18 @@ export function TestSection({
           </button>
         </div>
         <div className="flex gap-2">
-          {testNumbers.map((testNum) => (
+          {testCases.map((testCase, index) => (
             <div
-              key={testNum}
+              key={testCase.id}
               className={cn(
                 'cursor-pointer rounded px-3 py-1 text-xs',
-                activeTest === testNum
+                activeTestIndex === index
                   ? 'bg-background text-foreground border border-gray-300'
                   : 'bg-muted text-muted-foreground',
               )}
-              onClick={() => setActiveTest(testNum)}
+              onClick={() => setActiveTestIndex(index)}
             >
-              Test {testNum}
+              Test {index + 1}
             </div>
           ))}
         </div>
@@ -126,7 +108,7 @@ export function TestSection({
           <div className="flex h-full flex-col">
             <div className="text-foreground mb-1 text-xs font-medium">Input</div>
             <div className="bg-background border-border flex-1 overflow-auto rounded border p-2 text-sm text-blue-400">
-              {currentTest.input}
+              {currentTest.input || `No input for test ${activeTestIndex + 1}`}
             </div>
           </div>
 
@@ -134,7 +116,7 @@ export function TestSection({
           <div className="flex h-full flex-col">
             <div className="text-foreground mb-1 text-xs font-medium">Expected Output</div>
             <div className="bg-background border-border flex-1 overflow-auto rounded border p-2 text-sm text-blue-400">
-              {currentTest.expectedOutput}
+              {currentTest.expected_output || `No expected output for test ${activeTestIndex + 1}`}
             </div>
           </div>
 
