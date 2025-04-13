@@ -12,7 +12,7 @@ import { TopBar } from '@/components/challenges/candidate-view/header';
 import { QuestionSection } from '@/components/challenges/candidate-view/question-section';
 import { TestSection } from '@/components/challenges/candidate-view/test-section';
 
-import { cn, formatTime } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 interface ChallengeInterfaceProps {
   challengeId: string;
@@ -20,32 +20,14 @@ interface ChallengeInterfaceProps {
 
 export function ChallengeInterface({ challengeId }: ChallengeInterfaceProps) {
   const { questions, isLoading } = useQuestion({ challengeId });
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [leftPanelWidth, setLeftPanelWidth] = useState(40);
   const [bottomPanelHeight, setBottomPanelHeight] = useState(30);
   const [isHorizontalDragging, setIsHorizontalDragging] = useState(false);
   const [isVerticalDragging, setIsVerticalDragging] = useState(false);
-  const [remainingTime, setRemainingTime] = useState(3600); // 1 hour default
   const containerRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);
   const codeSectionRef = useRef<CodeSectionHandle>(null);
-  const [timerActive] = useState(true);
-
-  // Handle countdown timer
-  useEffect(() => {
-    if (!timerActive) return;
-
-    const timer = setInterval(() => {
-      setRemainingTime((prev) => {
-        if (prev <= 0) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [timerActive]);
 
   // Handle horizontal mouse events for resizing
   const handleHorizontalMouseDown = () => {
@@ -60,6 +42,17 @@ export function ChallengeInterface({ challengeId }: ChallengeInterfaceProps) {
   // Function to get code from the CodeSection component
   const getCode = () => {
     return codeSectionRef.current?.getCode() || '';
+  };
+
+  // Function to handle moving to the next question
+  const handleNextQuestion = () => {
+    if (questions && currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      // Handle submit if it's the last question
+      console.log('Submitting final answer');
+      // Add submission logic here
+    }
   };
 
   useEffect(() => {
@@ -132,8 +125,8 @@ export function ChallengeInterface({ challengeId }: ChallengeInterfaceProps) {
     );
   }
 
-  // Use the first question
-  const firstQuestion = questions[0];
+  // Get current question based on the index
+  const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <div
@@ -142,9 +135,13 @@ export function ChallengeInterface({ challengeId }: ChallengeInterfaceProps) {
         (isHorizontalDragging || isVerticalDragging) && 'select-none',
       )}
     >
-      <TopBar remainingTime={remainingTime} formatTime={formatTime} />
+      <TopBar
+        questionCount={questions.length}
+        currentQuestionIndex={currentQuestionIndex}
+        onNextQuestion={handleNextQuestion}
+      />
       <div ref={containerRef} className="relative flex flex-1 overflow-hidden">
-        <QuestionSection width={leftPanelWidth} question={firstQuestion} />
+        <QuestionSection width={leftPanelWidth} question={currentQuestion} />
         <div
           className={cn(
             'bg-border hover:bg-primary/50 active:bg-primary/70 absolute top-0 bottom-0 z-10 w-1 cursor-col-resize transition-colors',
@@ -164,13 +161,13 @@ export function ChallengeInterface({ challengeId }: ChallengeInterfaceProps) {
             bottomPanelHeight={bottomPanelHeight}
             isVerticalDragging={isVerticalDragging}
             handleVerticalMouseDown={handleVerticalMouseDown}
-            files={firstQuestion.files}
+            files={currentQuestion.files}
           />
           <TestSection
             height={bottomPanelHeight}
             isVerticalDragging={isVerticalDragging}
-            testCases={firstQuestion.test_cases}
-            questionId={firstQuestion.id}
+            testCases={currentQuestion.test_cases}
+            questionId={currentQuestion.id}
             getCode={getCode}
           />
         </div>
