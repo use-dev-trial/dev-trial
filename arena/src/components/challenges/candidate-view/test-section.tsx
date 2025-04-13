@@ -45,13 +45,13 @@ export function TestSection({
   };
 
   // Get the current test output
-  const currentOutput = outputs[activeTest] || null;
+  const currentOutput = outputs[activeTestIndex] || null;
 
   // Check if the current test has passed
   const hasCurrentTestPassed =
-    currentOutput !== null && currentOutput === currentTest.expectedOutput;
+    currentOutput !== null && currentOutput === currentTest.expected_output;
   const hasCurrentTestFailed =
-    currentOutput !== null && currentOutput !== currentTest.expectedOutput;
+    currentOutput !== null && currentOutput !== currentTest.expected_output;
 
   const handleRunTests = async () => {
     try {
@@ -59,7 +59,8 @@ export function TestSection({
 
       // Reset outputs and test status
       const initialOutputs: Record<number, string | null> = {};
-      testNumbers.forEach((num) => {
+      const testNumbers = Array.from({ length: testCases.length }, (_, i) => i);
+      testNumbers.forEach((num: number) => {
         initialOutputs[num] = null;
       });
       setOutputs(initialOutputs);
@@ -82,8 +83,8 @@ export function TestSection({
           newOutputs[testNum] = result;
 
           // Check if test passed or failed
-          const testCase = formattedTestCases[testNum];
-          if (result === testCase.expectedOutput) {
+          const testCase = testCases[testNum];
+          if (result === testCase.expected_output) {
             newPassedTests[testNum] = true;
           } else {
             newFailedTests[testNum] = true;
@@ -136,8 +137,8 @@ export function TestSection({
                 activeTestIndex === index
                   ? 'bg-background text-foreground border border-gray-300'
                   : 'bg-muted text-muted-foreground',
-                passedTests[testNum] && 'border-green-500',
-                failedTests[testNum] && 'border-red-500',
+                passedTests[index] && 'border-green-500',
+                failedTests[index] && 'border-red-500',
               )}
               onClick={() => setActiveTestIndex(index)}
             >
