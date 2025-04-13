@@ -67,7 +67,12 @@ class QuestionsService:
 
         test_cases = (
             [
-                TestCase(id=row["id"], description=row["description"])
+                TestCase(
+                    id=row["id"],
+                    description=row["description"],
+                    input=row["input"],
+                    expected_output=row["expected_output"],
+                )
                 for row in test_cases_result.data
             ]
             if test_cases_result.data
@@ -142,7 +147,12 @@ class QuestionsService:
 
         test_cases = (
             [
-                TestCase(id=row["id"], description=row["description"])
+                TestCase(
+                    id=row["id"],
+                    description=row["description"],
+                    input=row["input"],
+                    expected_output=row["expected_output"],
+                )
                 for row in test_cases_result.data
             ]
             if test_cases_result and test_cases_result.data

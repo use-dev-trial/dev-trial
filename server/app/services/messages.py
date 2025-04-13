@@ -280,6 +280,8 @@ async def _insert_test_cases(client: Client, result: RunResult, question_id: str
             TestCase(
                 id=test_case_id,
                 description=test_case.description,
+                input=test_case.input,
+                expected_output=test_case.expected_output,
             )
         )
         await client.table(Table.QUESTION_TEST_CASE).insert(
@@ -334,6 +336,8 @@ async def _update_test_cases(
             updated_test_cases[test_case.id] = TestCase(
                 id=test_case.id,
                 description=test_case.description,
+                input=test_case.input,
+                expected_output=test_case.expected_output,
             )
 
     final_test_cases: list[TestCase] = []
