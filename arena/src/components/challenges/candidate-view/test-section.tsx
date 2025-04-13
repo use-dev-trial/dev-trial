@@ -99,7 +99,7 @@ export function TestSection({
           if (typeof processedOutput === 'string' && processedOutput.includes('\n')) {
             // Split by newline and filter out empty strings
             const splitOutput = processedOutput.split('\n').filter((line) => line.trim() !== '');
-            processedOutput = splitOutput;
+            processedOutput = splitOutput.join('\n');
           }
 
           if (newOutputs.includes(testCase.expected_output)) {
