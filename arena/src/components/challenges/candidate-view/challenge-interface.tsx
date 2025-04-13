@@ -16,9 +16,10 @@ import { cn } from '@/lib/utils';
 
 interface ChallengeInterfaceProps {
   challengeId: string;
+  challengeName: string;
 }
 
-export function ChallengeInterface({ challengeId }: ChallengeInterfaceProps) {
+export function ChallengeInterface({ challengeId, challengeName }: ChallengeInterfaceProps) {
   const { questions, isLoading } = useQuestion({ challengeId });
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [leftPanelWidth, setLeftPanelWidth] = useState(40);
@@ -29,12 +30,10 @@ export function ChallengeInterface({ challengeId }: ChallengeInterfaceProps) {
   const rightPanelRef = useRef<HTMLDivElement>(null);
   const codeSectionRef = useRef<CodeSectionHandle>(null);
 
-  // Handle horizontal mouse events for resizing
   const handleHorizontalMouseDown = () => {
     setIsHorizontalDragging(true);
   };
 
-  // Handle vertical mouse events for resizing
   const handleVerticalMouseDown = () => {
     setIsVerticalDragging(true);
   };
@@ -139,6 +138,7 @@ export function ChallengeInterface({ challengeId }: ChallengeInterfaceProps) {
         questionCount={questions.length}
         currentQuestionIndex={currentQuestionIndex}
         onNextQuestion={handleNextQuestion}
+        challengeName={challengeName}
       />
       <div ref={containerRef} className="relative flex flex-1 overflow-hidden">
         <QuestionSection width={leftPanelWidth} question={currentQuestion} />

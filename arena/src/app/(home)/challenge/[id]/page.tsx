@@ -37,5 +37,5 @@ export default function ChallengeInterfacePage() {
     return <ChallengeIntro challenge={challenge} onStart={handleStart} />;
   }
 
-  return <ChallengeInterface challengeId={challengeId} />;
+  return <ChallengeInterface challengeId={challengeId} challengeName={challenge.name} />;
 }

@@ -133,10 +133,6 @@ export const CodeSection = forwardRef<CodeSectionHandle, CodeSectionProps>(
         <div className="border-border bg-muted text-muted-foreground flex items-center border-b px-4 py-1 text-xs">
           <span>challenge</span>
           <ChevronRight className="mx-1 h-3 w-3" />
-          <span>src</span>
-          <ChevronRight className="mx-1 h-3 w-3" />
-          <span>components</span>
-          <ChevronRight className="mx-1 h-3 w-3" />
           <FileText className="mr-1 h-3 w-3 text-yellow-500" />
           <span>{activeTab}</span>
         </div>

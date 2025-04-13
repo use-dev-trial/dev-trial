@@ -11,6 +11,7 @@ interface TopBarProps {
   initialTime?: number; // Optional prop to set initial time
   currentQuestionIndex: number;
   onNextQuestion: () => void;
+  challengeName: string;
 }
 
 export function TopBar({
@@ -18,6 +19,7 @@ export function TopBar({
   initialTime = 3600,
   currentQuestionIndex,
   onNextQuestion,
+  challengeName,
 }: TopBarProps) {
   const [remainingTime, setRemainingTime] = useState(initialTime);
   const [timerActive] = useState(true);
@@ -52,7 +54,7 @@ export function TopBar({
           {formatTimeUtil(remainingTime)}
         </span>
       </div>
-      <p>Challenge Name</p>
+      <p className="text-muted-foreground mr-2">{challengeName}</p>
       <div className="flex items-center gap-2">
         <p className="text-muted-foreground mr-2">
           Question {currentQuestionIndex + 1} of {questionCount}
