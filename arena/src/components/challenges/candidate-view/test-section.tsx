@@ -35,7 +35,9 @@ export function TestSection({
     >
   >({});
   const [isRunningTests, setIsRunningTests] = useState(false);
-  const [output, setOutput] = useState<string | null>(null);
+  const [outputs, setOutputs] = useState<Record<number, string | null>>({});
+  const [passedTests, setPassedTests] = useState<Record<number, boolean>>({});
+  const [failedTests, setFailedTests] = useState<Record<number, boolean>>({});
 
   // Initialize test cases based on provided data or defaults
   useEffect(() => {
@@ -60,23 +62,63 @@ export function TestSection({
     expectedOutput: 'Hello, Alice!',
   };
 
+  // Get the current test output
+  const currentOutput = outputs[activeTest] || null;
+
+  // Check if the current test has passed
+  const hasCurrentTestPassed =
+    currentOutput !== null && currentOutput === currentTest.expectedOutput;
+  const hasCurrentTestFailed =
+    currentOutput !== null && currentOutput !== currentTest.expectedOutput;
+
   const handleRunTests = async () => {
     try {
       setIsRunningTests(true);
-      setOutput(null);
+
+      // Reset outputs and test status
+      const initialOutputs: Record<number, string | null> = {};
+      testNumbers.forEach((num) => {
+        initialOutputs[num] = null;
+      });
+      setOutputs(initialOutputs);
+      setPassedTests({});
+      setFailedTests({});
 
       const code = getCode();
       const input: RunTestsInput = { code };
 
-      const result = await runTests(questionId, input);
-      setOutput(result);
+      // Run tests for all test cases
+      const newOutputs: Record<number, string | null> = {};
+      const newPassedTests: Record<number, boolean> = {};
+      const newFailedTests: Record<number, boolean> = {};
 
-      // Note: The current implementation of runTests doesn't return results
-      // In a real implementation, you would receive and display the actual test results
-      // setOutput('Tests completed. Check console for details.');
+      // In a real implementation, this would make separate calls for each test case
+      // or receive results for all test cases at once
+      for (const testNum of testNumbers) {
+        try {
+          const result = await runTests(questionId, input);
+          newOutputs[testNum] = result;
+
+          // Check if test passed or failed
+          const testCase = formattedTestCases[testNum];
+          if (result === testCase.expectedOutput) {
+            newPassedTests[testNum] = true;
+          } else {
+            newFailedTests[testNum] = true;
+          }
+        } catch (error) {
+          console.error(`Error running test ${testNum}:`, error);
+          newOutputs[testNum] =
+            `Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`;
+          newFailedTests[testNum] = true;
+        }
+      }
+
+      setOutputs(newOutputs);
+      setPassedTests(newPassedTests);
+      setFailedTests(newFailedTests);
     } catch (error) {
       console.error('Error running tests:', error);
-      setOutput(`Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`);
     } finally {
       setIsRunningTests(false);
     }
@@ -112,6 +154,8 @@ export function TestSection({
                 activeTest === testNum
                   ? 'bg-background text-foreground border border-gray-300'
                   : 'bg-muted text-muted-foreground',
+                passedTests[testNum] && 'border-green-500',
+                failedTests[testNum] && 'border-red-500',
               )}
               onClick={() => setActiveTest(testNum)}
             >
@@ -141,8 +185,14 @@ export function TestSection({
           {/* Actual Output Section */}
           <div className="flex h-full flex-col">
             <div className="text-foreground mb-1 text-xs font-medium">Output</div>
-            <div className="bg-background border-border flex-1 overflow-auto rounded border p-2 text-sm text-blue-400">
-              {output !== null ? output : '"No Output"'}
+            <div
+              className={cn(
+                'bg-background flex-1 overflow-auto rounded border p-2 text-sm text-blue-400',
+                hasCurrentTestPassed && 'border-green-500',
+                hasCurrentTestFailed && 'border-red-500',
+              )}
+            >
+              {currentOutput !== null ? currentOutput : '"No Output"'}
             </div>
           </div>
         </div>
