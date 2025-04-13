@@ -44,7 +44,7 @@ export function TestSection({
       testCases.forEach((testCase, index) => {
         formattedCases[index + 1] = {
           input: testCase.description || `Test Case ${index + 1}`,
-          expectedOutput: 'Expected result',
+          expectedOutput: 'Hello, Alice!',
         };
       });
       setFormattedTestCases(formattedCases);
@@ -55,7 +55,10 @@ export function TestSection({
   }, [testCases]);
 
   const testNumbers = Object.keys(formattedTestCases).map(Number);
-  const currentTest = formattedTestCases[activeTest] || { input: '', expectedOutput: '' };
+  const currentTest = formattedTestCases[activeTest] || {
+    input: '',
+    expectedOutput: 'Hello, Alice!',
+  };
 
   const handleRunTests = async () => {
     try {
@@ -84,65 +87,64 @@ export function TestSection({
       className={cn('flex h-full flex-col overflow-hidden', isVerticalDragging && 'select-none')}
       style={{ height: `${height}%` }}
     >
-      {/* Tests Header */}
-      <div className="border-border flex items-center justify-between border-b px-4 py-2">
-        <div className="text-foreground font-medium">Tests</div>
-        <button
-          className={cn(
-            'flex items-center gap-1 rounded px-3 py-1 text-sm',
-            isRunningTests
-              ? 'bg-muted text-muted-foreground cursor-not-allowed'
-              : 'bg-primary text-primary-foreground hover:bg-primary/90',
-          )}
-          onClick={handleRunTests}
-          disabled={isRunningTests}
-        >
-          {isRunningTests ? 'Running...' : 'Run'} <Play className="h-3.5 w-3.5" />
-        </button>
-      </div>
-
-      {/* Test Tabs */}
-      <div className="border-border flex gap-2 border-b p-2">
-        {testNumbers.map((testNum) => (
-          <div
-            key={testNum}
+      <div className="border-border border-b px-4 py-2">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="text-foreground font-medium">Tests</div>
+          <button
             className={cn(
-              'cursor-pointer rounded px-4 py-1 text-sm',
-              activeTest === testNum
-                ? 'bg-background text-foreground border border-gray-300'
-                : 'bg-muted text-muted-foreground',
+              'flex items-center gap-1 rounded px-3 py-1 text-sm',
+              isRunningTests
+                ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                : 'bg-primary text-primary-foreground hover:bg-primary/90',
             )}
-            onClick={() => setActiveTest(testNum)}
+            onClick={handleRunTests}
+            disabled={isRunningTests}
           >
-            Test {testNum}
-          </div>
-        ))}
-      </div>
-
-      {/* Main content area */}
-      <div className="grid grid-cols-2 gap-4 p-4">
-        {/* Input Section */}
-        <div>
-          <div className="text-foreground mb-1 text-sm font-medium">Input</div>
-          <div className="bg-background border-border h-12 rounded border p-3 text-sm text-blue-400">
-            {currentTest.input}
-          </div>
+            {isRunningTests ? 'Running...' : 'Run'} <Play className="h-3.5 w-3.5" />
+          </button>
         </div>
-
-        {/* Expected Output Section */}
-        <div>
-          <div className="text-foreground mb-1 text-sm font-medium">Expected Output</div>
-          <div className="bg-background border-border h-12 rounded border p-3 text-sm text-blue-400">
-            {currentTest.expectedOutput}
-          </div>
+        <div className="flex gap-2">
+          {testNumbers.map((testNum) => (
+            <div
+              key={testNum}
+              className={cn(
+                'cursor-pointer rounded px-3 py-1 text-xs',
+                activeTest === testNum
+                  ? 'bg-background text-foreground border border-gray-300'
+                  : 'bg-muted text-muted-foreground',
+              )}
+              onClick={() => setActiveTest(testNum)}
+            >
+              Test {testNum}
+            </div>
+          ))}
         </div>
       </div>
+      <div className="flex-1 overflow-auto p-3">
+        <div className="grid h-full grid-cols-3 gap-3">
+          {/* Input Section */}
+          <div className="flex h-full flex-col">
+            <div className="text-foreground mb-1 text-xs font-medium">Input</div>
+            <div className="bg-background border-border flex-1 overflow-auto rounded border p-2 text-sm text-blue-400">
+              {currentTest.input}
+            </div>
+          </div>
 
-      {/* Output Section */}
-      <div className="px-4 pb-4">
-        <div className="text-foreground mb-1 text-sm font-medium">Output</div>
-        <div className="bg-background border-border rounded border p-3 text-sm text-blue-400">
-          {output !== null ? output : '"No Output"'}
+          {/* Expected Output Section */}
+          <div className="flex h-full flex-col">
+            <div className="text-foreground mb-1 text-xs font-medium">Expected Output</div>
+            <div className="bg-background border-border flex-1 overflow-auto rounded border p-2 text-sm text-blue-400">
+              {currentTest.expectedOutput}
+            </div>
+          </div>
+
+          {/* Actual Output Section */}
+          <div className="flex h-full flex-col">
+            <div className="text-foreground mb-1 text-xs font-medium">Output</div>
+            <div className="bg-background border-border flex-1 overflow-auto rounded border p-2 text-sm text-blue-400">
+              {output !== null ? output : '"No Output"'}
+            </div>
+          </div>
         </div>
       </div>
     </div>
