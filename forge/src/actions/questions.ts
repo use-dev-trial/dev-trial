@@ -61,7 +61,7 @@ export async function getAllQuestions(): Promise<Question[]> {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log('Get All Questions Response', response.data);
+    console.log('Successfully retrieved all questions');
     return response.data.map((q: Question) => question.parse(q));
   } catch (error) {
     console.error('Error getting all questions:', error);
