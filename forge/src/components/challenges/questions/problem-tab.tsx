@@ -38,7 +38,17 @@ export default function ProblemTab({ problem, onProblemUpdate }: ProblemTabProps
                 >
                   {index + 1}
                 </Badge>
-                <span>{requirement}</span>
+                <Input
+                  value={requirement}
+                  onChange={(e) =>
+                    onProblemUpdate({
+                      ...problem,
+                      requirements: problem.requirements.map((r, i) =>
+                        i === index ? e.target.value : r,
+                      ),
+                    })
+                  }
+                />
               </li>
             ))}
           </ol>

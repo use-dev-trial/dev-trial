@@ -18,12 +18,32 @@ import { Question, TestCase, defaultQuestion } from '@/types/questions';
 
 export type Tab = 'problem' | 'files' | 'test-cases';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function areArraysEqual(arr1: any[], arr2: any[]): boolean {
+  if (!Array.isArray(arr1) || !Array.isArray(arr2)) {
+    return arr1 === arr2;
+  }
+
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  for (let i = 0; i < arr1.length; i++) {
+    // This comparison assumes elements are primitives or objects where reference equality is sufficient.
+    // If elements are objects needing deep comparison, this line needs to change.
+    if (arr1[i] !== arr2[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 const isProblemUpdated = (q1: Problem, q2: Problem): boolean => {
   // Dont account for id changes as we do not want to account for manual changes by the user
   return (
     q1.title !== q2.title ||
     q1.description !== q2.description ||
-    q1.requirements !== q2.requirements
+    !areArraysEqual(q1.requirements, q2.requirements)
   );
 };
 
@@ -101,6 +121,7 @@ export function useChat({ challenge_id, question }: UseChatProps) {
       if (areTestCasesUpdated(question.test_cases, data.question.test_cases)) {
         tabs.push('test-cases');
       }
+      console.log('TABS', tabs);
       setUpdatedQuestion(data.question);
       setUpdatedTabs(tabs);
 
