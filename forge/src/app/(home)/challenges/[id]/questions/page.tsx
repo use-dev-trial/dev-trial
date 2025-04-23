@@ -82,7 +82,7 @@ export default function Home() {
     if (challenge) {
       setChallengeName(challenge.name);
     }
-  }, [isLoadingChallenge, challengeError, errorChallenge, challenge, challenge_id, router, toast]);
+  }, [isLoadingChallenge, challengeError, errorChallenge, challenge, challenge_id, router]);
 
   const handleUpsertProblem = useCallback(
     async (problemInput: Problem, currentQuestionId: string | undefined) => {

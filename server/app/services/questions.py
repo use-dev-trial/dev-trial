@@ -188,7 +188,10 @@ class QuestionsService:
         )
 
         files = (
-            [File(id=row["id"], name=row["name"], code=row["code"]) for row in files_result.data]
+            [
+                File(id=row["id"], name=row["name"], code=row["code"], path=row["path"])
+                for row in files_result.data
+            ]
             if files_result and files_result.data
             else []
         )
