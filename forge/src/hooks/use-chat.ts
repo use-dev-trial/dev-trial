@@ -14,9 +14,10 @@ import {
   role,
 } from '@/types/messages';
 import { Problem } from '@/types/problems';
-import { Question, TestCase, defaultQuestion } from '@/types/questions';
+import { Question, defaultQuestion } from '@/types/questions';
+import { TestCase } from '@/types/test_cases';
 
-export type Tab = 'problem' | 'files' | 'test-cases';
+export type Tab = 'problem' | 'files' | 'test-cases' | 'styles';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function areArraysEqual(arr1: any[], arr2: any[]): boolean {

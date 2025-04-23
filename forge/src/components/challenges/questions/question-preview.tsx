@@ -1,7 +1,8 @@
 import { Tab } from '@/hooks/use-chat';
 
-import FileContainer from '@/components/challenges/questions/files-container';
-import ProblemTab from '@/components/challenges/questions/problem-tab';
+import FilesTab from '@/components/challenges/questions/tabs/files';
+import ProblemTab from '@/components/challenges/questions/tabs/problem';
+import StylesTab from '@/components/challenges/questions/tabs/styles';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { Problem } from '@/types/problems';
@@ -65,6 +66,15 @@ export default function QuestionPreview({
                 <span className="ml-2 inline-flex h-2 w-2 animate-pulse rounded-full bg-amber-500"></span>
               )}
             </TabsTrigger>
+            <TabsTrigger
+              value="styles"
+              className="rounded-md border-b-2 border-transparent px-4 data-[state=active]:border-blue-500 data-[state=active]:bg-transparent"
+            >
+              Styles
+              {updatedTabs.includes('styles') && (
+                <span className="ml-2 inline-flex h-2 w-2 animate-pulse rounded-full bg-amber-500"></span>
+              )}
+            </TabsTrigger>
           </TabsList>
           {isLoading && (
             <div className="sticky top-0 z-10 flex items-center justify-between border-b p-4">
@@ -83,14 +93,12 @@ export default function QuestionPreview({
               onProblemUpdate={onProblemUpdate || (() => {})}
             />
           </TabsContent>
-          {/* Files Tab Content */}
           <TabsContent value="files">
-            <section>
-              <FileContainer files={question.files || []} />
-            </section>
+            <FilesTab files={question.files || []} />
           </TabsContent>
-
-          {/* Test Cases Tab Content */}
+          <TabsContent value="styles">
+            <StylesTab styles={question.styles || []} />
+          </TabsContent>
           <TabsContent value="test-cases">
             <section>
               <div className="mb-4 flex items-center">
