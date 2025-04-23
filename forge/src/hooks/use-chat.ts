@@ -17,7 +17,7 @@ import { Problem } from '@/types/problems';
 import { Question, defaultQuestion } from '@/types/questions';
 import { TestCase } from '@/types/test_cases';
 
-export type Tab = 'problem' | 'files' | 'test-cases' | 'styles';
+export type Tab = 'problem' | 'files' | 'test-cases' | 'metrics';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function areArraysEqual(arr1: any[], arr2: any[]): boolean {

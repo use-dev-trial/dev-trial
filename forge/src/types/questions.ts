@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 import { file } from '@/types/files';
+import { metric } from '@/types/metrics';
 import { problem } from '@/types/problems';
-import { style } from '@/types/styles';
 import { test_case } from '@/types/test_cases';
 
 export const question = z.object({
@@ -10,7 +10,7 @@ export const question = z.object({
   problem: problem,
   files: z.array(file),
   test_cases: z.array(test_case),
-  styles: z.array(style),
+  metrics: z.array(metric),
 });
 
 export type Question = z.infer<typeof question>;
@@ -25,5 +25,5 @@ export const defaultQuestion: Question = {
   },
   files: [],
   test_cases: [],
-  styles: [],
+  metrics: [],
 };

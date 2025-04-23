@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 
 from app.models.file import File
 from app.models.problem import Problem
-from app.models.style import Style
+from app.models.metric import Metric
 from app.models.test_case import TestCase
 
 
@@ -18,8 +18,8 @@ class Question(BaseModel):
     test_cases: list[TestCase] = Field(
         description="The test cases which the candidate must pass to successfully complete the question.",
     )
-    styles: list[Style] = Field(
-        description="The styles which the candidate must follow to successfully complete the question.",
+    metrics: list[Metric] = Field(
+        description="The metrics which the candidate must follow to successfully complete the question.",
     )
 
 

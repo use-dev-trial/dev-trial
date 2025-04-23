@@ -12,13 +12,12 @@ class Table(StrEnum):
     CHALLENGES = "challenges"
     QUESTIONS = "questions"
     METRICS = "metrics"
-    STYLES = "styles"
 
     # Join Tables
     CHALLENGE_QUESTION = "challenge_question"
     QUESTION_FILE = "question_file"
     QUESTION_TEST_CASE = "question_test_case"
-    QUESTION_STYLE = "question_style"
+    QUESTION_METRIC = "question_metric"
 
 
 class DatabaseObjectMixin(BaseModel):

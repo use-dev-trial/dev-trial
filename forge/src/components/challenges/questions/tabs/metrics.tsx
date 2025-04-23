@@ -10,21 +10,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 
-import { Style } from '@/types/styles';
+import { Metric } from '@/types/metrics';
 
 import { TEMPLATE_METRICS } from '@/lib/constants';
 import { useDebouncedCallback } from '@/lib/utils';
 
-interface StylesTabProps {
-  styles: Style[];
+interface MetricsTabProps {
+  metrics: Metric[];
 }
 
-export default function StylesTab({ styles }: StylesTabProps) {
-  console.log('styles', styles);
+export default function MetricsTab({ metrics }: MetricsTabProps) {
   const { upsertMetrics } = useMetrics();
-  const [metrics, setMetrics] = useState<Array<{ id: string; content: string; selected: boolean }>>(
-    [],
-  );
 
   // Initialize metrics from template
   useEffect(() => {
