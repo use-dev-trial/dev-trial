@@ -1,8 +1,8 @@
 import { Tab } from '@/hooks/use-chat';
 
 import FilesTab from '@/components/challenges/questions/tabs/files';
+import MetricsTab from '@/components/challenges/questions/tabs/metrics';
 import ProblemTab from '@/components/challenges/questions/tabs/problem';
-import StylesTab from '@/components/challenges/questions/tabs/styles';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { Problem } from '@/types/problems';
@@ -67,11 +67,11 @@ export default function QuestionPreview({
               )}
             </TabsTrigger>
             <TabsTrigger
-              value="styles"
+              value="metrics"
               className="rounded-md border-b-2 border-transparent px-4 data-[state=active]:border-blue-500 data-[state=active]:bg-transparent"
             >
-              Styles
-              {updatedTabs.includes('styles') && (
+              Metrics
+              {updatedTabs.includes('metrics') && (
                 <span className="ml-2 inline-flex h-2 w-2 animate-pulse rounded-full bg-amber-500"></span>
               )}
             </TabsTrigger>
@@ -96,8 +96,8 @@ export default function QuestionPreview({
           <TabsContent value="files">
             <FilesTab files={question.files || []} />
           </TabsContent>
-          <TabsContent value="styles">
-            <StylesTab styles={question.styles || []} />
+          <TabsContent value="metrics">
+            <MetricsTab metrics={question.metrics || []} />
           </TabsContent>
           <TabsContent value="test-cases">
             <section>
