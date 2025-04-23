@@ -43,6 +43,7 @@ class MessagesService:
                 ),  # default values are not permitted in the agent system
                 files=[],
                 test_cases=[],
+                metrics=[],
             )
             await client.table(Table.CHALLENGE_QUESTION).insert(
                 ChallengeQuestion(
@@ -190,6 +191,7 @@ async def _insert_files(client: Client, result: RunResult, question_id: str) -> 
                 id=file_id,
                 name=file.name,
                 code=file.code,
+                path=file.path,
             )
         )
         await client.table(Table.QUESTION_FILE).insert(
@@ -219,9 +221,7 @@ async def _update_files(
                 }
             ).eq("id", file.id).execute()
             updated_files[file.id] = File(
-                id=file.id,
-                name=file.name,
-                code=file.code,
+                id=file.id, name=file.name, code=file.code, path=file.path
             )
         else:
             # LLM either creates a new file of hallucinates id of an existing file. For now, we will just create a new file
@@ -245,6 +245,7 @@ async def _update_files(
                 id=file.id,
                 name=file.name,
                 code=file.code,
+                path=file.path,
             )
 
     final_files: list[File] = []
@@ -315,6 +316,8 @@ async def _update_test_cases(
             updated_test_cases[test_case.id] = TestCase(
                 id=test_case.id,
                 description=test_case.description,
+                input=test_case.input,
+                expected_output=test_case.expected_output,
             )
         else:
             # LLM either creates a new test case of hallucinates id of an existing test case. For now, we will just create a new test case
