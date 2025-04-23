@@ -88,7 +88,6 @@ export default function FilesTab({ files }: FilesTabProps) {
         )}
       </div>
 
-      {/* Code editor */}
       {currentFile && (
         <div className="flex">
           <Editor height="90vh" defaultLanguage="python" value={currentFile.code} />

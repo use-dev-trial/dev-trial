@@ -7,3 +7,6 @@ class File(BaseModel):
     code: str = Field(
         description="The code present in the file. It might be fully complete, partially complete, or empty (depending on the purpose of the file in the overall question)."
     )
+    path: list[str] = Field(
+        description="The path of the file in the file system. Each directory level is represented by a separate string in the list."
+    )
