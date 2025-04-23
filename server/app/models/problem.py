@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from app.models.database import DatabaseObjectMixin, UpsertMixin
+from app.models.database import UpsertMixin
 
 
 class Problem(BaseModel):
@@ -18,8 +18,4 @@ class UpsertProblemRequest(Problem, UpsertMixin):
 
 class UpsertProblemResponse(UpsertProblemRequest):
     # TODO: Might have metadata to return in the future. For now, the schema is exactly the same
-    pass
-
-
-class ProblemDB(Problem, DatabaseObjectMixin):
     pass

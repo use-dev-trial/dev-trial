@@ -4,14 +4,12 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Tab } from '@/hooks/use-chat';
-import { Bot, Loader2, Paperclip, Send, User } from 'lucide-react';
+import { Bot, Loader2, Send, User } from 'lucide-react';
 
 import SuggestionCard from '@/components/challenges/questions/suggestion-card';
 import { Button } from '@/components/ui/button';
 
 import { Message, role } from '@/types/messages';
-
-// Assuming Message type definition exists here
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -186,16 +184,6 @@ export default function ChatInterface({
               style={{ minHeight: '80px', maxHeight: '200px' }}
             />
             <div className="flex items-center justify-end space-x-1 border-t p-2 dark:border-gray-600">
-              <Button
-                type="button"
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200"
-                disabled={isLoading}
-                aria-label="Attach file"
-              >
-                <Paperclip size={16} />
-              </Button>
               <Button
                 type="submit"
                 size="icon"

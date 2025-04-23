@@ -5,17 +5,13 @@ import { useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { ChevronRight, FileCode, FileJson, FileText, FileType } from 'lucide-react';
 
-interface FileProps {
-  name: string;
-  code: string;
-  path?: string[];
+import { File } from '@/types/files';
+
+interface FilesTabProps {
+  files: File[];
 }
 
-interface FileContainerProps {
-  files: FileProps[];
-}
-
-export default function FileContainer({ files }: FileContainerProps) {
+export default function FilesTab({ files }: FilesTabProps) {
   const [activeFile, setActiveFile] = useState<string>(files.length > 0 ? files[0].name : '');
 
   const getFileExtension = (filename: string) => {

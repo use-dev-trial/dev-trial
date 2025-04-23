@@ -8,6 +8,7 @@ from app.models.database import Table
 from app.models.file import File
 from app.models.problem import Problem
 from app.models.question import Question
+from app.models.style import Style
 from app.models.test_case import TestCase
 
 load_dotenv()
@@ -95,9 +96,15 @@ class QuestionsService:
             .eq("question_id", question_id)
             .execute()
         )
+        style_ids_task = (
+            client.table(Table.QUESTION_STYLE)
+            .select("style_id")
+            .eq("question_id", question_id)
+            .execute()
+        )
 
-        question_result, test_case_ids_result, file_ids_result = await asyncio.gather(
-            question_task, test_case_ids_task, file_ids_task
+        question_result, test_case_ids_result, file_ids_result, style_ids_result = (
+            await asyncio.gather(question_task, test_case_ids_task, file_ids_task, style_ids_task)
         )
 
         if not question_result.data:
@@ -109,6 +116,9 @@ class QuestionsService:
             [row["test_case_id"] for row in test_case_ids_result.data]
             if test_case_ids_result.data
             else []
+        )
+        style_ids = (
+            [row["style_id"] for row in style_ids_result.data] if style_ids_result.data else []
         )
         file_ids = [row["file_id"] for row in file_ids_result.data] if file_ids_result.data else []
 
@@ -122,16 +132,22 @@ class QuestionsService:
             if test_case_ids
             else None
         )
+        styles_task = (
+            client.table(Table.STYLES).select("*").in_("id", style_ids).execute()
+            if style_ids
+            else None
+        )
         files_task = (
             client.table(Table.FILES).select("*").in_("id", file_ids).execute()
             if file_ids
             else None
         )
 
-        problem_result, test_cases_result, files_result = await asyncio.gather(
+        problem_result, test_cases_result, files_result, styles_result = await asyncio.gather(
             problem_task or asyncio.sleep(0),
             test_cases_task or asyncio.sleep(0),
             files_task or asyncio.sleep(0),
+            styles_task or asyncio.sleep(0),
         )
 
         problem = (
@@ -159,13 +175,27 @@ class QuestionsService:
             else []
         )
 
+        styles = (
+            [
+                Style(
+                    id=row["id"],
+                    style=row["style"],
+                )
+                for row in styles_result.data
+            ]
+            if styles_result and styles_result.data
+            else []
+        )
+
         files = (
             [File(id=row["id"], name=row["name"], code=row["code"]) for row in files_result.data]
             if files_result and files_result.data
             else []
         )
 
-        return Question(id=question_id, problem=problem, files=files, test_cases=test_cases)
+        return Question(
+            id=question_id, problem=problem, files=files, test_cases=test_cases, styles=styles
+        )
 
     async def run_tests(self, question_id: str, code: str, client: Client) -> list[str]:
         test_cases = await self.get_test_cases_by_question_id(
