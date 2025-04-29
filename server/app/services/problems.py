@@ -1,4 +1,3 @@
-from postgrest.types import CountMethod
 from supabase._async.client import AsyncClient as Client
 
 from app.models.database import Table
@@ -11,21 +10,6 @@ class ProblemsService:
     ) -> UpsertProblemResponse:
         question_id: str = input.question_id
         if input.id:
-            # Update existing entry in the problems table
-            count_result = (
-                await client.table(Table.PROBLEMS)
-                .select("id", count=CountMethod.exact)
-                .eq("id", input.id)
-                .execute()
-            )
-            if not count_result.count:
-                raise ValueError(
-                    f"Problem with id {input.id} not found when trying to update problem."
-                )
-            elif count_result.count > 1:
-                raise ValueError(
-                    f"Multiple problems with id {input.id} found when trying to update problem."
-                )
             upsert_problem_result = (
                 await client.table(Table.PROBLEMS)
                 .update(
@@ -39,11 +23,15 @@ class ProblemsService:
                 .execute()
             )
         else:  # id will be empty string if its a fresh problem
+            if not question_id:  # Empty string indicates that the question is not created yet
+                question_result = await client.table(Table.QUESTIONS).insert({}).execute()
+                question_id = question_result.data[0]["id"]
             # Create a new entry in the problems table
             upsert_problem_result = (
                 await client.table(Table.PROBLEMS)
                 .insert(
                     {
+                        "question_id": question_id,
                         "title": input.title,
                         "description": input.description,
                         "requirements": input.requirements,
@@ -51,23 +39,6 @@ class ProblemsService:
                 )
                 .execute()
             )
-            if not question_id:  # Empty string indicates that the question is not created yet
-                question_result = (
-                    await client.table(Table.QUESTIONS)
-                    .insert(
-                        {
-                            "problem_id": upsert_problem_result.data[0]["id"],
-                        }
-                    )
-                    .execute()
-                )
-                question_id = question_result.data[0]["id"]
-            else:
-                await client.table(Table.QUESTIONS).update(
-                    {
-                        "problem_id": upsert_problem_result.data[0]["id"],
-                    }
-                ).eq("id", question_id).execute()
 
         return UpsertProblemResponse(
             id=upsert_problem_result.data[0]["id"],

@@ -5,6 +5,8 @@ import { metric } from '@/types/metrics';
 import { problem } from '@/types/problems';
 import { test_case } from '@/types/test_cases';
 
+import { TEMPLATE_METRICS } from '@/lib/constants';
+
 export const question = z.object({
   id: z.string(),
   problem: problem,
@@ -25,5 +27,8 @@ export const defaultQuestion: Question = {
   },
   files: [],
   test_cases: [],
-  metrics: [],
+  metrics: TEMPLATE_METRICS.map((content, index) => ({
+    id: `template-${index}`, // Temporary ID for new metrics
+    content,
+  })),
 };

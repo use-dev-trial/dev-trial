@@ -17,23 +17,19 @@ import { useDebouncedCallback } from '@/lib/utils';
 
 interface MetricsTabProps {
   metrics: Metric[];
+  onMetricChange: (metric: Metric) => void;
+  onMetricDelete: (metric_id: string) => void;
+  onAddMetricButtonClick: () => void;
 }
 
-export default function MetricsTab({ metrics }: MetricsTabProps) {
+export default function MetricsTab({
+  metrics,
+  onMetricChange,
+  onMetricDelete,
+  onAddMetricButtonClick,
+}: MetricsTabProps) {
   const { upsertMetrics } = useMetrics();
 
-  // Initialize metrics from template
-  useEffect(() => {
-    setMetrics(
-      TEMPLATE_METRICS.map((content, index) => ({
-        id: `template-${index}`, // Temporary ID for new metrics
-        content,
-        selected: false,
-      })),
-    );
-  }, []);
-
-  // Handle metric selection
   const handleSelectMetric = (index: number, checked: boolean) => {
     const updatedMetrics = [...metrics];
     updatedMetrics[index].selected = checked;

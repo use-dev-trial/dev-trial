@@ -88,16 +88,16 @@ export default function QuestionPreview({
 
         <div className="overflow-auto">
           <TabsContent value="problem" className="space-y-6">
-            <ProblemTab
-              problem={question.problem}
-              onProblemUpdate={onProblemUpdate || (() => {})}
-            />
+            <ProblemTab problem={question.problem} onProblemUpdate={onProblemUpdate} />
           </TabsContent>
           <TabsContent value="files">
             <FilesTab files={question.files || []} />
           </TabsContent>
           <TabsContent value="metrics">
-            <MetricsTab metrics={question.metrics || []} />
+            <MetricsTab
+              metrics={question.metrics || []}
+              onAddMetricButtonClick={}
+            />
           </TabsContent>
           <TabsContent value="test-cases">
             <section>

@@ -4,16 +4,20 @@ from fastapi import APIRouter
 
 from app.controllers.challenges import ChallengesController
 from app.controllers.clerk import ClerkController
-from app.controllers.grading import GradingController
+from app.controllers.files import FilesController
 from app.controllers.messages import MessagesController
+from app.controllers.metrics import MetricsController
 from app.controllers.problems import ProblemsController
 from app.controllers.questions import QuestionsController
+from app.controllers.test_cases import TestCasesController
 from app.services.challenges import ChallengesService
 from app.services.clerk import ClerkService
-from app.services.grading import GradingService
+from app.services.files import FilesService
 from app.services.messages import MessagesService
+from app.services.metrics import MetricsService
 from app.services.problems import ProblemsService
 from app.services.questions import QuestionsService
+from app.services.test_cases import TestCasesService
 
 log = logging.getLogger(__name__)
 
@@ -87,18 +91,48 @@ router.include_router(
     prefix="/api/questions",
 )
 
-### Grading
+### Metrics
 
 
-def get_grading_controller_router():
-    service = GradingService()
-    return GradingController(service=service).router
+def get_metrics_controller_router():
+    service = MetricsService()
+    return MetricsController(service=service).router
 
 
 router.include_router(
-    get_grading_controller_router(),
-    tags=["grading"],
-    prefix="/api/grading",
+    get_metrics_controller_router(),
+    tags=["metrics"],
+    prefix="/api/metrics",
+)
+
+
+### Files
+
+
+def get_files_controller_router():
+    service = FilesService()
+    return FilesController(service=service).router
+
+
+router.include_router(
+    get_files_controller_router(),
+    tags=["files"],
+    prefix="/api/files",
+)
+
+
+### Test Cases
+
+
+def get_test_cases_controller_router():
+    service = TestCasesService()
+    return TestCasesController(service=service).router
+
+
+router.include_router(
+    get_test_cases_controller_router(),
+    tags=["test_cases"],
+    prefix="/api/test_cases",
 )
 
 ### Clerk
