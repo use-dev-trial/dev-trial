@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from app.models.database import UpsertMixin
+
 
 class File(BaseModel):
     id: str = Field(description="The ID of the question as it is stored in the database.")
@@ -10,3 +12,11 @@ class File(BaseModel):
     path: list[str] = Field(
         description="The path of the file in the file system. Each directory level is represented by a separate string in the list."
     )
+
+
+class UpsertFileRequest(File, UpsertMixin):
+    pass
+
+
+class UpsertFileResponse(UpsertFileRequest):
+    pass

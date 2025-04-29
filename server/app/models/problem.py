@@ -1,10 +1,9 @@
 from pydantic import BaseModel, Field
 
-from app.models.database import UpsertMixin
-
 
 class Problem(BaseModel):
     id: str = Field(description="The ID of the question as it is stored in the database.")
+    question_id: str = Field(description="The ID of the question as it is stored in the database.")
     title: str = Field(description="The title of the question.")
     description: str = Field(description="The general overview of the question.")
     requirements: list[str] = Field(
@@ -12,7 +11,7 @@ class Problem(BaseModel):
     )
 
 
-class UpsertProblemRequest(Problem, UpsertMixin):
+class UpsertProblemRequest(Problem):
     pass
 
 
