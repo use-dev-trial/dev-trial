@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Depends
 from supabase._async.client import AsyncClient as Client
 
-from app.models.metric import UpsertMetricRequest, UpsertMetricResponse
+from app.models.metric import GetAllMetricsResponse, UpsertMetricRequest, UpsertMetricResponse
 from app.services.metrics import MetricsService
 from app.utils.dependencies import init_db_client
 
@@ -18,6 +18,20 @@ class MetricsController:
 
     def setup_routes(self):
         router = self.router
+
+        @router.get(
+            "/{question_id}",
+            response_model=GetAllMetricsResponse,
+        )
+        async def get_all_metrics(
+            question_id: str, client: Client = Depends(init_db_client)
+        ) -> GetAllMetricsResponse:
+            log.info("Getting all metrics for question: %s", question_id)
+            response: GetAllMetricsResponse = await self.service.get_all_metrics(
+                question_id=question_id, client=client
+            )
+            log.info("Retrieved %d metrics", len(response.metrics))
+            return response
 
         @router.post(
             "",

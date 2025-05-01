@@ -1,17 +1,11 @@
 'use client';
 
-import { deleteMetric, upsertMetric } from '@/actions/metrics';
-import { UseMutationResult, useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteMetric } from '@/actions/metrics';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { DeleteMetricRequest, Metric, UpsertMetricRequest } from '@/types/metrics';
+import { GET_ALL_METRICS_QUERY_KEY } from '@/types/tanstack';
 
-interface UseDeleteMetricResult {
-  deleteMetric: (id: string) => Promise<void>;
-  isPending: boolean;
-  error: Error | null;
-}
-
-export function useDeleteMetric(): UseDeleteMetricResult {
+export function useDeleteMetric() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<void, Error, string>({
@@ -21,13 +15,14 @@ export function useDeleteMetric(): UseDeleteMetricResult {
     },
     onSuccess: () => {
       console.log('Successfully deleted a metric');
-      queryClient.invalidateQueries({ queryKey: ['metrics'] });
+      // Trigger a refetch of the metrics list in the read hook
+      queryClient.invalidateQueries({ queryKey: GET_ALL_METRICS_QUERY_KEY });
     },
   });
 
   return {
-    deleteMetric: deleteMutation.mutateAsync,
-    isPending: upsertMutation.isPending,
-    error: upsertMutation.error,
+    deleteMetric: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
   };
 }

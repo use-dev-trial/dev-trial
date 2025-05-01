@@ -16,3 +16,9 @@ export type UpsertMetricRequest = z.infer<typeof upsertMetricRequestSchema>;
 export const upsertMetricResponseSchema = upsertMetricRequestSchema;
 
 export type UpsertMetricResponse = z.infer<typeof upsertMetricResponseSchema>;
+
+export const getAllMetricsResponseSchema = z.object({
+  metrics: z.array(metric),
+});
+
+export type GetAllMetricsResponse = z.infer<typeof getAllMetricsResponseSchema>;

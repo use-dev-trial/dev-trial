@@ -19,8 +19,8 @@ class UpsertMetricResponse(UpsertMetricRequest):
     pass
 
 
-class DeleteMetricRequest(BaseModel):
-    id: str = Field(description="The ID of the metric to delete.")
+class GetAllMetricsResponse(BaseModel):
+    metrics: list[Metric] = Field(description="The metrics associated with the question")
 
 
 TEMPLATE_METRICS: list[str] = [
