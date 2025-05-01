@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 
 import { useState } from 'react';
 
+import { createTemplateQuestion } from '@/actions/questions';
 import { useAllQuestions } from '@/hooks/questions/use-all-question';
 import {
   CheckSquare,
@@ -14,16 +15,16 @@ import {
   PlusCircle,
 } from 'lucide-react';
 
-import AddQuestionDialog from '@/components/challenges/home/add-question-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+import { createTemplateQuestionRequestSchema } from '@/types/questions';
 
 import { ROUTES } from '@/lib/constants';
 
 export default function QuestionsTab({ challengeId }: { challengeId: string }) {
   const router = useRouter();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [expandedQuestionId, setExpandedQuestionId] = useState<string | null>(null);
   const { questions } = useAllQuestions({
     challengeId: challengeId,
@@ -54,19 +55,6 @@ export default function QuestionsTab({ challengeId }: { challengeId: string }) {
 
   return (
     <div className="space-y-6">
-      {/* <div className="flex items-center justify-between">
-        <Button
-          size="sm"
-          className="bg-blue-500 hover:bg-blue-600"
-          onClick={() => setIsDialogOpen(true)}
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add Question
-        </Button>
-      </div> */}
-
-      {/* <Separator className="my-4" /> */}
-
       {questions.length === 0 ? (
         <div className="bg-muted/30 flex flex-col items-center justify-center rounded-lg border border-dashed p-12">
           <MessageSquare className="text-muted-foreground mb-4 h-12 w-12" />
@@ -74,7 +62,16 @@ export default function QuestionsTab({ challengeId }: { challengeId: string }) {
           <p className="text-muted-foreground mb-6 max-w-sm text-center text-sm">
             Create questions for your challenge to get started
           </p>
-          <Button className="bg-blue-500 hover:bg-blue-600" onClick={() => setIsDialogOpen(true)}>
+          <Button
+            className="bg-blue-500 hover:bg-blue-600"
+            onClick={async () => {
+              const createTemplateQuestionRequest = createTemplateQuestionRequestSchema.parse({
+                challenge_id: challengeId,
+              });
+              await createTemplateQuestion(createTemplateQuestionRequest);
+              router.push(ROUTES.QUESTIONS(challengeId));
+            }}
+          >
             <PlusCircle className="mr-2 h-4 w-4" />
             Add Question
           </Button>
@@ -155,12 +152,6 @@ export default function QuestionsTab({ challengeId }: { challengeId: string }) {
           ))}
         </div>
       )}
-
-      <AddQuestionDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        onAddQuestion={() => router.push(ROUTES.QUESTIONS(challengeId))}
-      />
     </div>
   );
 }

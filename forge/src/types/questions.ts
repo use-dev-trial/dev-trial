@@ -5,8 +5,6 @@ import { metric } from '@/types/metrics';
 import { problem } from '@/types/problems';
 import { test_case } from '@/types/test_cases';
 
-import { TEMPLATE_METRICS } from '@/lib/constants';
-
 export const question = z.object({
   id: z.string(),
   problem: problem,
@@ -17,18 +15,22 @@ export const question = z.object({
 
 export type Question = z.infer<typeof question>;
 
+export const createTemplateQuestionRequestSchema = z.object({
+  challenge_id: z.string(),
+});
+
+export type CreateTemplateQuestionRequest = z.infer<typeof createTemplateQuestionRequestSchema>;
+
 export const defaultQuestion: Question = {
   id: '',
   problem: {
     id: '',
+    question_id: '',
     title: '',
     description: '',
     requirements: [],
   },
   files: [],
   test_cases: [],
-  metrics: TEMPLATE_METRICS.map((content, index) => ({
-    id: `template-${index}`, // Temporary ID for new metrics
-    content,
-  })),
+  metrics: [],
 };

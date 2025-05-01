@@ -26,7 +26,7 @@ export default function QuestionPreview({
   const handleTabChange = (value: string) => {
     if (
       onTabChange &&
-      ['problem', 'files', 'test-cases'].includes(value) &&
+      ['problem', 'files', 'test-cases', 'metrics'].includes(value) &&
       updatedTabs.includes(value as Tab)
     ) {
       onTabChange(value as Tab);
@@ -94,10 +94,7 @@ export default function QuestionPreview({
             <FilesTab files={question.files || []} />
           </TabsContent>
           <TabsContent value="metrics">
-            <MetricsTab
-              metrics={question.metrics || []}
-              onAddMetricButtonClick={}
-            />
+            <MetricsTab question_id={question.id} defaultMetrics={question.metrics || []} />
           </TabsContent>
           <TabsContent value="test-cases">
             <section>

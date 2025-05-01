@@ -5,6 +5,9 @@ from app.models.metric import UpsertMetricRequest, UpsertMetricResponse
 
 
 class MetricsService:
+    async def delete_metric(self, id: str, client: Client):
+        await client.table(Table.METRICS).delete().eq("id", id).execute()
+
     async def upsert_metric(
         self, input: UpsertMetricRequest, client: Client
     ) -> UpsertMetricResponse:

@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function ChallengeInterface() {
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('questions');
+  const [activeTab, setActiveTab] = useState<string>('questions');
   const params = useParams();
   const { challenge, isLoading, error } = useSingleChallenge(params.id as string);
 
@@ -82,22 +82,6 @@ export default function ChallengeInterface() {
               <Card>
                 <CardContent className="text-muted-foreground flex h-64 items-center justify-center p-6">
                   Responses content will appear here
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="analytics" className="mt-6">
-              <Card>
-                <CardContent className="text-muted-foreground flex h-64 items-center justify-center p-6">
-                  Analytics content will appear here
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="settings" className="mt-6">
-              <Card>
-                <CardContent className="text-muted-foreground flex h-64 items-center justify-center p-6">
-                  Settings content will appear here
                 </CardContent>
               </Card>
             </TabsContent>

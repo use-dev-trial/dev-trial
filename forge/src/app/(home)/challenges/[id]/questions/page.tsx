@@ -20,7 +20,7 @@ import Loader from '@/components/shared/loader';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { Problem, UpsertProblemResponse, upsertProblemRequestSchema } from '@/types/problems';
-import { Question, defaultQuestion } from '@/types/questions';
+import { Question } from '@/types/questions';
 
 import { MAX_NUM_QUESTIONS, ROUTES } from '@/lib/constants';
 import { useDebouncedCallback } from '@/lib/utils';
@@ -38,7 +38,7 @@ export default function Home() {
   } = useSingleChallenge(challenge_id);
 
   const previewContainerRef = useRef<HTMLDivElement>(null);
-  const [questions, setQuestions] = useState<Question[]>([defaultQuestion]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [challengeName, setChallengeName] = useState('');

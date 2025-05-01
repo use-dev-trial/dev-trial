@@ -1,7 +1,7 @@
-from app.models.database import Table
-from app.models.file import UpsertFileRequest
-from app.models.file import UpsertFileResponse
 from supabase._async.client import AsyncClient as Client
+
+from app.models.database import Table
+from app.models.file import UpsertFileRequest, UpsertFileResponse
 
 
 class FilesService:
