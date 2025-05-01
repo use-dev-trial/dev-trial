@@ -73,3 +73,20 @@ export async function getAllChallenges(): Promise<GetAllChallengesResponse> {
     throw error;
   }
 }
+
+export async function deleteChallenge(id: string): Promise<void> {
+  const token: string = await getClerkToken();
+
+  try {
+    console.log('Deleting challenge');
+    await axios.delete(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/challenges/${id}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  } catch (error) {
+    console.error('Error deleting challenge:', error);
+    throw error;
+  }
+}

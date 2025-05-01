@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 
 import { useState } from 'react';
 
-import { useSingleChallenge } from '@/hooks/challenges/use-single-challenge';
+import { useGetSingleChallenge } from '@/hooks/challenges/read/single';
 import { Send } from 'lucide-react';
 
 import QuestionsTab from '@/components/challenges/home/questions-tab';
@@ -16,7 +16,7 @@ export default function ChallengeInterface() {
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('questions');
   const params = useParams();
-  const { challenge, isLoading, error } = useSingleChallenge(params.id as string);
+  const { challenge, isLoading, error } = useGetSingleChallenge(params.id as string);
 
   const onInviteDialogToggle = () => {
     setIsInviteDialogOpen((prevIsInviteDialogOpen) => !prevIsInviteDialogOpen);

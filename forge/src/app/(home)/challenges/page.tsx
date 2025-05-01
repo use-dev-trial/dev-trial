@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { useAllChallenges } from '@/hooks/challenges/use-all-challenges';
+import { useGetAllChallenges } from '@/hooks/challenges/read/all';
 import { Plus } from 'lucide-react';
 
 import { ChallengeCard } from '@/components/challenges/card';
@@ -14,7 +14,7 @@ import { CHALLENGE_CARD_GRADIENTS, ROUTES } from '@/lib/constants';
 import { formatDate } from '@/lib/utils';
 
 export default function ChallengePage() {
-  const { challenges, isLoading, error } = useAllChallenges();
+  const { challenges, isLoading, error } = useGetAllChallenges();
   const [isCreateChallengeDialogOpen, setIsCreateChallengeDialogOpen] = useState(false);
 
   const onCreateChallengeDialogToggle = () => {

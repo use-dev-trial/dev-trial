@@ -13,6 +13,12 @@ log = logging.getLogger(__name__)
 
 
 class ChallengesService:
+    async def delete_challenge(self, client: Client, challenge_id: str):
+        await client.table(Table.CHALLENGES).delete().eq("id", challenge_id).execute()
+        await client.table(Table.CHALLENGE_QUESTION).delete().eq(
+            "challenge_id", challenge_id
+        ).execute()
+
     async def get_challenge(self, client: Client, challenge_id: str) -> Challenge:
         select_challenge_result = (
             await client.table(Table.CHALLENGES).select("*").eq("id", challenge_id).execute()

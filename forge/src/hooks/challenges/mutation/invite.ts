@@ -1,25 +1,24 @@
 import { inviteCandidates as inviteCandidatesAction } from '@/actions/candidates';
-import { UseMutationResult, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { InviteCandidatesRequest } from '@/types/candidates';
+import { INVITE_CANDIDATES_MUTATION_KEY } from '@/types/tanstack';
 
-interface UseInviteCandidatesResult {
-  inviteCandidates: UseMutationResult<void, Error, InviteCandidatesRequest>['mutateAsync'];
-  isPending: boolean;
-  error: Error | null;
-}
-
-export function useInviteCandidates(): UseInviteCandidatesResult {
+export function useInviteCandidates() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<void, Error, InviteCandidatesRequest>({
+    mutationKey: INVITE_CANDIDATES_MUTATION_KEY,
     mutationFn: inviteCandidatesAction,
     onError: (err) => {
       console.error('Error inviting candidates:', err.message);
     },
     onSuccess: () => {
       console.log('Successfully invited candidates');
-      queryClient.invalidateQueries({ queryKey: ['invite'] });
+      queryClient.invalidateQueries({ queryKey: INVITE_CANDIDATES_MUTATION_KEY });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: INVITE_CANDIDATES_MUTATION_KEY });
     },
   });
 
