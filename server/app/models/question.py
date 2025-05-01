@@ -1,8 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.models.file import File
-from app.models.problem import Problem
 from app.models.metric import Metric
+from app.models.problem import Problem
 from app.models.test_case import TestCase
 
 
@@ -21,6 +21,19 @@ class Question(BaseModel):
     metrics: list[Metric] = Field(
         description="The metrics which the candidate must follow to successfully complete the question.",
     )
+
+
+class CreateTemplateQuestionRequest(BaseModel):
+    challenge_id: str = Field(
+        description="The ID of the challenge this template question is associated with.",
+    )
+
+    @field_validator("challenge_id")
+    @classmethod
+    def validate_challenge_id(cls, v):
+        if not v:
+            raise ValueError("Challenge ID is required.")
+        return v
 
 
 class RunTestsRequest(BaseModel):

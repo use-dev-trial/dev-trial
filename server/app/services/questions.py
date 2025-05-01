@@ -6,15 +6,63 @@ from supabase._async.client import AsyncClient as Client
 
 from app.models.database import Table
 from app.models.file import File
+from app.models.metric import TEMPLATE_METRICS, Metric
 from app.models.problem import Problem
-from app.models.question import Question
-from app.models.metric import Metric
+from app.models.question import CreateTemplateQuestionRequest, Question
 from app.models.test_case import TestCase
 
 load_dotenv()
 
 
 class QuestionsService:
+
+    async def create_template_question(
+        self, input: CreateTemplateQuestionRequest, client: Client
+    ) -> Question:
+        question_result = await client.table(Table.QUESTIONS).insert({}).execute()
+        question_id = question_result.data[0]["id"]
+        await client.table(Table.CHALLENGE_QUESTION).insert(
+            {
+                "challenge_id": input.challenge_id,
+                "question_id": question_id,
+            }
+        ).execute()
+        metrics: list[Metric] = []
+        for content in TEMPLATE_METRICS:
+            metric_result = (
+                await client.table(Table.METRICS)
+                .insert(
+                    {
+                        "content": content,
+                    }
+                )
+                .execute()
+            )
+            metrics.append(
+                Metric(
+                    id=metric_result.data[0]["id"],
+                    content=content,
+                )
+            )
+            await client.table(Table.QUESTION_METRIC).insert(
+                {
+                    "question_id": question_id,
+                    "metric_id": metric_result.data[0]["id"],
+                }
+            ).execute()
+        return Question(
+            id=question_id,
+            problem=Problem(
+                id="",
+                question_id=question_id,
+                title="",
+                description="",
+                requirements=[],
+            ),
+            files=[],
+            test_cases=[],
+            metrics=metrics,
+        )
 
     async def get_all_questions(self, client: Client) -> list[Question]:
         question_id_list_result = await client.table(Table.QUESTIONS).select("id").execute()
@@ -153,12 +201,13 @@ class QuestionsService:
         problem = (
             Problem(
                 id=problem_result.data[0]["id"],
+                question_id=question_id,
                 title=problem_result.data[0]["title"],
                 description=problem_result.data[0]["description"],
                 requirements=problem_result.data[0]["requirements"],
             )
             if problem_result and problem_result.data
-            else Problem(id="", title="", description="", requirements=[])
+            else Problem(id="", question_id=question_id, title="", description="", requirements=[])
         )
 
         test_cases = (
@@ -189,7 +238,7 @@ class QuestionsService:
 
         files = (
             [
-                File(id=row["id"], name=row["name"], code=row["code"], path=row["path"])
+                File(id=row["id"], name=row["name"], code=row["code"], path=row["path"] or [])
                 for row in files_result.data
             ]
             if files_result and files_result.data

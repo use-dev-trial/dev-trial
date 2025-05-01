@@ -1,19 +1,25 @@
 'use client';
 
-import { upsertMetric } from '@/actions/grading';
+import { useState } from 'react';
+
+import { deleteMetric, upsertMetric } from '@/actions/metrics';
 import { UseMutationResult, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { Metric } from '@/types/grading';
+import { DeleteMetricRequest, Metric, UpsertMetricRequest } from '@/types/metrics';
 
 interface useMetricsResult {
-  upsertMetrics: UseMutationResult<void, Error, Metric>['mutateAsync'];
+  metrics: Metric[];
+  setMetrics: React.Dispatch<React.SetStateAction<Metric[]>>;
+  upsertMetric: UseMutationResult<void, Error, UpsertMetricRequest>['mutateAsync'];
+  deleteMetric: UseMutationResult<void, Error, DeleteMetricRequest>['mutateAsync'];
   isPending: boolean;
   error: Error | null;
 }
 
-export function useMetrics(): useMetricsResult {
+export function useMetrics(defaultMetrics: Metric[]): useMetricsResult {
+  const [metrics, setMetrics] = useState<Metric[]>(defaultMetrics);
   const queryClient = useQueryClient();
-  const mutation = useMutation<void, Error, Metric>({
+  const upsertMutation = useMutation<void, Error, UpsertMetricRequest>({
     mutationFn: upsertMetric,
     onError: (err) => {
       console.error('Error upserting metrics:', err.message);
@@ -24,9 +30,23 @@ export function useMetrics(): useMetricsResult {
     },
   });
 
+  const deleteMutation = useMutation<void, Error, DeleteMetricRequest>({
+    mutationFn: deleteMetric,
+    onError: (err) => {
+      console.error('Error deleting metrics:', err.message);
+    },
+    onSuccess: () => {
+      console.log('Successfully deleted metrics');
+      queryClient.invalidateQueries({ queryKey: ['metrics'] });
+    },
+  });
+
   return {
-    upsertMetrics: mutation.mutateAsync,
-    isPending: mutation.isPending,
-    error: mutation.error,
+    metrics,
+    setMetrics,
+    upsertMetric: upsertMutation.mutateAsync,
+    deleteMetric: deleteMutation.mutateAsync,
+    isPending: upsertMutation.isPending,
+    error: upsertMutation.error,
   };
 }

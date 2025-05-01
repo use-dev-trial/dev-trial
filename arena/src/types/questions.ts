@@ -21,18 +21,6 @@ export const question = z.object({
 
 export type Question = z.infer<typeof question>;
 
-export const defaultQuestion: Question = {
-  id: '',
-  problem: {
-    id: '',
-    title: '',
-    description: '',
-    requirements: [],
-  },
-  files: [],
-  test_cases: [],
-};
-
 export const runTestsInput = z.object({
   code: z.string(),
 });

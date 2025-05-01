@@ -1,6 +1,6 @@
-from app.models.test_case import UpsertTestCaseRequest
-from app.models.test_case import UpsertTestCaseResponse
 from supabase._async.client import AsyncClient as Client
+
+from app.models.test_case import UpsertTestCaseRequest, UpsertTestCaseResponse
 
 
 class TestCasesService:

@@ -32,3 +32,11 @@ class MetricsController:
             )
             log.info("Upserted problem: %s", response.id)
             return response
+
+        @router.delete(
+            "/{id}",
+        )
+        async def delete_metric(id: str, client: Client = Depends(init_db_client)):
+            log.info("Deleting metric: %s", id)
+            await self.service.delete_metric(id=id, client=client)
+            log.info("Deleted metric: %s", id)

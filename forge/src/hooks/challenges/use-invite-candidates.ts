@@ -1,4 +1,4 @@
-import { inviteCandidates as inviteCanidatesAction } from '@/actions/candidates';
+import { inviteCandidates as inviteCandidatesAction } from '@/actions/candidates';
 import { UseMutationResult, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { InviteCandidatesRequest } from '@/types/candidates';
@@ -13,7 +13,7 @@ export function useInviteCandidates(): UseInviteCandidatesResult {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<void, Error, InviteCandidatesRequest>({
-    mutationFn: inviteCanidatesAction,
+    mutationFn: inviteCandidatesAction,
     onError: (err) => {
       console.error('Error inviting candidates:', err.message);
     },
