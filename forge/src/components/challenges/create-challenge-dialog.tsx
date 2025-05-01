@@ -2,7 +2,7 @@ import { useRouter } from 'next/navigation';
 
 import { KeyboardEvent, useState } from 'react';
 
-import { useCreateChallenge } from '@/hooks/challenges/use-create-challenge';
+import { useCreateChallenge } from '@/hooks/challenges/mutation/create';
 import { toast } from 'sonner';
 
 import Loader from '@/components/shared/loader';

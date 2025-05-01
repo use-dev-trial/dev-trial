@@ -16,9 +16,3 @@ export type UpsertMetricRequest = z.infer<typeof upsertMetricRequestSchema>;
 export const upsertMetricResponseSchema = upsertMetricRequestSchema;
 
 export type UpsertMetricResponse = z.infer<typeof upsertMetricResponseSchema>;
-
-export const deleteMetricRequestSchema = z.object({
-  id: z.string(),
-});
-
-export type DeleteMetricRequest = z.infer<typeof deleteMetricRequestSchema>;

@@ -23,7 +23,7 @@ export async function upsertMetric(request: UpsertMetricRequest) {
   }
 }
 
-export async function deleteMetric(request: DeleteMetricRequest) {
+export async function deleteMetric(request: DeleteMetricRequest): Promise<void> {
   const token: string = await getClerkToken();
 
   try {

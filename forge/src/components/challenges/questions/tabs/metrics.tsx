@@ -1,6 +1,6 @@
 'use client';
 
-import { useMetrics } from '@/hooks/use-metrics';
+import { useMetrics } from '@/hooks/metrics/use-metrics';
 import { Plus, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';

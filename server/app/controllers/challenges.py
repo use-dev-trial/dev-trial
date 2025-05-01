@@ -37,6 +37,14 @@ class ChallengesController:
             log.info("Challenge: %s", response)
             return response
 
+        @router.delete(
+            "/{challenge_id}",
+        )
+        async def delete_challenge(challenge_id: str, client: Client = Depends(init_db_client)):
+            log.info(f"Deleting challenge with id {challenge_id}...")
+            await self.service.delete_challenge(challenge_id=challenge_id, client=client)
+            log.info("Deleted challenge with id %s", challenge_id)
+
         @router.get(
             "",
             response_model=GetAllChallengesResponse,

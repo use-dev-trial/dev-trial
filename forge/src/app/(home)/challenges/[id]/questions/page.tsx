@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { upsertProblem } from '@/actions/problems';
-import { useSingleChallenge } from '@/hooks/challenges/use-single-challenge';
+import { useGetSingleChallenge } from '@/hooks/challenges/read/single';
 import { useChat } from '@/hooks/use-chat';
 import { toast } from 'sonner';
 
@@ -35,7 +35,7 @@ export default function Home() {
     isLoading: isLoadingChallenge,
     error: challengeError,
     error: errorChallenge,
-  } = useSingleChallenge(challenge_id);
+  } = useGetSingleChallenge(challenge_id);
 
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [questions, setQuestions] = useState<Question[]>([]);

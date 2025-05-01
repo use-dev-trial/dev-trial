@@ -2,7 +2,7 @@
 
 import { ChangeEvent, KeyboardEvent, useRef, useState } from 'react';
 
-import { useInviteCandidates } from '@/hooks/challenges/use-invite-candidates';
+import { useInviteCandidates } from '@/hooks/challenges/mutation/invite';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
 
