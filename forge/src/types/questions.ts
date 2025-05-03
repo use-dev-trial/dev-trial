@@ -27,7 +27,7 @@ export const defaultQuestion: Question = {
     id: '',
     question_id: '',
     title: '',
-    description: '',
+    description: 'Add a description for your coding interview question.',
     requirements: [],
   },
   files: [],

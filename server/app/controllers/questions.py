@@ -3,6 +3,7 @@ import logging
 from fastapi import APIRouter, Depends
 from supabase._async.client import AsyncClient as Client
 
+from app.models.problem import Problem
 from app.models.question import CreateTemplateQuestionRequest, Question, RunTestsRequest
 from app.services.questions import QuestionsService
 from app.utils.dependencies import init_db_client
@@ -69,6 +70,20 @@ class QuestionsController:
                 challenge_id=challenge_id, client=client
             )
             log.info("Questions: %s", response)
+            return response
+
+        @router.get(
+            "/{question_id}/problem",
+            response_model=Problem,
+        )
+        async def get_problem_by_question_id(
+            question_id: str, client: Client = Depends(init_db_client)
+        ) -> Problem:
+            log.info(f"Getting problem for question {question_id}...")
+            response: Problem = await self.service.get_problem_by_question_id(
+                question_id=question_id, client=client
+            )
+            log.info("Problem: %s", response)
             return response
 
         @router.post(

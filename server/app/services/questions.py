@@ -91,6 +91,12 @@ class QuestionsService:
 
         return await asyncio.gather(*tasks)
 
+    async def get_problem_by_question_id(self, question_id: str, client: Client) -> Problem:
+        problem_result = (
+            await client.table(Table.PROBLEMS).select("*").eq("question_id", question_id).execute()
+        )
+        return Problem.model_validate(problem_result.data[0])
+
     async def get_test_cases_by_question_id(
         self, question_id: str, client: Client
     ) -> list[TestCase]:

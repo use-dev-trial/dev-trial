@@ -47,8 +47,8 @@ class ProblemsService:
 
         return Problem(
             id=upsert_problem_result.data[0]["id"],
+            question_id=question_id,
             title=upsert_problem_result.data[0]["title"],
             description=upsert_problem_result.data[0]["description"],
             requirements=upsert_problem_result.data[0]["requirements"],
-            question_id=question_id,
         )

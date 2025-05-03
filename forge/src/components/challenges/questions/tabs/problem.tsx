@@ -1,30 +1,62 @@
-import { useUpsertProblem } from '@/hooks/problems/mutation/upsert';
+import { useEffect, useState } from 'react';
 
+import { useUpsertProblem } from '@/hooks/problems/mutation/upsert';
+import { useGetProblemByQuestionId } from '@/hooks/problems/read/single';
+import { useQueryClient } from '@tanstack/react-query';
+
+import Loader from '@/components/shared/loader';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 
 import { Problem } from '@/types/problems';
+import { defaultQuestion } from '@/types/questions';
+import { GET_SINGLE_PROBLEM_QUERY_KEY_PREFIX } from '@/types/tanstack';
 
 import { useDebouncedCallback } from '@/lib/utils';
 
 interface ProblemTabProps {
-  problem: Problem;
+  question_id: string;
 }
 
-export default function ProblemTab({ problem }: ProblemTabProps) {
+export default function ProblemTab({ question_id }: ProblemTabProps) {
+  const queryClient = useQueryClient();
+
   const { upsertProblem } = useUpsertProblem();
-  const handleUpsertProblem = (input: Problem) => {
-    upsertProblem(input);
-  };
+  const [localProblem, setLocalProblem] = useState<Problem | null>(null);
+  const { problem: serverProblem, isLoading } = useGetProblemByQuestionId(question_id);
 
-  const debouncedUpsertProblem = useDebouncedCallback(handleUpsertProblem, 1000);
+  useEffect(() => {
+    if (serverProblem) {
+      setLocalProblem(serverProblem);
+    }
+  }, [serverProblem]);
 
-  const onProblemUpdate = async (input: Problem) => {
-    debouncedUpsertProblem(input);
-  };
+  const debouncedUpsertProblem = useDebouncedCallback((p: Problem) => upsertProblem(p), 1000);
+
+  function onProblemUpdate(updatedProblem: Problem) {
+    setLocalProblem(updatedProblem);
+    // optimistic cache update
+    queryClient.setQueryData<Problem>(
+      [GET_SINGLE_PROBLEM_QUERY_KEY_PREFIX, updatedProblem.id],
+      updatedProblem,
+    );
+    debouncedUpsertProblem(updatedProblem);
+  }
+
+  if (!isLoading && !localProblem) {
+    defaultQuestion.problem.question_id = question_id;
+    onProblemUpdate(defaultQuestion.problem);
+  }
+
+  if (isLoading || !localProblem) {
+    return <Loader text={'problem'} />;
+  }
 
   const requirements =
-    problem.requirements.length === 0 ? ['List your requirements here'] : problem.requirements;
+    localProblem.requirements.length === 0
+      ? ['List your requirements here']
+      : localProblem.requirements;
+
   return (
     <>
       <section>
@@ -33,8 +65,8 @@ export default function ProblemTab({ problem }: ProblemTabProps) {
         </div>
         <Input
           className="rounded-lg leading-relaxed shadow-sm"
-          onChange={(e) => onProblemUpdate({ ...problem, description: e.target.value })}
-          value={problem.description || 'Add a description for your coding interview question.'}
+          onChange={(e) => onProblemUpdate({ ...localProblem, description: e.target.value })}
+          value={localProblem.description}
         />
       </section>
 
@@ -56,8 +88,8 @@ export default function ProblemTab({ problem }: ProblemTabProps) {
                   value={requirement}
                   onChange={(e) =>
                     onProblemUpdate({
-                      ...problem,
-                      requirements: problem.requirements.map((r, i) =>
+                      ...localProblem,
+                      requirements: localProblem.requirements.map((r, i) =>
                         i === index ? e.target.value : r,
                       ),
                     })

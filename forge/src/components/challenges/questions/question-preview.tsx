@@ -74,7 +74,7 @@ export default function QuestionPreview({
   const tabContent = (
     <div className="overflow-auto">
       <TabsContent value="problem" className="space-y-6">
-        <ProblemTab problem={question.problem} />
+        <ProblemTab question_id={question.id} />
       </TabsContent>
       <TabsContent value="files">
         <FilesTab files={question.files || []} />

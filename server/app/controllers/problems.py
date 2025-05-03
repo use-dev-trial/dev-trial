@@ -26,9 +26,9 @@ class ProblemsController:
         async def upsert_problem(
             input: Problem, client: Client = Depends(init_db_client)
         ) -> Problem:
-            log.info("Upserting problem: %s", input.title)
+            log.info("Upserting problem...")
             response: Problem = await self.service.upsert_problem(input=input, client=client)
-            log.info("Upserted problem: %s", response.title)
+            log.info("Upserted problem: %s", response.id)
             return response
 
         @router.get(

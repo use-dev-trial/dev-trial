@@ -28,13 +28,13 @@ export async function upsertProblem(request: Problem): Promise<Problem> {
   }
 }
 
-export async function getProblem(problemId: string): Promise<Problem> {
+export async function getProblemByQuestionId(question_id: string): Promise<Problem> {
   const token: string = await getClerkToken();
 
   try {
-    console.log('Getting problem:', problemId);
+    console.log('Getting problem by question id:', question_id);
     const response = await axios.get(
-      `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/problems/${problemId}`,
+      `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/questions/${question_id}/problem`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ export async function getProblem(problemId: string): Promise<Problem> {
     );
     return problem.parse(response.data);
   } catch (error) {
-    console.error('Error getting problem:', error);
+    console.error('Error getting problem by question id:', error);
     throw error;
   }
 }
