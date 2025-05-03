@@ -1,14 +1,28 @@
+import { useUpsertProblem } from '@/hooks/problems/mutation/upsert';
+
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 
 import { Problem } from '@/types/problems';
 
+import { useDebouncedCallback } from '@/lib/utils';
+
 interface ProblemTabProps {
   problem: Problem;
-  onProblemUpdate: (input: Problem) => void;
 }
 
-export default function ProblemTab({ problem, onProblemUpdate }: ProblemTabProps) {
+export default function ProblemTab({ problem }: ProblemTabProps) {
+  const { upsertProblem } = useUpsertProblem();
+  const handleUpsertProblem = (input: Problem) => {
+    upsertProblem(input);
+  };
+
+  const debouncedUpsertProblem = useDebouncedCallback(handleUpsertProblem, 1000);
+
+  const onProblemUpdate = async (input: Problem) => {
+    debouncedUpsertProblem(input);
+  };
+
   const requirements =
     problem.requirements.length === 0 ? ['List your requirements here'] : problem.requirements;
   return (

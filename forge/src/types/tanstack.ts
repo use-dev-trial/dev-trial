@@ -7,3 +7,6 @@ export const GET_SINGLE_CHALLENGE_QUERY_KEY_PREFIX = 'challenge'; // Full query 
 
 // Metrics
 export const GET_ALL_METRICS_QUERY_KEY = ['metrics'];
+
+// Problem
+export const GET_SINGLE_PROBLEM_QUERY_KEY_PREFIX = 'problem'; // Full query key will be [GET_SINGLE_CHALLENGE_QUERY_KEY_PREFIX, problemId]

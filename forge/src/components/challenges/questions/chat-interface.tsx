@@ -3,7 +3,7 @@
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-import { Tab } from '@/hooks/use-chat';
+import { QuestionPreviewTabName } from '@/hooks/use-chat';
 import { Bot, Loader2, Send, User } from 'lucide-react';
 
 import SuggestionCard from '@/components/challenges/questions/suggestion-card';
@@ -14,7 +14,7 @@ import { Message, role } from '@/types/messages';
 interface ChatInterfaceProps {
   messages: Message[];
   isLoading: boolean;
-  updatedTabs: Tab[];
+  updatedTabs: QuestionPreviewTabName[];
   onSendMessage: (message: string) => void;
 }
 
@@ -61,7 +61,7 @@ export default function ChatInterface({
     }
   }, [messages, isLoading]);
 
-  const getTabDisplayName = (tab: Tab): string => {
+  const getTabDisplayName = (tab: QuestionPreviewTabName): string => {
     switch (tab) {
       case 'problem':
         return 'Problem';

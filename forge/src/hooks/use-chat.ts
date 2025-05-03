@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { send } from '@/actions/messages';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { z } from 'zod';
 
 import { File } from '@/types/files';
 import {
@@ -17,7 +18,8 @@ import { Problem } from '@/types/problems';
 import { Question, defaultQuestion } from '@/types/questions';
 import { TestCase } from '@/types/test_cases';
 
-export type Tab = 'problem' | 'files' | 'test-cases' | 'metrics';
+export const questionPreviewTabName = z.enum(['problem', 'files', 'test-cases', 'metrics']);
+export type QuestionPreviewTabName = z.infer<typeof questionPreviewTabName>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function areArraysEqual(arr1: any[], arr2: any[]): boolean {
@@ -83,7 +85,7 @@ export function useChat({ challenge_id, question }: UseChatProps) {
   const [updatedQuestion, setUpdatedQuestion] = useState<Question>(defaultQuestion);
   const [messages, setMessages] = useState<Message[]>([]);
   const [lastMessageId, setLastMessageId] = useState<string>('');
-  const [updatedTabs, setUpdatedTabs] = useState<Tab[]>([]);
+  const [updatedTabs, setUpdatedTabs] = useState<QuestionPreviewTabName[]>([]);
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -109,20 +111,19 @@ export function useChat({ challenge_id, question }: UseChatProps) {
       setLastMessageId(data.id);
 
       // Determine which tabs were updated
-      const tabs: Tab[] = [];
+      const tabs: QuestionPreviewTabName[] = [];
 
       if (isProblemUpdated(question.problem, data.question.problem)) {
-        tabs.push('problem');
+        tabs.push(questionPreviewTabName.Values.problem);
       }
 
       if (areFilesUpdated(question.files, data.question.files)) {
-        tabs.push('files');
+        tabs.push(questionPreviewTabName.Values.files);
       }
 
       if (areTestCasesUpdated(question.test_cases, data.question.test_cases)) {
-        tabs.push('test-cases');
+        tabs.push(questionPreviewTabName.Values['test-cases']);
       }
-      console.log('TABS', tabs);
       setUpdatedQuestion(data.question);
       setUpdatedTabs(tabs);
 
@@ -138,8 +139,8 @@ export function useChat({ challenge_id, question }: UseChatProps) {
     mutation.mutate({ content });
   };
 
-  const clearUpdatedTab = (tab: Tab) => {
-    setUpdatedTabs((prev) => prev.filter((t: Tab) => t !== tab));
+  const clearUpdatedTab = (tab: QuestionPreviewTabName) => {
+    setUpdatedTabs((prev) => prev.filter((t: QuestionPreviewTabName) => t !== tab));
   };
 
   return {
