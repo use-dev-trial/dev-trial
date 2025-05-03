@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { UpsertMetricRequest, UpsertMetricResponse } from '@/types/metrics';
 import { GET_ALL_METRICS_QUERY_KEY } from '@/types/tanstack';
 
-export function useMetrics() {
+export function useUpsertMetric() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<UpsertMetricResponse, Error, UpsertMetricRequest>({

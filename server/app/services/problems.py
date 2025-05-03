@@ -1,13 +1,18 @@
 from supabase._async.client import AsyncClient as Client
 
 from app.models.database import Table
-from app.models.problem import UpsertProblemRequest, UpsertProblemResponse
+from app.models.problem import Problem
 
 
 class ProblemsService:
-    async def upsert_problem(
-        self, input: UpsertProblemRequest, client: Client
-    ) -> UpsertProblemResponse:
+
+    async def get_problem(self, problem_id: str, client: Client) -> Problem:
+        get_problem_result = (
+            await client.table(Table.PROBLEMS).select("*").eq("id", problem_id).execute()
+        )
+        return Problem.model_validate(get_problem_result.data[0])
+
+    async def upsert_problem(self, input: Problem, client: Client) -> Problem:
         question_id: str = input.question_id
         if input.id:
             upsert_problem_result = (
@@ -40,7 +45,7 @@ class ProblemsService:
                 .execute()
             )
 
-        return UpsertProblemResponse(
+        return Problem(
             id=upsert_problem_result.data[0]["id"],
             title=upsert_problem_result.data[0]["title"],
             description=upsert_problem_result.data[0]["description"],

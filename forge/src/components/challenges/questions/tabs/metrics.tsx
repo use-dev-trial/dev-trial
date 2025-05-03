@@ -1,23 +1,26 @@
 'use client';
 
-import { useMetrics } from '@/hooks/metrics/use-metrics';
+import { useDeleteMetric } from '@/hooks/metrics/mutation/delete';
+import { useUpsertMetric } from '@/hooks/metrics/mutation/upsert';
+import { useGetAllMetrics } from '@/hooks/metrics/read/all';
 import { Plus, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 
-import { Metric, deleteMetricRequestSchema, upsertMetricRequestSchema } from '@/types/metrics';
+import { Metric, upsertMetricRequestSchema } from '@/types/metrics';
 
 import { useDebouncedCallback } from '@/lib/utils';
 
 interface MetricsTabProps {
   question_id: string;
-  defaultMetrics: Metric[];
 }
 
-export default function MetricsTab({ question_id, defaultMetrics }: MetricsTabProps) {
-  const { metrics, setMetrics, upsertMetric, deleteMetric } = useMetrics(defaultMetrics);
+export default function MetricsTab({ question_id }: MetricsTabProps) {
+  const { metrics } = useGetAllMetrics(question_id);
+  const { upsertMetric } = useUpsertMetric();
+  const { deleteMetric } = useDeleteMetric();
 
   function handleUpsertMetric(updatedMetric: Metric) {
     const upsertMetricRequest = upsertMetricRequestSchema.parse({
@@ -27,11 +30,8 @@ export default function MetricsTab({ question_id, defaultMetrics }: MetricsTabPr
     upsertMetric(upsertMetricRequest);
   }
 
-  const handleDeleteMetric = (metric: Metric) => {
-    const deleteMetricRequest = deleteMetricRequestSchema.parse({
-      id: metric.id,
-    });
-    deleteMetric(deleteMetricRequest);
+  const handleDeleteMetric = (id: string) => {
+    deleteMetric(id);
   };
 
   const debouncedUpsertMetric = useDebouncedCallback(handleUpsertMetric, 1000);
@@ -40,7 +40,6 @@ export default function MetricsTab({ question_id, defaultMetrics }: MetricsTabPr
   const onUpdateMetric = (index: number, content: string) => {
     const updatedMetrics = [...metrics];
     updatedMetrics[index].content = content;
-    setMetrics(updatedMetrics);
     debouncedUpsertMetric(updatedMetrics[index]);
   };
 
@@ -48,8 +47,7 @@ export default function MetricsTab({ question_id, defaultMetrics }: MetricsTabPr
     const updatedMetrics = [...metrics];
     const deletedMetric: Metric = updatedMetrics[index];
     updatedMetrics.splice(index, 1);
-    setMetrics(updatedMetrics);
-    debouncedDeleteMetric(deletedMetric);
+    debouncedDeleteMetric(deletedMetric.id);
   };
 
   const onAddMetric = () => {
@@ -57,7 +55,6 @@ export default function MetricsTab({ question_id, defaultMetrics }: MetricsTabPr
       id: '',
       content: '',
     };
-    setMetrics([...metrics, newMetric]);
     debouncedUpsertMetric(newMetric);
   };
 

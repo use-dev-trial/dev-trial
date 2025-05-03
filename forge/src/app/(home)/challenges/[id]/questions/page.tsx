@@ -3,9 +3,8 @@
 import { useParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { upsertProblem } from '@/actions/problems';
 import { useGetSingleChallenge } from '@/hooks/challenges/read/single';
 import { useChat } from '@/hooks/use-chat';
 import { toast } from 'sonner';
@@ -19,11 +18,9 @@ import RenameChallengeTitleDialog from '@/components/challenges/questions/rename
 import Loader from '@/components/shared/loader';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-import { Problem, UpsertProblemResponse, upsertProblemRequestSchema } from '@/types/problems';
-import { Question } from '@/types/questions';
+import { Question, defaultQuestion } from '@/types/questions';
 
 import { MAX_NUM_QUESTIONS, ROUTES } from '@/lib/constants';
-import { useDebouncedCallback } from '@/lib/utils';
 
 export default function Home() {
   const router = useRouter();
@@ -83,39 +80,6 @@ export default function Home() {
       setChallengeName(challenge.name);
     }
   }, [isLoadingChallenge, challengeError, errorChallenge, challenge, challenge_id, router]);
-
-  const handleUpsertProblem = useCallback(
-    async (problemInput: Problem, currentQuestionId: string | undefined) => {
-      try {
-        const upsertProblemRequest = upsertProblemRequestSchema.parse({
-          ...problemInput,
-          question_id: currentQuestionId,
-        });
-        const upsertProblemResponse: UpsertProblemResponse =
-          await upsertProblem(upsertProblemRequest);
-
-        setQuestions((prev) => ({
-          ...prev,
-          id: upsertProblemResponse.question_id,
-          problem: upsertProblemResponse,
-        })); // Register ID changes for both the question and/or problem (if they are not created before this invocation)
-      } catch (error) {
-        console.error('Error updating problem via debounced call:', error);
-      }
-    },
-    [],
-  );
-
-  const debouncedSaveProblem = useDebouncedCallback(handleUpsertProblem, 1000);
-
-  const onProblemUpdate = async (input: Problem) => {
-    setQuestions((prev) => {
-      const newQuestions = [...prev];
-      newQuestions[selectedQuestionIndex].problem = input;
-      debouncedSaveProblem(input, newQuestions[selectedQuestionIndex].id);
-      return newQuestions;
-    });
-  };
 
   const onRenameDialogToggle = () => {
     setIsRenameDialogOpen((prevIsRenameDialogOpen) => !prevIsRenameDialogOpen);
@@ -192,7 +156,6 @@ export default function Home() {
           question={questions[selectedQuestionIndex]}
           updatedTabs={updatedTabs}
           onTabChange={clearUpdatedTab}
-          onProblemUpdate={onProblemUpdate}
         />
       </div>
       <RenameChallengeTitleDialog

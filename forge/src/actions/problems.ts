@@ -2,19 +2,15 @@
 
 import axios from 'axios';
 
-import {
-  UpsertProblemRequest,
-  UpsertProblemResponse,
-  upsertProblemResponseSchema,
-} from '@/types/problems';
+import { Problem, problem } from '@/types/problems';
 
 import { getClerkToken } from '@/lib/clerk';
 
-export async function upsertProblem(request: UpsertProblemRequest): Promise<UpsertProblemResponse> {
+export async function upsertProblem(request: Problem): Promise<Problem> {
   const token: string = await getClerkToken();
 
   try {
-    console.log('Sending message:', request);
+    console.log('Upserting problem:', request);
     const response = await axios.post(
       `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/problems`,
       request,
@@ -25,9 +21,30 @@ export async function upsertProblem(request: UpsertProblemRequest): Promise<Upse
         },
       },
     );
-    return upsertProblemResponseSchema.parse(response.data);
+    return problem.parse(response.data);
   } catch (error) {
-    console.error('Error sending message:', error);
+    console.error('Error upserting problem:', error);
+    throw error;
+  }
+}
+
+export async function getProblem(problemId: string): Promise<Problem> {
+  const token: string = await getClerkToken();
+
+  try {
+    console.log('Getting problem:', problemId);
+    const response = await axios.get(
+      `${process.env.EXPO_PUBLIC_API_BASE_URL}/api/problems/${problemId}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return problem.parse(response.data);
+  } catch (error) {
+    console.error('Error getting problem:', error);
     throw error;
   }
 }
