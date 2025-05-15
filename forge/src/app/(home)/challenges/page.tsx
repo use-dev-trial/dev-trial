@@ -1,26 +1,79 @@
 'use client';
 
-import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
+import { useEffect, useState } from 'react';
+
+import { createTemplateQuestion } from '@/actions/questions';
+import { useCreateChallenge } from '@/hooks/challenges/mutation/create';
 import { useGetAllChallenges } from '@/hooks/challenges/read/all';
 import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { ChallengeCard } from '@/components/challenges/card';
 import CreateChallengeDialog from '@/components/challenges/create-challenge-dialog';
 import Loader from '@/components/shared/loader';
 import { Card } from '@/components/ui/card';
 
+import { Challenge, createChallengeRequestSchema } from '@/types/challenges';
+import { createTemplateQuestionRequestSchema } from '@/types/questions';
+
 import { CHALLENGE_CARD_GRADIENTS, ROUTES } from '@/lib/constants';
 import { formatDate } from '@/lib/utils';
 
 export default function ChallengePage() {
-  const { challenges, isLoading, error } = useGetAllChallenges();
+  const router = useRouter();
+
+  const {
+    challenges,
+    isLoading: isLoadingChallenges,
+    error: loadingChallengesError,
+  } = useGetAllChallenges();
+  const { createChallenge, error: creatingChallengeError } = useCreateChallenge();
+
+  const [isCreatingChallenge, setIsCreatingChallenge] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isCreateChallengeDialogOpen, setIsCreateChallengeDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (isLoadingChallenges || isCreatingChallenge) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [isLoadingChallenges, isCreatingChallenge]);
 
   const onCreateChallengeDialogToggle = () => {
     setIsCreateChallengeDialogOpen(
       (prevIsCreateChallengeDialogOpen) => !prevIsCreateChallengeDialogOpen,
     );
+  };
+
+  const onCreateChallengeBtnClick = async (challengeName: string, challengeDescription: string) => {
+    if (!challengeName.trim() || !challengeDescription.trim() || isLoading) {
+      return;
+    }
+
+    setIsCreatingChallenge(true);
+
+    const createChallengeRequest = createChallengeRequestSchema.parse({
+      name: challengeName.trim(),
+      description: challengeDescription.trim(),
+    });
+
+    try {
+      const createdChallenge: Challenge = await createChallenge(createChallengeRequest);
+      const createTemplateQuestionRequest = createTemplateQuestionRequestSchema.parse({
+        challenge_id: createdChallenge.id,
+      });
+      await createTemplateQuestion(createTemplateQuestionRequest);
+      onCreateChallengeDialogToggle();
+      router.push(ROUTES.QUESTIONS(createdChallenge.id));
+    } catch {
+      toast("We couldn't create your challenge. Please try again later.");
+    } finally {
+      setIsCreatingChallenge(false);
+    }
   };
 
   return (
@@ -33,16 +86,17 @@ export default function ChallengePage() {
           </p>
         </header>
 
-        {isLoading && <Loader text="challenges" />}
+        {isLoadingChallenges && <Loader text="Loading challenges" />}
+        {isCreatingChallenge && <Loader text="Creating challenge" />}
 
-        {error && (
+        {loadingChallengesError && (
           <div className="rounded-md bg-red-50 p-4 text-red-800">
             <p>Error loading challenges. Please try again later.</p>
-            <p className="text-sm">{error.message}</p>
+            <p className="text-sm">{loadingChallengesError.message}</p>
           </div>
         )}
 
-        {!isLoading && !error && challenges.length === 0 && (
+        {!isLoading && !loadingChallengesError && challenges.length === 0 && (
           <div className="rounded-md border-2 bg-white p-6 text-center dark:bg-gray-800">
             <h3 className="text-lg font-medium">No challenges yet</h3>
             <p className="mt-2 mb-6">Create your first challenge to get started.</p>
@@ -89,7 +143,10 @@ export default function ChallengePage() {
       </div>
       <CreateChallengeDialog
         isOpen={isCreateChallengeDialogOpen}
+        isLoading={isCreatingChallenge}
+        error={creatingChallengeError}
         onOpenChange={onCreateChallengeDialogToggle}
+        onCreateChallengeBtnClick={onCreateChallengeBtnClick}
       />
     </div>
   );

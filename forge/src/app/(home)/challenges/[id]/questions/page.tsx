@@ -88,7 +88,7 @@ export default function Home() {
   if (isLoadingChallenge || challengeError) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loader text="questions" />
+        <Loader text="Loading questions" />
       </div>
     );
   }

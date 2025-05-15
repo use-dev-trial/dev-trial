@@ -1,12 +1,5 @@
-import { useRouter } from 'next/navigation';
-
 import { KeyboardEvent, useState } from 'react';
 
-import { createTemplateQuestion } from '@/actions/questions';
-import { useCreateChallenge } from '@/hooks/challenges/mutation/create';
-import { toast } from 'sonner';
-
-import Loader from '@/components/shared/loader';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,56 +11,32 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
-import { Challenge, createChallengeRequestSchema } from '@/types/challenges';
-import { createTemplateQuestionRequestSchema } from '@/types/questions';
-
-import { ROUTES } from '@/lib/constants';
-
 interface CreateChallengeDialogProps {
   isOpen: boolean;
+  isLoading: boolean;
+  error: Error | null;
   onOpenChange: (open: boolean) => void;
+  onCreateChallengeBtnClick: (challengeName: string, challengeDescription: string) => void;
 }
 
 export default function CreateChallengeDialog({
   isOpen,
+  isLoading,
+  error,
   onOpenChange,
+  onCreateChallengeBtnClick,
 }: CreateChallengeDialogProps) {
-  const router = useRouter();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const { createChallenge, isPending, error } = useCreateChallenge();
-
-  const handleCreateChallenge = async () => {
-    if (!name.trim() || !description.trim() || isPending) {
-      return;
-    }
-
-    const createChallengeRequest = createChallengeRequestSchema.parse({
-      name: name.trim(),
-      description: description.trim(),
-    });
-
-    try {
-      const createdChallenge: Challenge = await createChallenge(createChallengeRequest);
-      const createTemplateQuestionRequest = createTemplateQuestionRequestSchema.parse({
-        challenge_id: createdChallenge.id,
-      });
-      await createTemplateQuestion(createTemplateQuestionRequest);
-      onOpenChange(false);
-      router.push(ROUTES.QUESTIONS(createdChallenge.id));
-    } catch {
-      toast("We couldn't create your challenge. Please try again later.");
-    }
-  };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && name.trim() && description.trim() && !isPending) {
-      handleCreateChallenge();
+    if (event.key === 'Enter' && name.trim() && description.trim() && !isLoading) {
+      onCreateChallengeBtnClick(name, description);
     }
   };
 
-  if (isPending) {
-    return <Loader text={'challenge'} />;
+  if (isLoading) {
+    return;
   }
 
   return (
@@ -89,7 +58,7 @@ export default function CreateChallengeDialog({
               placeholder="Python Decorator Challenge"
               className="w-full"
               autoFocus
-              disabled={isPending}
+              disabled={isLoading}
             />
           </div>
           <div className="grid gap-2">
@@ -103,7 +72,7 @@ export default function CreateChallengeDialog({
               onKeyDown={handleKeyDown}
               placeholder="Best practices surrounding Python decorator usage"
               className="w-full"
-              disabled={isPending}
+              disabled={isLoading}
             />
           </div>
         </div>
@@ -112,16 +81,16 @@ export default function CreateChallengeDialog({
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="button" variant="outline" disabled={isPending}>
+            <Button type="button" variant="outline" disabled={isLoading}>
               Cancel
             </Button>
           </DialogClose>
           <Button
             type="button"
-            onClick={handleCreateChallenge}
-            disabled={!name.trim() || !description.trim() || isPending}
+            onClick={() => onCreateChallengeBtnClick(name, description)}
+            disabled={!name.trim() || !description.trim() || isLoading}
           >
-            {isPending ? 'Creating...' : 'Create'}
+            {isLoading ? 'Creating...' : 'Create'}
           </Button>
         </DialogFooter>
       </DialogContent>
