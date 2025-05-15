@@ -17,4 +17,3 @@ start-forge:
 
 start-arena:
 	cd arena && npm run dev
-
