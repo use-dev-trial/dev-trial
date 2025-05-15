@@ -2,6 +2,7 @@ import { useRouter } from 'next/navigation';
 
 import { KeyboardEvent, useState } from 'react';
 
+import { createTemplateQuestion } from '@/actions/questions';
 import { useCreateChallenge } from '@/hooks/challenges/mutation/create';
 import { toast } from 'sonner';
 
@@ -18,6 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 
 import { Challenge, createChallengeRequestSchema } from '@/types/challenges';
+import { createTemplateQuestionRequestSchema } from '@/types/questions';
 
 import { ROUTES } from '@/lib/constants';
 
@@ -47,6 +49,10 @@ export default function CreateChallengeDialog({
 
     try {
       const createdChallenge: Challenge = await createChallenge(createChallengeRequest);
+      const createTemplateQuestionRequest = createTemplateQuestionRequestSchema.parse({
+        challenge_id: createdChallenge.id,
+      });
+      await createTemplateQuestion(createTemplateQuestionRequest);
       onOpenChange(false);
       router.push(ROUTES.QUESTIONS(createdChallenge.id));
     } catch {
