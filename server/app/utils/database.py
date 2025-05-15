@@ -22,6 +22,10 @@ async def db_client(
 ) -> Client:
     supabase_url = os.environ["SUPABASE_URL"]
 
+    """
+    Note that if we set ADMIN_ACCESS to true, there won't be an org_id associated with the db request, which might be a cause of problem when the entry requires org_id to be non-null.
+    """
+
     # Development
     if os.environ.get("ADMIN_ACCESS") == "true":
         supabase_key = os.environ["SUPABASE_SERVICE_KEY"]
@@ -30,6 +34,7 @@ async def db_client(
             supabase_key=supabase_key,
         )
     # Production
+
     else:
         supabase_key = os.environ["SUPABASE_ANON_KEY"]
         return await create_client(
