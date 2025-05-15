@@ -27,29 +27,10 @@ class QuestionsService:
                 "question_id": question_id,
             }
         ).execute()
-        metrics: list[Metric] = []
-        for content in TEMPLATE_METRICS:
-            metric_result = (
-                await client.table(Table.METRICS)
-                .insert(
-                    {
-                        "content": content,
-                    }
-                )
-                .execute()
-            )
-            metrics.append(
-                Metric(
-                    id=metric_result.data[0]["id"],
-                    content=content,
-                )
-            )
-            await client.table(Table.QUESTION_METRIC).insert(
-                {
-                    "question_id": question_id,
-                    "metric_id": metric_result.data[0]["id"],
-                }
-            ).execute()
+
+        metrics: list[Metric] = await asyncio.gather(
+            *(_insert_and_link_metric(client, question_id, content) for content in TEMPLATE_METRICS)
+        )
         return Question(
             id=question_id,
             problem=Problem(
@@ -266,3 +247,25 @@ class QuestionsService:
         result = []
         result.extend([line for line in output.split("\n") if line])
         return result
+
+
+async def _insert_and_link_metric(client: Client, question_id: str, content: str) -> Metric:
+    metric_res = (
+        await client.table(Table.METRICS)
+        .insert(
+            {
+                "content": content,
+            }
+        )
+        .execute()
+    )
+    metric_id = metric_res.data[0]["id"]
+
+    await client.table(Table.QUESTION_METRIC).insert(
+        {
+            "question_id": question_id,
+            "metric_id": metric_id,
+        }
+    ).execute()
+
+    return Metric(id=metric_id, content=content)
