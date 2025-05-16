@@ -75,7 +75,7 @@ export default function ChallengeInterface() {
             </div>
 
             <TabsContent value="questions" className="mt-6">
-              <QuestionsTab challengeId={params.id as string} />
+              <QuestionsTab challenge_id={params.id as string} />
             </TabsContent>
 
             <TabsContent value="responses" className="mt-6">

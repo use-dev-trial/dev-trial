@@ -23,12 +23,13 @@ import { createTemplateQuestionRequestSchema } from '@/types/questions';
 
 import { ROUTES } from '@/lib/constants';
 
-export default function QuestionsTab({ challengeId }: { challengeId: string }) {
+type QuestionsTabProps = {
+  challenge_id: string;
+};
+export default function QuestionsTab({ challenge_id }: QuestionsTabProps) {
   const router = useRouter();
   const [expandedQuestionId, setExpandedQuestionId] = useState<string | null>(null);
-  const { questions } = useAllQuestions({
-    challengeId: challengeId,
-  });
+  const { questions } = useAllQuestions(challenge_id);
 
   const toggleExpand = (questionId: string) => {
     if (expandedQuestionId === questionId) {

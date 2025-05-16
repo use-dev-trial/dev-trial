@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 
 import { useEffect, useRef, useState } from 'react';
 
+import { createTemplateQuestion } from '@/actions/questions';
 import { useGetSingleChallenge } from '@/hooks/challenges/read/single';
+import { useAllQuestions } from '@/hooks/questions/use-all-question';
 import { useChat } from '@/hooks/use-chat';
 import { toast } from 'sonner';
 
@@ -18,7 +20,7 @@ import RenameChallengeTitleDialog from '@/components/challenges/questions/rename
 import Loader from '@/components/shared/loader';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-import { Question, defaultQuestion } from '@/types/questions';
+import { Question, createTemplateQuestionRequestSchema, defaultQuestion } from '@/types/questions';
 
 import { MAX_NUM_QUESTIONS, ROUTES } from '@/lib/constants';
 
@@ -33,10 +35,11 @@ export default function Home() {
     error: challengeError,
     error: errorChallenge,
   } = useGetSingleChallenge(challenge_id);
+  const { questions, isLoading: isLoadingQuestions, refetch } = useAllQuestions(challenge_id);
+  const [isCreatingNewQuestion, setIsCreatingNewQuestion] = useState(false);
+  const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
 
   const previewContainerRef = useRef<HTMLDivElement>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
   const [challengeName, setChallengeName] = useState('');
 
@@ -50,15 +53,7 @@ export default function Home() {
   } = useChat({ challenge_id, question: questions[selectedQuestionIndex] });
 
   useEffect(() => {
-    setQuestions((prev) => {
-      const newQuestions = [...prev];
-      newQuestions[selectedQuestionIndex] = updatedQuestion;
-      return newQuestions;
-    });
-  }, [updatedQuestion, selectedQuestionIndex]);
-
-  useEffect(() => {
-    if (isLoadingChallenge) {
+    if (isLoadingChallenge || isLoadingQuestions) {
       return;
     }
 
@@ -85,10 +80,10 @@ export default function Home() {
     setIsRenameDialogOpen((prevIsRenameDialogOpen) => !prevIsRenameDialogOpen);
   };
 
-  if (isLoadingChallenge || challengeError) {
+  if (isLoadingChallenge || isLoadingQuestions || isCreatingNewQuestion) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loader text="Loading questions" />
+        <Loader text="Loading question" />
       </div>
     );
   }
@@ -134,7 +129,23 @@ export default function Home() {
             ))}
             {questions.length < MAX_NUM_QUESTIONS && (
               <QuestionTemplatesDialog
-                onSelectQuestion={(question: Question) => {
+                onCreateNewQuestion={async () => {
+                  try {
+                    setIsCreatingNewQuestion(true);
+                    await createTemplateQuestion({
+                      challenge_id: challenge_id,
+                    });
+                    await refetch();
+                    setSelectedQuestionIndex((prev) => prev + 1);
+                  } finally {
+                    setIsCreatingNewQuestion(false);
+                  }
+                }}
+                onSelectQuestion={async (question: Question) => {
+                  const createTemplateQuestionRequest = createTemplateQuestionRequestSchema.parse({
+                    challenge_id: challenge_id,
+                  });
+                  const newQuestion = await createTemplateQuestion(createTemplateQuestionRequest);
                   setQuestions((prev) => [...prev, question]);
                   setSelectedQuestionIndex((prev) => prev + 1);
                 }}

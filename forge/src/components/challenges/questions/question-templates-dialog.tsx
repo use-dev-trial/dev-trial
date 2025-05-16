@@ -6,6 +6,7 @@ import { getAllQuestions } from '@/actions/questions';
 import { Plus } from 'lucide-react';
 
 import { QuestionCard } from '@/components/challenges/questions/question-card';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -18,9 +19,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import type { Question } from '@/types/questions';
 
 interface QuestionTemplatesDialogProps {
-  onSelectQuestion: (question: Question) => void;
+  onCreateNewQuestion: () => Promise<void>;
+  onSelectQuestion: (question: Question) => Promise<void>;
 }
 export default function QuestionTemplatesDialog({
+  onCreateNewQuestion,
   onSelectQuestion,
 }: QuestionTemplatesDialogProps) {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -33,6 +36,11 @@ export default function QuestionTemplatesDialog({
     };
     fetchQuestions();
   }, []);
+
+  const handleCreateNewQuestion = () => {
+    onCreateNewQuestion();
+    setOpen(false);
+  };
 
   const handleSelectQuestion = (question: Question) => {
     onSelectQuestion(question);
@@ -65,6 +73,14 @@ export default function QuestionTemplatesDialog({
           </DialogHeader>
           <div className="flex-grow overflow-y-auto pr-4">
             <div className="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2 md:grid-cols-3">
+              <Card
+                className="cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
+                onClick={handleCreateNewQuestion}
+              >
+                <CardHeader>
+                  <CardTitle className="text-sm">Create Your Own</CardTitle>
+                </CardHeader>
+              </Card>
               {questions.map((question) => (
                 <QuestionCard
                   key={question.id}
