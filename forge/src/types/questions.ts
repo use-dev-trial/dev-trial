@@ -21,16 +21,11 @@ export const createTemplateQuestionRequestSchema = z.object({
 
 export type CreateTemplateQuestionRequest = z.infer<typeof createTemplateQuestionRequestSchema>;
 
-export const defaultQuestion: Question = {
-  id: '',
-  problem: {
-    id: '',
-    question_id: '',
-    title: '',
-    description: '',
-    requirements: [],
-  },
-  files: [],
-  test_cases: [],
-  metrics: [],
-};
+export const associateQuestionWithChallengeRequestSchema = z.object({
+  question_id: z.string(),
+  challenge_id: z.string(),
+});
+
+export type AssociateQuestionWithChallengeRequest = z.infer<
+  typeof associateQuestionWithChallengeRequestSchema
+>;

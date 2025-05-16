@@ -36,6 +36,15 @@ class CreateTemplateQuestionRequest(BaseModel):
         return v
 
 
+class AssociateQuestionWithChallengeRequest(BaseModel):
+    question_id: str = Field(
+        description="The ID of the question to associate with the challenge.",
+    )
+    challenge_id: str = Field(
+        description="The ID of the challenge to associate the question with.",
+    )
+
+
 class RunTestsRequest(BaseModel):
     code: str = Field(
         description="The code which the candidate has written.",

@@ -8,7 +8,11 @@ from app.models.database import Table
 from app.models.file import File
 from app.models.metric import TEMPLATE_METRICS, Metric
 from app.models.problem import Problem
-from app.models.question import CreateTemplateQuestionRequest, Question
+from app.models.question import (
+    AssociateQuestionWithChallengeRequest,
+    CreateTemplateQuestionRequest,
+    Question,
+)
 from app.models.test_case import TestCase
 
 load_dotenv()
@@ -71,6 +75,16 @@ class QuestionsService:
         ]
 
         return await asyncio.gather(*tasks)
+
+    async def associate_question_with_challenge(
+        self, input: AssociateQuestionWithChallengeRequest, client: Client
+    ) -> None:
+        await client.table(Table.CHALLENGE_QUESTION).insert(
+            {
+                "challenge_id": input.challenge_id,
+                "question_id": input.question_id,
+            }
+        ).execute()
 
     async def get_test_cases_by_question_id(
         self, question_id: str, client: Client

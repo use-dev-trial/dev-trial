@@ -2,7 +2,12 @@
 
 import axios from 'axios';
 
-import { CreateTemplateQuestionRequest, Question, question } from '@/types/questions';
+import {
+  AssociateQuestionWithChallengeRequest,
+  CreateTemplateQuestionRequest,
+  Question,
+  question,
+} from '@/types/questions';
 
 import { getClerkToken } from '@/lib/clerk';
 
@@ -90,6 +95,26 @@ export async function getAllQuestions(): Promise<Question[]> {
     return response.data.map((q: Question) => question.parse(q));
   } catch (error) {
     console.error('Error getting all questions:', error);
+    throw error;
+  }
+}
+
+export async function associateQuestionWithChallenge(
+  input: AssociateQuestionWithChallengeRequest,
+): Promise<void> {
+  const token: string = await getClerkToken();
+
+  try {
+    console.log('Associating question with challenge...');
+    await axios.post(`${process.env.EXPO_PUBLIC_API_BASE_URL}/api/questions/associate`, input, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log('Successfully associated question with challenge');
+  } catch (error) {
+    console.error('Error associating question with challenge:', error);
     throw error;
   }
 }

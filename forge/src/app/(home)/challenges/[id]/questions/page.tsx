@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import { useEffect, useRef, useState } from 'react';
 
-import { createTemplateQuestion } from '@/actions/questions';
+import { associateQuestionWithChallenge, createTemplateQuestion } from '@/actions/questions';
 import { useGetSingleChallenge } from '@/hooks/challenges/read/single';
 import { useAllQuestions } from '@/hooks/questions/use-all-question';
 import { useChat } from '@/hooks/use-chat';
@@ -20,7 +20,11 @@ import RenameChallengeTitleDialog from '@/components/challenges/questions/rename
 import Loader from '@/components/shared/loader';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-import { Question, createTemplateQuestionRequestSchema, defaultQuestion } from '@/types/questions';
+import {
+  Question,
+  associateQuestionWithChallengeRequestSchema,
+  createTemplateQuestionRequestSchema,
+} from '@/types/questions';
 
 import { MAX_NUM_QUESTIONS, ROUTES } from '@/lib/constants';
 
@@ -36,7 +40,7 @@ export default function Home() {
     error: errorChallenge,
   } = useGetSingleChallenge(challenge_id);
   const { questions, isLoading: isLoadingQuestions, refetch } = useAllQuestions(challenge_id);
-  const [isCreatingNewQuestion, setIsCreatingNewQuestion] = useState(false);
+  const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState<number>(0);
 
   const previewContainerRef = useRef<HTMLDivElement>(null);
@@ -80,7 +84,7 @@ export default function Home() {
     setIsRenameDialogOpen((prevIsRenameDialogOpen) => !prevIsRenameDialogOpen);
   };
 
-  if (isLoadingChallenge || isLoadingQuestions || isCreatingNewQuestion) {
+  if (isLoadingChallenge || isLoadingQuestions || isCreatingQuestion) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader text="Loading question" />
@@ -131,23 +135,33 @@ export default function Home() {
               <QuestionTemplatesDialog
                 onCreateNewQuestion={async () => {
                   try {
-                    setIsCreatingNewQuestion(true);
-                    await createTemplateQuestion({
-                      challenge_id: challenge_id,
-                    });
+                    setIsCreatingQuestion(true);
+                    const createTemplateQuestionRequest = createTemplateQuestionRequestSchema.parse(
+                      {
+                        challenge_id: challenge_id,
+                      },
+                    );
+                    await createTemplateQuestion(createTemplateQuestionRequest);
                     await refetch();
                     setSelectedQuestionIndex((prev) => prev + 1);
                   } finally {
-                    setIsCreatingNewQuestion(false);
+                    setIsCreatingQuestion(false);
                   }
                 }}
-                onSelectQuestion={async (question: Question) => {
-                  const createTemplateQuestionRequest = createTemplateQuestionRequestSchema.parse({
-                    challenge_id: challenge_id,
-                  });
-                  const newQuestion = await createTemplateQuestion(createTemplateQuestionRequest);
-                  setQuestions((prev) => [...prev, question]);
-                  setSelectedQuestionIndex((prev) => prev + 1);
+                onSelectExistingQuestion={async (question: Question) => {
+                  try {
+                    setIsCreatingQuestion(true);
+                    const associateQuestionWithChallengeRequest =
+                      associateQuestionWithChallengeRequestSchema.parse({
+                        question_id: question.id,
+                        challenge_id: challenge_id,
+                      });
+                    await associateQuestionWithChallenge(associateQuestionWithChallengeRequest);
+                    await refetch();
+                    setSelectedQuestionIndex((prev) => prev + 1);
+                  } finally {
+                    setIsCreatingQuestion(false);
+                  }
                 }}
               />
             )}

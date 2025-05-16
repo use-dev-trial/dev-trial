@@ -15,7 +15,7 @@ import {
   role,
 } from '@/types/messages';
 import { Problem } from '@/types/problems';
-import { Question, defaultQuestion } from '@/types/questions';
+import { Question } from '@/types/questions';
 import { TestCase } from '@/types/test_cases';
 
 export const questionPreviewTabName = z.enum(['problem', 'files', 'test-cases', 'metrics']);
@@ -82,7 +82,6 @@ interface UseChatProps {
 }
 
 export function useChat({ challenge_id, question }: UseChatProps) {
-  const [updatedQuestion, setUpdatedQuestion] = useState<Question>(defaultQuestion);
   const [messages, setMessages] = useState<Message[]>([]);
   const [lastMessageId, setLastMessageId] = useState<string>('');
   const [updatedTabs, setUpdatedTabs] = useState<QuestionPreviewTabName[]>([]);
@@ -144,7 +143,6 @@ export function useChat({ challenge_id, question }: UseChatProps) {
   };
 
   return {
-    updatedQuestion,
     messages,
     isLoading: mutation.isPending,
     updatedTabs,

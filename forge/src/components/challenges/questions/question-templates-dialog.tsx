@@ -20,11 +20,11 @@ import type { Question } from '@/types/questions';
 
 interface QuestionTemplatesDialogProps {
   onCreateNewQuestion: () => Promise<void>;
-  onSelectQuestion: (question: Question) => Promise<void>;
+  onSelectExistingQuestion: (question: Question) => Promise<void>;
 }
 export default function QuestionTemplatesDialog({
   onCreateNewQuestion,
-  onSelectQuestion,
+  onSelectExistingQuestion,
 }: QuestionTemplatesDialogProps) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [open, setOpen] = useState(false);
@@ -42,8 +42,8 @@ export default function QuestionTemplatesDialog({
     setOpen(false);
   };
 
-  const handleSelectQuestion = (question: Question) => {
-    onSelectQuestion(question);
+  const handleSelectExistingQuestion = (question: Question) => {
+    onSelectExistingQuestion(question);
     setOpen(false);
   };
 
@@ -85,7 +85,7 @@ export default function QuestionTemplatesDialog({
                 <QuestionCard
                   key={question.id}
                   question={question}
-                  onClick={() => handleSelectQuestion(question)}
+                  onClick={() => handleSelectExistingQuestion(question)}
                 />
               ))}
             </div>

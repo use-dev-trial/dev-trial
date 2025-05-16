@@ -3,7 +3,12 @@ import logging
 from fastapi import APIRouter, Depends
 from supabase._async.client import AsyncClient as Client
 
-from app.models.question import CreateTemplateQuestionRequest, Question, RunTestsRequest
+from app.models.question import (
+    AssociateQuestionWithChallengeRequest,
+    CreateTemplateQuestionRequest,
+    Question,
+    RunTestsRequest,
+)
 from app.services.questions import QuestionsService
 from app.utils.dependencies import init_db_client
 
@@ -70,6 +75,17 @@ class QuestionsController:
             )
             log.info("Questions: %s", response)
             return response
+
+        @router.post(
+            "/associate",
+        )
+        async def associate_question_with_challenge(
+            input: AssociateQuestionWithChallengeRequest,
+            client: Client = Depends(init_db_client),
+        ) -> None:
+            log.info("Associating question with challenge...")
+            await self.service.associate_question_with_challenge(input=input, client=client)
+            log.info("Question associated with challenge successfully")
 
         @router.post(
             "/run-tests/{question_id}",
